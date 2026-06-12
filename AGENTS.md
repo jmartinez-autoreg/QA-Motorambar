@@ -52,6 +52,34 @@ Si hay ambigüedad entre PO y QA, preguntar: *"¿Actúo como PO (redactar US) o 
 
 > Los subagentes son la **fuente única** de las reglas de su rol. El cerebro no repite esas reglas.
 
+### 3.1 Despacho no-bloqueante (anti-bloqueo)
+
+Por defecto, despachar un subagente **bloquea** la conversación hasta que termina — mientras tanto
+no se puede atender otra solicitud.
+
+Si el usuario tiene **2+ tareas independientes** en la misma sesión (mismo o distinto rol — ej.
+"mientras preparas la US 9521, crea también el TC de la US 9500"), o pide explícitamente avanzar
+en paralelo:
+
+1. **Proponer despacho en paralelo** (REGLA 2, no asumir):
+   > "Puedo lanzar [QA-PRO/PO-PRO] para [tarea 2] en paralelo mientras trabajo en [tarea 1] — te
+   > aviso con los resultados de cada uno apenas terminen. ¿Procedo así?"
+
+2. **Si confirma y la plataforma soporta background** (ver `CLAUDE.md` / `copilot-instructions.md`
+   para el mecanismo real):
+   - Despachar cada tarea como un subagente independiente en background.
+   - Cada subagente aplica sus propias reglas de rol (PRECOND, story points, evidencia, bitácora
+     §8.10, etc.) de forma independiente.
+   - Al completarse cada uno, **notificar** con el resumen de resultados (IDs/URLs — §8.9) sin
+     interrumpir las demás tareas en curso.
+
+3. **Si la plataforma no soporta background:** ofrecer abrir una segunda sesión/pestaña y
+   despachar ahí (`@QA-PRO ...` / `@PO-PRO ...`), o encolar y avisar el orden ("primero termino
+   [tarea 1], luego empiezo [tarea 2]").
+
+> Un mismo subagente (ej. `QA-PRO`) puede lanzarse **varias veces en paralelo** para tareas
+> independientes (ej. TCs de 2 USs distintas).
+
 ---
 
 ## 4. PASO 0 — Identificar el tipo de solicitud
@@ -78,6 +106,7 @@ Si el usuario menciona: test plans, TCs, ejecutar, automatizar, crear tests, cor
 | "leer TCs de ADO" (sin ejecutar) | `tc-reader` | QA-PRO |
 | "redactar US", "crear historia", "criterios de aceptación" | `po-user-story` | PO-PRO |
 | "configurar contexto", "nuevo proyecto", "actualizar UI-UX", "agregar pantallas/screenshots", "onboarding" | `project-onboarding` | — |
+| "qué hice hoy", "mi bitácora", "pendientes del sprint" | `activity-logger` | QA-PRO o PO-PRO (el activo) |
 
 Rutas de skills: `.claude/skills/<skill>/SKILL.md`.
 
@@ -134,6 +163,8 @@ Antes de ejecutar, cuestionar cuando la solicitud puede ser ineficiente:
 - Múltiples criterios en la misma pantalla → proponer un solo TC agrupado.
 - US con ≤ 2 SP → sugerir exploratoria sin TP formal (Escenario B).
 - Screenshots pedidos en cada paso → recordar que solo se captura donde el criterio lo requiere.
+- Tareas independientes (QA + PO, o 2 tareas QA) en la misma sesión → proponer despacho en
+  paralelo (§3.1, anti-bloqueo).
 
 ---
 
@@ -150,8 +181,20 @@ Antes de ejecutar, cuestionar cuando la solicitud puede ser ineficiente:
 6. **Detección automática del trabajo del día.** Al registrar horas o generar Daily, detectar las tareas QA cerradas hoy vía WIQL + historial de revisiones (zona horaria UTC-4). **Nunca** preguntar "¿qué hiciste hoy?". Extraer horas de `Microsoft.VSTS.Scheduling.CompletedWork`; solo preguntar si = 0 o vacío.
 7. **No ejecutar TCs sobre US que no esté `Resolved`** sin advertir y recibir confirmación.
 8. **Confirmar antes de registrar en Zoho** — mostrar tabla y esperar ✅.
-9. **Responder en el idioma del usuario.** Al cerrar una fase, dar resumen con los IDs creados/modificados.
-10. **Confirmar antes de publicar/actualizar un comentario en un work item de ADO** — mostrar el texto exacto a publicar y la causa/razón, esperar ✅.
+9. **Idioma de interacción.** Usar el idioma definido en `context/CONTEXT.md` § "Configuración del
+   Agente" → "Idioma de interacción". Si el campo está vacío o con placeholder, **antes de responder
+   la primera interacción de la sesión**, preguntar (en formato bilingüe: *"¿En qué idioma prefieres
+   que interactuemos? / In which language would you like to interact?"*) y guardar la respuesta en
+   ese campo. Al cerrar una fase, dar resumen con los IDs creados/modificados.
+10. **Bitácora de actividad automática.** Al completar cualquier actividad con valor para Zoho (QA o PO —
+    ver tablas de `zoho_timelog`), anexar una entrada en la bitácora del día (skill `activity-logger`).
+    Append silencioso: sin preguntar, sin interrumpir el flujo. Zona horaria y sprint se leen de
+    `context/CONTEXT.md` § "Configuración del Agente".
+11. **Comentarios en ADO autocontenidos y confirmados.** El texto de un comentario en un work item
+    de ADO debe justificarse en términos de la aplicación/UI — **nunca** citar rutas internas del
+    repo (`context/...`, `.claude/...`); quien lee en ADO no tiene acceso a esas carpetas. Antes de
+    publicar o actualizar cualquier comentario, mostrar el texto exacto y la causa/razón, y esperar
+    ✅ (análogo a la regla 8 de Zoho).
 
 ---
 
@@ -196,6 +239,8 @@ Así, cambiar de plataforma no toca ninguna regla — solo la tabla de mapeo.
 | Dar una llamada MCP por hecha | Ejecutar y confirmar con resultado real |
 | Dejar archivos temporales en la raíz | Mandarlos a `.workspace/` |
 | Duplicar una regla en varios archivos | Escribirla **una vez** en su archivo dueño (este, subagente o skill) |
+| Completar una actividad sin anexarla a la bitácora | Append silencioso vía `activity-logger` (AGENTS.md §8.10) |
+| Publicar/actualizar un comentario de ADO citando rutas del repo o sin confirmación | Justificar en términos de la app/UI + mostrar texto y esperar ✅ (AGENTS.md §8.11) |
 | Detectar un error y no reportarlo | Activar REGLA 1 |
 
 ---
@@ -212,5 +257,6 @@ Así, cambiar de plataforma no toca ninguna regla — solo la tabla de mapeo.
 3. Leer el SKILL.md completo y seguir sus fases en orden.
 4. Aplicar las reglas del subagente (PRECOND, story points, evidencia, etc.).
 5. Reportar resultado final con IDs/URLs.
-6. Si algo salió mal → REGLA 1 (auto-aprendizaje).
+6. Anexar la actividad a la bitácora del día (`activity-logger`, silencioso — AGENTS.md §8.10).
+7. Si algo salió mal → REGLA 1 (auto-aprendizaje).
 ```

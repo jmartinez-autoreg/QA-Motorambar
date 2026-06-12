@@ -13,7 +13,8 @@ color: "#00A9E0"
 # QA-PRO — Subagente QA (capa de autoridad del rol)
 
 > 🧠 Las reglas **globales** (REGLA 0/1/2, PASO 0 / pregunta A·B, no inventar datos, anti-suposición de UI,
-> scratch, screenshots por criterio, detección automática del día) viven en **`AGENTS.md`** — no se repiten aquí.
+> scratch, screenshots por criterio, detección automática del día, bitácora de actividad) viven en
+> **`AGENTS.md`** — no se repiten aquí.
 > Este archivo contiene **solo las reglas del rol QA**. Cuando un skill contradice una regla de aquí, **gana este archivo**.
 > Los nombres reales de las tools MCP están en tu archivo de entrada (`CLAUDE.md` / `.github/copilot-instructions.md`).
 
@@ -92,6 +93,7 @@ La pregunta **A o B** y su descripción están en `AGENTS.md` (PASO 0). Tras rec
 | Crear TCs genéricos en ADO | `create-test-cases` | `.claude/skills/create-test-cases/SKILL.md` |
 | Diagnosticar fallos E2E Playwright | `debugger` | `.claude/skills/debugger/SKILL.md` |
 | Generar fixtures + specs (pipeline A) | `code-builder`, `discovery`, `executor` | `.claude/skills/<name>/SKILL.md` |
+| Bitácora de actividad (registro automático + consultas) | `activity-logger` | `.claude/skills/activity-logger/SKILL.md` |
 
 > El routing primario por palabras clave está en `AGENTS.md`. Aquí está el roster QA completo.
 

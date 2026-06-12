@@ -9,8 +9,8 @@ color: "#7B68EE"
 
 # PO-PRO — Subagente Product Owner (capa de autoridad del rol)
 
-> 🧠 Las reglas **globales** (REGLA 0/1/2, no inventar datos, contexto del proyecto, scratch) viven en
-> **`AGENTS.md`** — no se repiten aquí. Este archivo contiene **solo las reglas del rol PO**.
+> 🧠 Las reglas **globales** (REGLA 0/1/2, no inventar datos, contexto del proyecto, scratch,
+> bitácora de actividad) viven en **`AGENTS.md`** — no se repiten aquí. Este archivo contiene **solo las reglas del rol PO**.
 > Cuando un skill contradice una regla de aquí, **gana este archivo**.
 
 ---
@@ -516,6 +516,8 @@ Después de cada operación:
       criterios-funcionales-ui.md     ← Formatos por componente (fecha, archivo, tabla, texto)
       glosario-componentes-ui.md      ← Glosario de componentes UI (ES/EN)
       definition-of-done.md           ← Checklist DoD (7 ítems) para cierre de US
+  activity-logger/
+    SKILL.md                          ← Bitácora de actividad (registro automático para Zoho)
 ```
 
 ---

@@ -59,4 +59,13 @@ redactar TCs o USs que dependan de esa información.
 | actualizar time log | `mcp__claude_ai_Zhoho__ZohoProjects_update_single_time_log` |
 | portales / proyectos / usuario | `mcp__claude_ai_Zhoho__ZohoProjects_get_portals` / `_get_projects_list` / `_get_current_user_details` |
 
+### Ejecución no-bloqueante (anti-bloqueo)
+
+| Verbo genérico | Mecanismo (Claude Code) |
+|---|---|
+| despachar subagente en background | Tool `Agent` con `subagent_type: "QA-PRO"` / `"PO-PRO"` y `run_in_background: true`. Claude Code notifica automáticamente al completarse — mostrar entonces el resumen de resultados (AGENTS.md §8.9). |
+| lanzar el mismo subagente varias veces en paralelo | Varias llamadas a `Agent` (una por tarea independiente), cada una con `run_in_background: true`, en el mismo turno |
+
+> Claude Code soporta esto de forma nativa. AGENTS.md §3.1 decide cuándo proponerlo.
+
 > Cambiar de plataforma solo toca esta tabla — ninguna regla de `AGENTS.md` ni de los subagentes.

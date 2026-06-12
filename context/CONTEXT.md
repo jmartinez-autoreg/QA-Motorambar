@@ -6,6 +6,22 @@
 
 ---
 
+## Configuración del Agente
+
+> Usado por el skill `activity-logger` (fecha/hora local + carpetas de bitácora) y por la regla de
+> idioma de interacción (AGENTS.md §8.9). Se completa una vez con `project-onboarding`, o se
+> pregunta en la primera interacción si falta.
+
+| Campo | Valor |
+|-------|-------|
+| Idioma de interacción | `Español` |
+| Zona horaria | `America/Puerto_Rico (UTC-4)` |
+| Sprint actual | `S2 Entregable 3` |
+
+> Actualiza "Sprint actual" al iniciar cada sprint nuevo — define el nombre de carpeta de la bitácora.
+
+---
+
 ## Ambientes de Prueba
 
 > Actualmente solo existe el ambiente de **Test**. No hay Dev/Preprod separados para QA — toda ejecución de pruebas (manual o automatizada) se hace contra Test.
