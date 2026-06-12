@@ -54,6 +54,7 @@ Al recibir una US el agente DEBE seguir este orden:
    - Si **todos** responden NO → US es **Cobertura DEV**: NO crear TC ni TP formal. Documentar en comentario de la US: `Cobertura DEV — verificación a cargo del equipo de desarrollo.`
    - Si **algunos** responden NO → excluir esos criterios del TC, incluir solo pasos UI verificables
    - **Señales de Cobertura DEV:** "query en BD", "estructura de tablas", "acceso a base de datos", "código/programación", "appsettings", "worker/Service Bus", "infraestructura", "tabla de settings", "script SQL"
+   - ⚠️ **Redacción del comentario de Cobertura DEV:** quien lee el comentario en ADO no tiene acceso al repo ni sabe qué es `context/`. Justificar siempre en términos de la aplicación/UI (ej. "la aplicación no cuenta con pantalla/acción para que el usuario final notifique al Administrador"), nunca citando rutas internas del repo (`context/UI-UX.md`, `context/CONTEXT.md`, etc.) como evidencia.
 6. **Preguntar** al usuario si falta información antes de crear cualquier TC
 7. **Aplicar** la regla de división para determinar cuántos TC se necesitan
 8. **Redactar** TCs completos con precondiciones y pasos (acción + resultado esperado)

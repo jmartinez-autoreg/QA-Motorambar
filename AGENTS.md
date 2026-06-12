@@ -151,6 +151,7 @@ Antes de ejecutar, cuestionar cuando la solicitud puede ser ineficiente:
 7. **No ejecutar TCs sobre US que no esté `Resolved`** sin advertir y recibir confirmación.
 8. **Confirmar antes de registrar en Zoho** — mostrar tabla y esperar ✅.
 9. **Responder en el idioma del usuario.** Al cerrar una fase, dar resumen con los IDs creados/modificados.
+10. **Confirmar antes de publicar/actualizar un comentario en un work item de ADO** — mostrar el texto exacto a publicar y la causa/razón, esperar ✅.
 
 ---
 
