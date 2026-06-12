@@ -197,6 +197,8 @@ Las PRECONDs se numeran **secuencialmente desde 0**. Incluir **solo** las catego
 > - Datos + login → `PRECOND 0: Datos [...] | PRECOND 1: Login - ...`
 > - TC deps + datos + login → `PRECOND 0: TC deps [...] | PRECOND 1: Datos [...] | PRECOND 2: Login - ...`
 
+> ⚠️ **PRECOND vs PASO — estado previo vs. estado que el TC debe demostrar:** una PRECOND representa una condición que **ya existe** antes de iniciar la prueba. Si crear esa condición es precisamente lo que el TC necesita probar (ej. iniciar una segunda sesión simultánea del mismo usuario para verificar el control de sesión única), esa acción —incluyendo un login— va como **paso de ejecución** con su propio resultado esperado, no como PRECOND (confirmado 2026-06-12, TC 11500: el login del "Navegador B" no puede ser PRECOND porque es ese login el que invalida la sesión del "Navegador A", que es justo lo que el TC valida).
+
 > ⚠️ **REGLA DE ORO:** UNA PRECOND POR ROW/STEP. Jamás fusionar múltiples PRECONDs en una sola fila.
 >
 > ⚠️ **FORMATO INTERNO CON SALTOS DE LÍNEA:** Cada PRECOND ocupa un solo row en ADO, pero internamente usa saltos de línea para separar cada campo. El resultado visual en ADO es:
@@ -224,6 +226,7 @@ Las PRECONDs se numeran **secuencialmente desde 0**. Incluir **solo** las catego
 > - Letras (`1A`, `1B`...) cuando hay más de una PRECOND del mismo tipo en la misma posición.
 > - `PRECOND 0: TC Ejecutado` + lista `- {ID}: {título}` cuando el TC depende de otro TC ya ejecutado.
 > - Referencias inline `(PRECOND N)` / `(PRECOND 1A)` dentro del texto de un paso, para citar de dónde provienen los datos usados.
+> - **Preferir el dato concreto sobre la referencia abstracta:** si el dato (username, VIN, etc.) ya identifica sin ambigüedad de dónde proviene, usar el dato directamente (ej. `distri2`) en vez de `(PRECOND 1)` o etiquetas genéricas tipo "Usuario A"/"Usuario B".
 
 ### Estructura de Pasos
 

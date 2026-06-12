@@ -104,6 +104,7 @@ llamada MCP falla por algo prevenible con una mejor regla.
    │  Problema   : [qué salió mal]
    │  Causa raíz : [regla faltante o incorrecta]
    │  Fix         : [qué texto cambiaría y en qué archivo]
+   │  Alcance     : TEMPLATE (AGENTS.md / .claude/agents / .claude/skills / CLAUDE.md) | PROYECTO (context/...)
    └──────────────────────────────────────────────
 
 2. PROPONER el archivo único donde vive esa regla:
