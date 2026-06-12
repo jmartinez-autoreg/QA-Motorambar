@@ -409,3 +409,28 @@ Screenshot: ![header-sesion-inactividad](screenshots/header-sesion-inactividad.p
 
 **Notas para TCs:** el contador regresivo es dinámico — para TCs de este modal, validar la presencia del modal y los botones, no un valor exacto de segundos.
 ---
+
+## Motorambar > Admin > Usuarios (Gestionar Usuarios)
+- **Ruta/URL:** _(pendiente confirmar — sección "Admin", rol Sys Admin)_
+- **Cómo se llega aquí:** menú lateral (rol Sys Admin) → opción "Usuarios".
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Ícono | botón ícono de "prohibido" (círculo con línea diagonal, por fila de usuario) | — | abre el modal "Revocar Token" para ese usuario |
+- **Estados:** _(pendiente — falta screenshot completo de la lista de usuarios)_
+- **Screenshot:** _(pendiente)_
+- **Notas para TCs:** ver modal "Revocar Token" abajo — descripción literal confirmada por el usuario (sin captura adjunta aún).
+
+### Componente: Modal "Revocar Token"
+- **Cómo se llega aquí:** clic en el ícono de "prohibido" (círculo con línea diagonal) de un usuario en "Usuarios".
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Cuerpo | texto | "¿Estás seguro de que deseas revocar el token de {Nombre}? El usuario deberá iniciar sesión nuevamente." | `{Nombre}` = nombre del usuario (ej. "distri distri" para `distri2`) |
+  | Botón | secundario | "Cancelar" | cierra el modal sin realizar ninguna acción |
+  | Botón | primario | "Revocar Token" | revoca el token de sesión del usuario; muestra toast "Token revocado exitosamente" |
+  | Cerrar | ícono "X" | — | cierra el modal sin realizar ninguna acción (igual que "Cancelar") |
+- **Estados:** —
+- **Screenshot:** _(pendiente)_
+- **Notas para TCs:** tras "Revocar Token", el usuario afectado queda desconectado en su siguiente interacción que requiera autenticación → pantalla de acceso bloqueado (`/sso-login`, ver "Login SSO (Autoreg)" en `CONTEXT.md`).
+---

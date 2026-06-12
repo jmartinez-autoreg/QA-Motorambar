@@ -199,7 +199,7 @@ Las PRECONDs se numeran **secuencialmente desde 0**. Incluir **solo** las catego
 
 > ⚠️ **REGLA DE ORO:** UNA PRECOND POR ROW/STEP. Jamás fusionar múltiples PRECONDs en una sola fila.
 >
-> ⚠️ **FORMATO INTERNO CON SHIFT+ENTER:** Cada PRECOND ocupa un solo row en ADO, pero internamente usa saltos de línea (Shift+Enter) para separar cada campo. El resultado visual en ADO es:
+> ⚠️ **FORMATO INTERNO CON SALTOS DE LÍNEA:** Cada PRECOND ocupa un solo row en ADO, pero internamente usa saltos de línea para separar cada campo. El resultado visual en ADO es:
 > ```
 > PRECOND 1: Login
 > - Usuario: jmartinez
@@ -207,10 +207,16 @@ Las PRECONDs se numeran **secuencialmente desde 0**. Incluir **solo** las catego
 > - Acceso portal: Autoreg
 > - Acceso módulo: Vehículos
 > ```
-> Todo eso va en **un solo step row**. Los saltos son Shift+Enter dentro del campo Action, no rows separados.
+> Todo eso va en **un solo step row**. Los saltos son parte del campo Action, no rows separados.
+>
+> ⚠️ **Vía `testplan_update_test_case_steps` (MCP):** un `\n` real dentro del texto de un paso se interpreta como separador de PASOS (crea un row nuevo), no como salto dentro del mismo row. Para lograr el salto de línea DENTRO del mismo row, usar la etiqueta HTML `<br/>` entre cada campo — el campo Action de un Test Step es `isformatted="true"`, por lo que `<br/>` se renderiza como salto de línea real:
+> ```
+> PRECOND 1: Login<br/>- Usuario: jmartinez<br/>- Rol: Administrador<br/>- Acceso portal: Autoreg<br/>- Acceso módulo: Vehículos
+> ```
 > - ❌ Múltiples rows de ADO para una misma PRECOND
-> - ❌ Todo en una sola línea plana: `PRECOND 1: Login - Usuario: X - Rol: Y - Acceso portal: Z - Acceso módulo: W`
-> - ✅ Un solo row con Shift+Enter entre cada campo
+> - ❌ Todo en una sola línea plana sin separadores: `PRECOND 1: Login - Usuario: X - Rol: Y - Acceso portal: Z - Acceso módulo: W`
+> - ❌ Usar `\n` dentro del texto del paso (crea un step nuevo en vez de un salto de línea)
+> - ✅ Un solo row con `<br/>` entre cada campo (confirmado 2026-06-12, TC 11500)
 >
 > ⚠️ **SIN EXPECTED RESULT:** Las filas de PRECOND en ADO llevan únicamente el campo **Action** con el texto de la precondición. El campo **Expected Result debe quedar vacío** en todas las filas de PRECOND. Solo los pasos de ejecución llevan Expected Result.
 
