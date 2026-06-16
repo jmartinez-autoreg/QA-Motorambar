@@ -13,8 +13,7 @@ color: "#00A9E0"
 # QA-PRO — Subagente QA (capa de autoridad del rol)
 
 > 🧠 Las reglas **globales** (REGLA 0/1/2, PASO 0 / pregunta A·B, no inventar datos, anti-suposición de UI,
-> scratch, screenshots por criterio, detección automática del día, bitácora de actividad) viven en
-> **`AGENTS.md`** — no se repiten aquí.
+> scratch, screenshots por criterio, detección automática del día, bitácora de actividad) viven en **`AGENTS.md`** — no se repiten aquí.
 > Este archivo contiene **solo las reglas del rol QA**. Cuando un skill contradice una regla de aquí, **gana este archivo**.
 > Los nombres reales de las tools MCP están en tu archivo de entrada (`CLAUDE.md` / `.github/copilot-instructions.md`).
 
@@ -39,6 +38,17 @@ Incluir solo las categorías que el TC necesita, en este orden:
 agregar una letra mayúscula al número (`1A`, `1B`, `1C`...). Ejemplo real: `PRECOND 1A: Referido Admitido`
 / `PRECOND 1B: Referido Serv. Rel. Activo` / `PRECOND 2: Login`.
 
+**Múltiples Logins en posiciones distintas → numeración secuencial, no letras.** La notación de
+letras (`0A`/`0B`) es solo para PRECONDs del **mismo tipo en la misma posición**. Si el TC necesita
+2+ Logins en momentos distintos del flujo (ej. 2 sesiones en navegadores distintos), cada Login
+recibe su **propio número secuencial**: `PRECOND 0: Login - Usuario: ...`, `PRECOND 1: Login - Usuario: ...`
+— nunca `PRECOND 0A` / `PRECOND 0B`.
+
+**Login como PASO (no PRECOND) cuando crear esa sesión es lo que el TC verifica.** PRECOND es solo
+para estado **preexistente** al inicio de la prueba. Si abrir una sesión (ej. 2da sesión en otro
+navegador) es la acción que el TC necesita ejecutar para llegar al escenario bajo prueba, ese Login
+va como **paso numerado** de la ejecución, no como PRECOND.
+
 **`PRECOND 0` para dependencias de TCs:** cuando el TC depende de otro TC ya ejecutado, usar el formato
 estructurado (una línea `- {ID}: {título}` por dependencia, mismo row vía Shift+Enter):
 ```
@@ -46,9 +56,10 @@ PRECOND 0: TC Ejecutado
 - 83057: Solicitud Horas Comp.: Validación Crear [Reg - Solicitud Ninguna / SI Crear]
 ```
 
-**Referencias inline:** en el texto de un paso de ejecución, citar entre paréntesis la PRECOND de la que
-provienen los datos usados: `(PRECOND 2)`, `(PRECOND 1A)`, `(PRECOND 1 / 2)`. Ejemplo: "Ingresar portal
-Finanzas (PRECOND 3)".
+**Referencias inline:** en el texto de un paso de ejecución, usar el **valor literal/real** definido
+en la PRECOND (ej. el username real `distri2`, nunca etiquetas abstractas como "Usuario A/B" o
+"Navegador B") y citar entre paréntesis la PRECOND de la que proviene: `(PRECOND 2)`, `(PRECOND 1A)`,
+`(PRECOND 1 / 2)`. Ejemplos: "Iniciar sesión con distri2 (PRECOND 1)"; "Ingresar portal Finanzas (PRECOND 3)".
 
 **Una PRECOND por fila.** Los resultados esperados describen lo **visualmente verificable**, no comportamiento de backend.
 No crear TCs sin revisar la sección **Discussion** de la US (puede contener escenarios excluidos).

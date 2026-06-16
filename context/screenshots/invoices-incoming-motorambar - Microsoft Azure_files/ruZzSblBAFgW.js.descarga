@@ -1,0 +1,1 @@
+define("@azure/portalfx-components/lib/Resources.resjson",{ErrorBoundaryResources:{UnexpectedError:"Se produjo un error inesperado"},OAuthButtonResources:{DefaultAriaLabel:"Autenticarse con un servicio externo"}});

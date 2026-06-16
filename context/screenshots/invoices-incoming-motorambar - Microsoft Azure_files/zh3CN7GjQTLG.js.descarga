@@ -1,0 +1,1 @@
+define("@microsoft/azureportal-reactview/major-version/1",["require","exports"],function(e,r){"use strict";Object.defineProperty(r,"__esModule",{value:!0}),r.versionId=void 0,r.versionId={version:"1.0.1"}});

@@ -174,9 +174,12 @@ Screenshot: ![vehiculos-importados-filtro-localidades](screenshots/vehiculos-imp
 **Menú "Acciones"** (botón "Acciones")
 | Elemento | Tipo | Texto/label literal | Comportamiento |
 |---|---|---|---|
-| Opción de menú | item | "Importar CPA" (ícono documento) | navega a `/import/cpa` |
+| Opción de menú | item | "Importar Vehículos" (ícono upload) | navega a `/import/vehicles` — abre pantalla de carga de Excel con vehículos |
+| Opción de menú | item | "Importar CFA" (ícono documento) | navega a `/import/cpa` (nota: la UI dice "CFA" pero la ruta es `/import/cpa`) |
+| Opción de menú | item | "Historial de Importaciones" (ícono historial) | navega a `/import/history` — muestra tabla con todas las importaciones realizadas |
+| Opción de menú | item | "Configurar Importación" (ícono settings) | navega a `/import/config` — permite mapear columnas del Excel con propiedades del vehículo |
 
-Screenshot: ![vehiculos-importados-acciones-menu](screenshots/vehiculos-importados-acciones-menu.png)
+Screenshot: ![vehiculos-importados-acciones-menu-completo](screenshots/vehiculos-importados-acciones-menu-completo.png)
 
 **Menú "..." por fila / barra de acciones batch**
 | Elemento | Tipo | Texto/label literal | Comportamiento |
@@ -433,4 +436,74 @@ Screenshot: ![header-sesion-inactividad](screenshots/header-sesion-inactividad.p
 - **Estados:** —
 - **Screenshot:** _(pendiente)_
 - **Notas para TCs:** tras "Revocar Token", el usuario afectado queda desconectado en su siguiente interacción que requiera autenticación → pantalla de acceso bloqueado (`/sso-login`, ver "Login SSO (Autoreg)" en `CONTEXT.md`).
+---
+
+## Motorambar > Import > Importar Vehículos
+- **Ruta/URL:** `/import/vehicles`
+- **Cómo se llega aquí:** botón "Acciones" → "Importar Vehículos" desde "Vehículos Importados" (`/import`).
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Título | texto | "Importar Vehículos" | — |
+  | Descripción | texto | "Sube un archivo Excel con los vehículos a importar" | — |
+  | Dropzone | input file | ícono upload + "Arrastra y suelta tu archivo aquí" / "o **haz clic para seleccionar**" | solo acepta archivos Excel (.xlsx, .xls) hasta 10 MB |
+  | Texto ayuda | texto gris | "Solo archivos Excel (.xlsx, .xls) hasta 10 MB" | — |
+  | Botón | outline | "Seleccionar archivo" | abre explorador de archivos |
+- **Reglas de validación (mensajes de "Importante"):**
+  | Mensaje | Descripción |
+  |---|---|
+  | "El archivo debe contener la columna VIN configurada en la importación" | la columna VIN es obligatoria y debe estar definida en "Configurar Importación" |
+  | "Los VINs duplicados en el archivo serán ignorados" | si el Excel contiene el mismo VIN varias veces, solo se procesa la primera ocurrencia |
+  | "Asegúrate de configurar las columnas de importación antes de subir el archivo" | antes de importar, verificar en "Configurar Importación" que el mapeo Excel → Propiedades esté completo |
+- **Estados:** vacío (sin archivo seleccionado) / con archivo adjunto (muestra nombre de archivo + botón "Subir" habilitado) / procesando (progress bar + mensaje "Procesando..." / completado (mensaje de éxito + resumen de vehículos importados).
+- **Screenshot:** ![import-vehiculos](screenshots/import-vehiculos.png)
+- **Notas para TCs:** esta pantalla depende de que la "Configuración de Importación" (`/import/config`) esté completa — si el mapeo de columnas está vacío o incompleto, el sistema rechazará el archivo con un mensaje de error indicando qué columnas faltan. Validar ambos casos (configuración completa vs. incompleta) en los TCs.
+---
+
+## Motorambar > Import > Historial de Importaciones de Vehículos
+- **Ruta/URL:** `/import/history`
+- **Cómo se llega aquí:** botón "Acciones" → "Historial de Importaciones" desde "Vehículos Importados" (`/import`).
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Título | texto (con ícono historial circular morado) | "Historial de Importaciones de Vehículos" | — |
+  | Subtítulo | texto gris | "Visualiza todas las importaciones de vehículos realizadas" | — |
+  | Botón | primario morado (esquina superior derecha) | "Nueva Importación" (ícono upload) | navega a `/import/vehicles` |
+  | Tabla | grid | columnas: NOMBRE DE ARCHIVO / FECHA ↓ / ESTADO | ordenado descendente por fecha |
+  | Columna NOMBRE DE ARCHIVO | texto con ícono documento | nombre del archivo Excel original (ej. "xBTh3wK3D", "s%3D", "20260518_122734_1100_PDVFile.xlsx%3t=2026-06...") | los nombres pueden estar truncados o codificados si son muy largos |
+  | Columna FECHA | texto | formato "DD jun AAAA, HH:MM" (ej. "14 jun 2026, 01:00", "14 jun 2026, 00:00") | zona horaria UTC-4 (Puerto Rico) |
+  | Columna ESTADO | badge verde | "Completado" | todas las importaciones visibles tienen estado "Completado" — estados de error/pendiente no documentados en captura |
+  | Paginación | controles | — | presente pero no visible en captura (scroll necesario) |
+- **Estados:** con datos (historial con múltiples importaciones) / vacío (sin importaciones previas — no documentado).
+- **Screenshot:** ![import-historial](screenshots/import-historial.png)
+- **Notas para TCs:** los nombres de archivo mostrados en la tabla pueden estar codificados/truncados (URL encoding + límite de caracteres) — al validar el historial en un TC, no asumir que el nombre mostrado coincide exactamente con el nombre original del archivo subido. El badge "Completado" confirma que la importación finalizó sin errores críticos, pero no garantiza que **todos** los VINs del archivo fueron procesados exitosamente (ej. duplicados ignorados, VINs inválidos omitidos). Para validar el detalle de una importación, se requiere funcionalidad de "ver detalle" (ícono/acción no visible en captura actual — pendiente confirmar si existe).
+---
+
+## Motorambar > Import > Configuración de Importación
+- **Ruta/URL:** `/import/config`
+- **Cómo se llega aquí:** botón "Acciones" → "Configurar Importación" desde "Vehículos Importados" (`/import`).
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Título | texto | "Configuración de Importación" | — |
+  | Descripción | texto | "Personaliza los nombres de las columnas del archivo Excel que usa tu empresa para importar vehículos." | — |
+  | Botón | outline gris (esquina superior derecha) | "Restaurar Todo" (ícono reset) | restaura todas las columnas a sus valores por defecto |
+  | Botón | primario morado (esquina superior derecha) | "Guardar Cambios" (ícono disco) | persiste la configuración modificada |
+  | Tabla | grid | columnas: PROPIEDAD DEL VEHÍCULO / COLUMNA EN EXCEL / VALOR POR DEFECTO / ACCIONES | cada fila representa un campo del modelo de vehículo |
+  | Columna PROPIEDAD | label fijo | ej. "Auto Color", "Bank Name", "Body Type", "Client Id", "Contributor Id", "Country Origin Code", "Credit Letter Number", "Dealer", "Dealer Licence", "Doors", "EIN (Tax ID)", "Horse Power", "Invoice"... | lista completa de propiedades del modelo Vehicle en el sistema |
+  | Columna COLUMNA EN EXCEL | input de texto editable | ej. "autoColor", "BankName", "BodyType", "clientId", "contributorId", "countryOriginCode", "CreditLetterNumber", "dealer", "dealerLicence", "doors", "EIN(TaxID)", "horsePower", "invoice"... | el nombre **exacto** de la columna en el Excel del usuario (case-sensitive) |
+  | Columna VALOR POR DEFECTO | label fijo (solo lectura) | ej. "autoColor", "BankName", "BodyType"... | valor sugerido por el sistema — coincide con el nombre del campo en el backend |
+  | Columna ACCIONES | ícono(s) por fila | — | no visibles en captura (scroll necesario) — posible editar/eliminar mapeo |
+- **Comportamiento del mapeo:**
+  - El usuario puede personalizar el nombre de cada columna en "COLUMNA EN EXCEL" para que coincida con el archivo Excel de su empresa.
+  - Al importar un archivo (`/import/vehicles`), el sistema busca en el Excel la columna con el nombre exacto configurado aquí.
+  - Si una columna obligatoria (ej. VIN) no está mapeada o el Excel no contiene esa columna, la importación falla con error.
+  - "VALOR POR DEFECTO" es de solo lectura — muestra el nombre del campo en el modelo del backend, pero el usuario NO está obligado a usar ese nombre en su Excel.
+- **Estados:** con configuración guardada (valores en "COLUMNA EN EXCEL") / sin configuración (campos vacíos — importación fallará) / modificado sin guardar (banner amarillo "Cambios sin guardar" — no visible en captura).
+- **Screenshot:** ![import-configuracion](screenshots/import-configuracion.png)
+- **Notas para TCs:**
+  - Esta es una **configuración global por empresa/usuario** — una vez guardada, aplica a todas las importaciones futuras de ese usuario.
+  - Caso de uso típico: la empresa usa un Excel con columnas en español ("Color", "Marca", "Puertas") pero el sistema espera inglés ("autoColor", "brand", "doors") → aquí se mapea "Color" → "autoColor".
+  - Al escribir TCs de importación, **siempre verificar primero** que la configuración esté completa antes de subir el Excel — si no, el TC fallará por configuración incompleta, no por un bug en la importación.
+  - El screenshot muestra una configuración ya guardada (todos los campos poblados). Estado inicial (sin configuración) — no documentado.
 ---

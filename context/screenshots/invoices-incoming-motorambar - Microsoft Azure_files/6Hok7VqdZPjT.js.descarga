@@ -1,0 +1,1 @@
+define("MsPortalImpl/Widgets/AzHome/AzHome.Store",["require","exports","MsPortalImpl/Widgets/AzureHome/AzureHome.Store"],function(e,t,o){"use strict";t.useDiContainer=t.DiContainerContext=void 0;t.DiContainerContext=o.DiContainerContext,t.useDiContainer=o.useDiContainer});

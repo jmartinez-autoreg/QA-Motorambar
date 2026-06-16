@@ -1,0 +1,1 @@
+define("@fluentui/react-utilities/lib/virtualParent/elementContains",["exports","@fluentui/react-utilities/lib/virtualParent/getParent"],function(t,e){"use strict";t.elementContains=function(t,n){if(!t||!n)return!1;if(t===n)return!0;{const i=new WeakSet;for(;n;){const r=(0,e.getParent)(n,{skipVirtual:i.has(n)});if(i.add(n),r===t)return!0;n=r}}return!1}});

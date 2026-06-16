@@ -42,6 +42,11 @@ Preguntar (en una sola tanda, no una por una) los datos que falten en `context/C
 - Organización y proyecto en Azure DevOps + usuario QA
 - Terminología literal de UI que no debe traducirse/cambiarse
 - Stack frontend de cada portal (si se conoce)
+- Idioma de interacción preferido del usuario (si no es obvio de su mensaje) → completar
+  § "Configuración del Agente" (regla global AGENTS.md §8.9)
+- País del usuario → derivar zona horaria IANA (ej. Venezuela → `America/Caracas`, UTC-4) y nombre
+  del sprint actual del equipo (ej. "Sprint 24") → completar § "Configuración del Agente"
+  (usado por el skill `activity-logger` para la bitácora de actividad)
 
 Escribir directamente sobre `context/CONTEXT.md` (Edit), respetando la estructura de secciones del template. No eliminar secciones aunque queden vacías — marcarlas `_(pendiente)_`.
 

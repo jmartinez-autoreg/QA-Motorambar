@@ -1,0 +1,1 @@
+define("@fluentui/react-overflow/lib/useIsOverflowGroupVisible",["exports","@fluentui/react-overflow/lib/overflowContext"],function(e,o){"use strict";e.useIsOverflowGroupVisible=function(e){return(0,o.useOverflowContext)(o=>o.groupVisibility[e])}});

@@ -1254,7 +1254,7 @@ Strict mode violations resueltas: 2
 
 ## FASE 6 — Protocolo TC-ID → Test en Verde (Flujo Completo Autónomo)
 
-**Trigger:** El usuario proporciona un ID de Test Case y una organización ADO.
+**Trigger:** El usuario proporciona un ID de Test Case (organización/proyecto ADO opcionales).
 **Contrato:** El usuario solo hace DOS cosas: ejecutar `codegen` y ejecutar los tests al final.
 El agente hace TODO lo demás de forma autónoma.
 
@@ -1264,8 +1264,8 @@ El agente hace TODO lo demás de forma autónoma.
 
 ```
 Entrada mínima aceptada:
-  "TC: 9360"              → asumir org=AutoregPR, project=AUTOREG
-  "TC 9360, org: MiOrg"   → usar org indicada
+  "TC: 9360"              → usar Organización/Proyecto de context/CONTEXT.md § "Organización ADO" (AGENTS.md §2)
+  "TC 9360, org: MiOrg"   → usar org indicada para esta solicitud
   "#9360"                 → mismo tratamiento
 ```
 

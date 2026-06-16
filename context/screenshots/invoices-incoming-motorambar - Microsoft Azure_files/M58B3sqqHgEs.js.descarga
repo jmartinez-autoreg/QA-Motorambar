@@ -1,0 +1,1 @@
+define("@fluentui/react-calendar-compat/lib/utils/focus",["exports"],function(i){"use strict";let t;i.focusAsync=function(i,e){if(i){if(t)return void(t=i);t=i,e&&e.requestAnimationFrame(()=>{t&&t.focus(),t=void 0})}}});

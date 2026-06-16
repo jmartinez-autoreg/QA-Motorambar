@@ -51,10 +51,14 @@ Al recibir una US el agente DEBE seguir este orden:
 3. **Identificar** portal, módulo, pantalla para el nombre del TC
 4. **Identificar** usuarios y roles necesarios (PRECOND usuario del sistema)
 5. **Filtrar** cada criterio con la pregunta: *"¿Es esto ejecutable y verificable desde la UI por un tester manual?"*
-   - Si **todos** responden NO → US es **Cobertura DEV**: NO crear TC ni TP formal. Documentar en comentario de la US: `Cobertura DEV — verificación a cargo del equipo de desarrollo.`
+   - Si **todos** responden NO → US es **Cobertura DEV**: NO crear TC ni TP formal. Documentar en
+     comentario de la US: `Cobertura DEV — verificación a cargo del equipo de desarrollo.` + una
+     justificación breve **en términos de la aplicación/UI** (ej. "la aplicación no cuenta con
+     pantalla/acción para que el usuario final notifique al Administrador"). ⛔ Nunca citar rutas
+     internas del repo (`context/UI-UX.md`, `.claude/...`) — quien lee el comentario en ADO no
+     tiene acceso a esa carpeta.
    - Si **algunos** responden NO → excluir esos criterios del TC, incluir solo pasos UI verificables
    - **Señales de Cobertura DEV:** "query en BD", "estructura de tablas", "acceso a base de datos", "código/programación", "appsettings", "worker/Service Bus", "infraestructura", "tabla de settings", "script SQL"
-   - ⚠️ **Redacción del comentario de Cobertura DEV:** quien lee el comentario en ADO no tiene acceso al repo ni sabe qué es `context/`. Justificar siempre en términos de la aplicación/UI (ej. "la aplicación no cuenta con pantalla/acción para que el usuario final notifique al Administrador"), nunca citando rutas internas del repo (`context/UI-UX.md`, `context/CONTEXT.md`, etc.) como evidencia.
 6. **Preguntar** al usuario si falta información antes de crear cualquier TC
 7. **Aplicar** la regla de división para determinar cuántos TC se necesitan
 8. **Redactar** TCs completos con precondiciones y pasos (acción + resultado esperado)
@@ -73,6 +77,23 @@ Al recibir una US el agente DEBE seguir este orden:
 ---
 
 ## Fases de Trabajo
+
+### Fase 0 — Verificar estado del Test Plan (obligatorio)
+
+**ANTES de cualquier análisis o creación de TC:**
+
+```
+1. Obtener la US con expand=relations (mcp_ado_wit_get_work_item, expand: "relations")
+2. Verificar campo Custom.TestPlanCompleted
+3. Verificar si existe relación tipo "Microsoft.VSTS.Common.TestedBy-Forward"
+4. Si AMBOS existen → informar "US [ID] ya tiene Test Plan asociado (work item XXXX)" y STOP
+5. Solo si NO existe TP → proceder a Fase 1
+```
+
+> ⚠️ Esta verificación es **obligatoria** al recibir solicitud de crear TP, analizar US, o listar USs que necesitan TP.
+> Nunca asumir que una US activa sin inspeccionar necesita TP nuevo.
+
+---
 
 ### Fase 1 — Preparar Test Plan
 
@@ -198,11 +219,9 @@ Las PRECONDs se numeran **secuencialmente desde 0**. Incluir **solo** las catego
 > - Datos + login → `PRECOND 0: Datos [...] | PRECOND 1: Login - ...`
 > - TC deps + datos + login → `PRECOND 0: TC deps [...] | PRECOND 1: Datos [...] | PRECOND 2: Login - ...`
 
-> ⚠️ **PRECOND vs PASO — estado previo vs. estado que el TC debe demostrar:** una PRECOND representa una condición que **ya existe** antes de iniciar la prueba. Si crear esa condición es precisamente lo que el TC necesita probar (ej. iniciar una segunda sesión simultánea del mismo usuario para verificar el control de sesión única), esa acción —incluyendo un login— va como **paso de ejecución** con su propio resultado esperado, no como PRECOND (confirmado 2026-06-12, TC 11500: el login del "Navegador B" no puede ser PRECOND porque es ese login el que invalida la sesión del "Navegador A", que es justo lo que el TC valida).
-
 > ⚠️ **REGLA DE ORO:** UNA PRECOND POR ROW/STEP. Jamás fusionar múltiples PRECONDs en una sola fila.
 >
-> ⚠️ **FORMATO INTERNO CON SALTOS DE LÍNEA:** Cada PRECOND ocupa un solo row en ADO, pero internamente usa saltos de línea para separar cada campo. El resultado visual en ADO es:
+> ⚠️ **FORMATO INTERNO CON SHIFT+ENTER:** Cada PRECOND ocupa un solo row en ADO, pero internamente usa saltos de línea (Shift+Enter) para separar cada campo. El resultado visual en ADO es:
 > ```
 > PRECOND 1: Login
 > - Usuario: jmartinez
@@ -210,16 +229,10 @@ Las PRECONDs se numeran **secuencialmente desde 0**. Incluir **solo** las catego
 > - Acceso portal: Autoreg
 > - Acceso módulo: Vehículos
 > ```
-> Todo eso va en **un solo step row**. Los saltos son parte del campo Action, no rows separados.
->
-> ⚠️ **Vía `testplan_update_test_case_steps` (MCP):** un `\n` real dentro del texto de un paso se interpreta como separador de PASOS (crea un row nuevo), no como salto dentro del mismo row. Para lograr el salto de línea DENTRO del mismo row, usar la etiqueta HTML `<br/>` entre cada campo — el campo Action de un Test Step es `isformatted="true"`, por lo que `<br/>` se renderiza como salto de línea real:
-> ```
-> PRECOND 1: Login<br/>- Usuario: jmartinez<br/>- Rol: Administrador<br/>- Acceso portal: Autoreg<br/>- Acceso módulo: Vehículos
-> ```
+> Todo eso va en **un solo step row**. Los saltos son Shift+Enter dentro del campo Action, no rows separados.
 > - ❌ Múltiples rows de ADO para una misma PRECOND
-> - ❌ Todo en una sola línea plana sin separadores: `PRECOND 1: Login - Usuario: X - Rol: Y - Acceso portal: Z - Acceso módulo: W`
-> - ❌ Usar `\n` dentro del texto del paso (crea un step nuevo en vez de un salto de línea)
-> - ✅ Un solo row con `<br/>` entre cada campo (confirmado 2026-06-12, TC 11500)
+> - ❌ Todo en una sola línea plana: `PRECOND 1: Login - Usuario: X - Rol: Y - Acceso portal: Z - Acceso módulo: W`
+> - ✅ Un solo row con Shift+Enter entre cada campo
 >
 > ⚠️ **SIN EXPECTED RESULT:** Las filas de PRECOND en ADO llevan únicamente el campo **Action** con el texto de la precondición. El campo **Expected Result debe quedar vacío** en todas las filas de PRECOND. Solo los pasos de ejecución llevan Expected Result.
 
@@ -227,7 +240,6 @@ Las PRECONDs se numeran **secuencialmente desde 0**. Incluir **solo** las catego
 > - Letras (`1A`, `1B`...) cuando hay más de una PRECOND del mismo tipo en la misma posición.
 > - `PRECOND 0: TC Ejecutado` + lista `- {ID}: {título}` cuando el TC depende de otro TC ya ejecutado.
 > - Referencias inline `(PRECOND N)` / `(PRECOND 1A)` dentro del texto de un paso, para citar de dónde provienen los datos usados.
-> - **Preferir el dato concreto sobre la referencia abstracta:** si el dato (username, VIN, etc.) ya identifica sin ambigüedad de dónde proviene, usar el dato directamente (ej. `distri2`) en vez de `(PRECOND 1)` o etiquetas genéricas tipo "Usuario A"/"Usuario B".
 
 ### Estructura de Pasos
 
@@ -259,6 +271,11 @@ Si hay muchos pasos, optimizar incluyendo solo los pasos que los criterios realm
 #### ⛔ Solo dividir en TCs separados cuando se cumple al menos UNA de estas condiciones:
 
 1. **Pantalla diferente** — el escenario ocurre en una pantalla o módulo distinto al flujo principal
+   > ⚠️ **Excepción:** si el escenario de la 2ª pantalla es **consecuencia directa / uso** de lo
+   > configurado o creado en la 1ª (ej. configurar un mapeo → usar esa misma configuración para
+   > importar), dentro del mismo flujo de prueba, sin requerir otro rol/sesión ni destruir el
+   > estado previo → **no aplica este criterio**. Agrupar en **1 solo TC** con pasos secuenciales
+   > que cubran ambas pantallas en el orden del flujo.
 2. **Rol de usuario diferente** — el escenario requiere un usuario con permisos distintos que no pueden coexistir en la misma sesión
 3. **El escenario negaría el estado** — ejecutar el escenario negativo destruiría los datos necesarios para el escenario positivo (y no se puede restablecer en el mismo TC)
 
@@ -274,6 +291,7 @@ Si hay muchos pasos, optimizar incluyendo solo los pasos que los criterios realm
 | Validar estado inicial de un elemento (ej. botón deshabilitado) | Paso de verificación al inicio del TC del flujo feliz |
 | Escenarios que comparten las mismas precondiciones | Un solo TC — las precondiciones son las mismas |
 | "Hay muchos criterios" sin que ninguno cambie de pantalla o rol | Agrupar todos, optimizar los pasos para cubrir solo lo necesario |
+| Configurar algo en una pantalla y usar esa configuración como entrada del siguiente paso en otra pantalla del mismo flujo (ej. configurar mapeo de columnas → importar archivo usando ese mapeo) | Un solo TC — pasos secuenciales: configurar en la 1ª pantalla, luego usar/verificar el resultado en la 2ª |
 
 #### Ejemplo correcto — 4 criterios en la misma pantalla → 1 TC
 
@@ -290,14 +308,77 @@ NO crear 4 TCs separados.
 
 ---
 
+## Evaluación de Sprint — ¿Cuáles USs califican para TP?
+
+> Cuando el usuario pida evaluar un conjunto de USs del sprint para decidir cuáles necesitan Test Plan,
+> aplicar **TRES FILTROS en este orden exacto** para cada US antes de evaluar SP.
+
+### FILTRO 1 — ¿Ya tiene Test Plan en ADO?
+
+```
+→ Consultar: testplan_list_test_plans (project, planName o buscar por US ID en el título/descripción)
+→ Si ya existe un TP vinculado a la US → clasificar como "Ya tiene TP" — NO proponer crear uno nuevo
+→ No saltar este filtro aunque el usuario no lo mencione — verificar siempre
+```
+
+### FILTRO 2 — ¿Es Cobertura DEV? (criterios no testeables por QA)
+
+```
+→ Leer descripción + criterios de aceptación de la US
+→ Si TODOS los criterios son técnicos/infraestructura → clasificar como "Cobertura DEV — no aplica TP"
+→ Una US puede tener SP > 2 y aún ser 100% Cobertura DEV
+
+Señales de Cobertura DEV a nivel de US:
+  - "infraestructura Azure", "acceso a repositorio", "script SQL", "worker", "Service Bus"
+  - "appsettings", "tabla de BD", "base de datos", "acceso a servidor"
+  - "documento inventario", "generar documento técnico"
+  - US sin UI, sin criterios de pantalla, solo configuración de backend/cloud
+  - Tareas administrativas (dar acceso a un usuario, permisos de sistema)
+
+⚠️ Si ALGUNOS criterios son Cobertura DEV y OTROS son UI verificables:
+   → La US SÍ califica para TP, pero excluir los criterios Cobertura DEV al redactar los TCs
+```
+
+### FILTRO 3 — ¿Tiene criterios de aceptación verificables?
+
+```
+→ Si la US no tiene descripción, no tiene criterios de aceptación o están vacíos
+→ Clasificar como "Requiere refinamiento PO" — no aplica TP hasta tener criterios definidos
+→ Aunque tenga SP altos, sin criterios no hay base para crear TCs
+```
+
+### Las 5 categorías de resultado (SIEMPRE usar las 5)
+
+| Categoría | Condición | Acción |
+|-----------|-----------|--------|
+| ✅ **Califica para TP formal** | > 2 SP + criterios UI verificables + sin TP existente | Crear TP → TCs → ejecutar |
+| ⚡ **Exploratoria directa** | ≤ 2 SP + criterios UI verificables + sin TP existente | Escenario B sin TP formal |
+| 📋 **Ya tiene TP** | Existe Test Plan en ADO vinculado a esta US | No crear nuevo TP — ejecutar el existente |
+| 🔧 **Cobertura DEV** | Todos los criterios son técnicos/no verificables por QA desde UI | No crear TC ni TP. Documentar: "Cobertura DEV" en la US |
+| ❌ **No califica** | Sin descripción/criterios, tarea admin, o requiere refinamiento PO | Bloquear hasta tener criterios. Escalar a PO si tiene SP altos (≥ 3) |
+
+### Formato de tabla de resultado para análisis de sprint
+
+```
+| US ID | Título | SP | Categoría | Razón |
+|-------|--------|----|-----------|-------|
+| XXXX  | ...    | N  | ✅ / ⚡ / 📋 / 🔧 / ❌ | [razón concreta — qué filtro activó la decisión] |
+```
+
+> ⚠️ **NUNCA omitir las categorías 📋 y 🔧** — son los matices que más se pasan por alto.
+> Una US clasificada como ✅ o ⚡ sin haber pasado los 3 filtros = análisis incompleto.
+
+---
+
 ## Regla de Story Points
 
-> Antes de crear un Test Plan formal, evaluar los Story Points de la US.
+> Se aplica **solo después** de pasar los 3 filtros de evaluación anteriores.
 
 | Story Points | Decisión |
 |---|---|
 | **≤ 2 SP** | **No crear Test Plan formal en ADO.** Ejecutar pruebas exploratorias directas (Escenario B) sin TCs formales. Documentar resultado en la US con formato §16.2 (`QA PASSED` / `QA FAILED`). |
 | **> 2 SP** | Flujo completo: crear TP → TCs → ejecutar → documentar con §16.1 (`QA PASSED` / `QA NOT PASSED`). |
+| **Sin SP** | Tratar como caso especial: evaluar si los criterios son verificables por QA. Si sí → proponer al usuario si crear TP o exploratoria. Si no → Cobertura DEV o Requiere refinamiento PO. |
 
 > ⚠️ Si la US tiene ≤ 2 SP y el usuario pide crear un TP formal → advertir y proponer exploratoria directa. No bloquear si el usuario insiste, pero **siempre avisar**.
 

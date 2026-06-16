@@ -145,14 +145,32 @@ Un log por sub-tarea ADO. Cada actividad QA (Preparar TP, Ejecutar TP, QA Demo, 
 > ⚠️ Notas con bullets de actividades: usar `<br>` HTML, NUNCA `\n`.
 > Ejemplo: `...tarea(s): 10713 Preparar Test Plan.<br>• Análisis de criterios<br>• Redacción de casos`
 
+> 💡 **Extensión de esta tabla:** si la bitácora (`activity-logger`) marca repetidamente la misma
+> actividad como "Sin nota oficial" (QA o PO), proponer agregar una fila nueva aquí vía REGLA 1
+> (Auto-Aprendizaje, AGENTS.md §6).
+
 ---
 
 ## PROCEDIMIENTO DE REGISTRO DIARIO
 
 ### PASO 0 — Recopilar información (OBLIGATORIO antes de cualquier acción)
 
-> ⚡ **EFICIENCIA PRIMERO:** Resolver automáticamente todo lo que se pueda desde ADO y Zoho
-> ANTES de hacer preguntas al usuario. Solo preguntar lo que NO se puede obtener automáticamente.
+> ⚡ **EFICIENCIA PRIMERO:** Resolver automáticamente todo lo que se pueda desde ADO, Zoho y la
+> bitácora de actividad ANTES de hacer preguntas al usuario. Solo preguntar lo que NO se puede
+> obtener automáticamente.
+
+**PASO 0.0 — Leer la bitácora del día** (skill `activity-logger`):
+
+```
+→ .workspace/bitacora/tareas-realizadas/<Sprint-actual>/<fecha>.md
+  - Sección "✅ Listas para registrar en Zoho" → ya trae US, sub-tarea ADO y "Detalle"
+    (usar el Detalle como bullets de la nota: <br>•...). Solo falta resolver Zoho Task ID
+    (PASO 1) y horas (CompletedWork, este PASO 0).
+  - Sección "⚠️ Pendientes de clasificar" → preguntar SOLO la "Falta" indicada por fila
+    (Sin Zoho Task ID / Sin nota oficial / Sin horas claras) — NO preguntar genéricamente
+    "¿qué hiciste hoy?".
+Si el archivo no existe → continuar con el flujo normal de preguntas (sin bitácora disponible).
+```
 
 Verificar que el usuario proporcionó todos los datos. Si falta alguno, **PREGUNTAR**:
 

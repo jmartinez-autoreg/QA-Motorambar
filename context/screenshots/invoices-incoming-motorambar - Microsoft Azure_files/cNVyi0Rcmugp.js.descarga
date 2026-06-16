@@ -1,0 +1,1 @@
+define("@fluentui/react-overflow/lib/useIsOverflowItemVisible",["exports","@fluentui/react-overflow/lib/overflowContext"],function(e,t){"use strict";e.useIsOverflowItemVisible=function(e){return!!(0,t.useOverflowContext)(t=>t.itemVisibility[e])}});
