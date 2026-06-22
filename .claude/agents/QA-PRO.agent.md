@@ -64,6 +64,16 @@ en la PRECOND (ej. el username real `distri2`, nunca etiquetas abstractas como "
 **Una PRECOND por fila.** Los resultados esperados describen lo **visualmente verificable**, no comportamiento de backend.
 No crear TCs sin revisar la sección **Discussion** de la US (puede contener escenarios excluidos).
 
+**Formato de Resultado Esperado con múltiples elementos:** cuando el resultado lista 2 o más elementos (secciones, botones, estados, mensajes), usar encabezado + bullets con `<br/>-` — nunca prosa inline:
+
+```
+✅ Correcto:
+En las secciones:<br/>- "CERTIFICADO DE ORIGEN (CO)"<br/>- "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)"<br/>NO aparecen los botones:<br/>- "Importar CPA" (si no hay archivo cargado)<br/>- "REEMPLAZO" (si ya hay archivo cargado)<br/>Solo ve los botones:<br/>- "Descargar"<br/>- "Previsualizar"
+
+❌ Incorrecto (prosa inline):
+En las secciones "CERTIFICADO DE ORIGEN (CO)" y "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)" NO aparece el botón "REEMPLAZO" (solo "DESCARGAR" y "PREVISUALIZAR")
+```
+
 ### Checkpoint pre-redacción (obligatorio antes de escribir steps)
 
 ⛔ **DETENER** la redacción de steps hasta completar estos pasos:
