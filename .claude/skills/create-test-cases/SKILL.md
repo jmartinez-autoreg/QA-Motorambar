@@ -172,6 +172,30 @@ Al redactar el resultado esperado de un paso, considerar estos aspectos (no todo
 | **Resumen** | Sin detalle del mensaje/alerta | "Presenta pantalla de inicio" |
 | **Detallado** | Mensaje de validación + alerta con botón seleccionado, texto literal completo | "Presenta alerta 'Tiene cambios sin guardar. ¿Desea cancelar?' con botones 'Sí' y 'No (seleccionado)'" |
 
+### Formato de Resultado Esperado con múltiples elementos
+
+**Cuando el resultado esperado lista 2 o más elementos** (secciones, botones, estados, mensajes, campos), **usar encabezado + bullets con `<br/>-`** — **NUNCA prosa inline:**
+
+```
+✅ Correcto (bullets estructurados):
+En las secciones:<br/>- "CERTIFICADO DE ORIGEN (CO)"<br/>- "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)"<br/>NO aparecen los botones:<br/>- "REEMPLAZO"<br/>Solo aparecen los botones:<br/>- "DESCARGAR"<br/>- "PREVISUALIZAR"
+
+❌ Incorrecto (prosa inline):
+En las secciones "CERTIFICADO DE ORIGEN (CO)" y "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)" NO aparece el botón "REEMPLAZO" (solo "DESCARGAR" y "PREVISUALIZAR")
+```
+
+**Razón:** El formato de bullets facilita la verificación visual durante la ejecución manual — el tester puede marcar mentalmente cada elemento de la lista. La prosa inline obliga a leer/parsear la frase completa, aumentando la probabilidad de omitir un elemento.
+
+**Aplicar cuando:**
+- Se validan múltiples botones/opciones presentes o ausentes
+- Se verifica el estado de varios campos/secciones a la vez
+- Se lista más de un mensaje/alerta en el mismo resultado
+
+**NO aplicar cuando:**
+- El resultado menciona un solo elemento (ej. "Aparece el botón 'Guardar'")
+- El resultado es una redirección simple (ej. "Se redirige al Dashboard")
+- El resultado es un mensaje único (ej. "Se presenta el mensaje 'Guardado correctamente'")
+
 ---
 
 ## 5. Procedimiento técnico en ADO (vía MCP)
