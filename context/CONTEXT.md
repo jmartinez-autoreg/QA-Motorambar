@@ -58,6 +58,17 @@
 - Botón "Cambiar idioma" (ES/EN) visible en ambas pantallas (toggle de locale)
 - Si el token es válido → login automático → redirige a `/` (Dashboard)
 
+### Cierre de sesión — comportamiento real
+- Al hacer clic en "Cerrar sesión" (menú usuario, esquina superior derecha), Motorambar **NO redirige automáticamente** al login de Autoreg — queda en la **pantalla de acceso bloqueado** (`/sso-login` sin token válido).
+- Para volver a entrar, el usuario debe navegar manualmente a Autoreg (`testwaf.portaldevehiculos.com`) y autenticarse de nuevo → landing PDV → botón "Portal Distribuidor" → Motorambar.
+
+**Convención para TCs — simplificación de steps de login/logout:**
+- **Evitar** detallar cada paso intermedio del flujo de cierre/apertura de sesión (logout → pantalla bloqueada → Autoreg → landing PDV → botón Portal Distribuidor → Motorambar).
+- **Usar** un step genérico consolidado que abarque todo el proceso:
+  - ✅ **"Cerrar sesión e iniciar sesión con usuario `<usuario>` - Rol: `<rol>`"**
+  - Resultado esperado: **"Login exitoso, el sistema muestra el Dashboard de Motorambar"**
+- Esto reduce pasos redundantes y evita entrar en "detalles poco finos" que no son el foco de la prueba.
+
 ### Login interno / desarrollo — `/login`
 - Header morado con logo "VehicleDocs" y subtítulo "Sistema Autoreg — Ingresa a tu cuenta"
 - Dos tabs:
