@@ -68,6 +68,7 @@ Al recibir una US el agente DEBE seguir este orden:
 11. **Validar formato ADO de pasos** antes de publicar: `N. accion|resultado` con `\n` entre pasos
   - PRECOND debe llevar prefijo literal `PRECOND X:` dentro del texto de accion
   - PRECOND sin resultado se envía como `...|` (vacío)
+  - **Saltos de línea dentro de un PRECOND (Shift+Enter):** usar `<br/>` en el texto del action — NO `\n` (que crea un step nuevo separado). Ejemplo: `PRECOND 0: Login<br/>- Usuario: X<br/>- Rol: Y<br/>- Acceso portal: Z<br/>- Acceso módulo: W`
   - En ADO puede aparecer `Verify step completes successfully` por comportamiento de plataforma; no es error de estructura
 
 > **Regla de oro:** NO crear un TC por cada criterio de aceptación.
@@ -78,20 +79,30 @@ Al recibir una US el agente DEBE seguir este orden:
 
 ## Fases de Trabajo
 
-### Fase 0 — Verificar estado del Test Plan (obligatorio)
-
-**ANTES de cualquier análisis o creación de TC:**
+### Fase 0 — Verificar estado del Test Plan (obligatorio antes de cualquier acción)
 
 ```
-1. Obtener la US con expand=relations (mcp_ado_wit_get_work_item, expand: "relations")
-2. Verificar campo Custom.TestPlanCompleted
-3. Verificar si existe relación tipo "Microsoft.VSTS.Common.TestedBy-Forward"
-4. Si AMBOS existen → informar "US [ID] ya tiene Test Plan asociado (work item XXXX)" y STOP
-5. Solo si NO existe TP → proceder a Fase 1
+1. Obtener la US con expand=relations:
+   mcp_ado_wit_get_work_item (id: US_ID, expand: "relations")
+
+2. Verificar campo Custom.TestPlanCompleted:
+   → Si = True → la US ya tiene TP registrado
+
+3. Verificar si existe relación tipo "Microsoft.VSTS.Common.TestedBy-Forward":
+   → Si existe → hay al menos un TC vinculado a esta US
+
+4. Decisión:
+   → Si Custom.TestPlanCompleted = True  O  existe relación TestedBy-Forward:
+     Informar: "⚠️ Esta US ya tiene un Test Plan asociado (TC: [work item ID]).
+                No se creará un nuevo TP para evitar duplicados."
+     STOP — no continuar a Fase 1 sin confirmación explícita del usuario.
+
+   → Si ninguna de las dos condiciones existe:
+     Proceder a Fase 1 normalmente.
 ```
 
-> ⚠️ Esta verificación es **obligatoria** al recibir solicitud de crear TP, analizar US, o listar USs que necesitan TP.
-> Nunca asumir que una US activa sin inspeccionar necesita TP nuevo.
+> ⚠️ Esta fase es obligatoria — nunca saltar aunque el usuario diga "crea el TP".
+> Si el usuario insiste después del aviso → confirmar explícitamente antes de proceder.
 
 ---
 
@@ -282,6 +293,60 @@ Si hay muchos pasos, optimizar incluyendo solo los pasos que los criterios realm
 > Estos 3 criterios corresponden a los criterios C/D/E de la Tabla 9 (GUÍA-QA-Redacción de casos
 > de pruebas v1.00, §6 — división de Test Cases).
 
+> ⚠️ **Los criterios de división NO son multiplicadores.** Si un criterio justifica dividir, aplica
+> ese criterio **una sola vez**. No combines dos criterios para obtener más TCs (ej. rol × pantalla
+> = 4 TCs es incorrecto). Ver patrón de permisos abajo.
+
+#### 🔐 Patrón de permisos por rol (US que validan qué ve/usa cada rol)
+
+Cuando la US prueba que un rol **no tiene acceso** a algo y otro rol **sí lo tiene**:
+
+> **Preferir siempre 1 TC con cambio de sesión en el flujo.** Solo crear más de 1 TC si el flujo
+> del rol con acceso es tan distinto e independiente que compartir el TC añade confusión real —
+> y en ese caso, **preguntar primero** (ver regla de confirmación más abajo).
+
+**Estructura del TC único de permisos:**
+```
+PRECOND 0: Login - Usuario: [usuario_rol_restringido] - Rol: [Rol sin acceso] - Acceso portal: Z - Acceso módulo: W
+
+STEP 1: Navegar a [pantalla X]
+         → El botón/acción [Z] no aparece en la pantalla (verificación corta)
+STEP 2: Cerrar sesión
+         → Sistema redirige a pantalla de login
+STEP 3: Iniciar sesión con [usuario_rol_con_acceso] - Rol: [Rol con acceso] (parámetro del TC)
+         → Login exitoso
+STEP 4: Navegar a [pantalla X]
+         → El botón/acción [Z] aparece visible
+STEP 5: [Continuar el flujo completo con el rol que sí tiene acceso]
+         → [Resultado esperado del flujo]
+```
+
+Reglas del patrón:
+- El login del rol restringido va en **PRECOND** (estado preexistente).
+- El login del rol con acceso va como **STEP** de ejecución (es la acción del TC en ese momento).
+- Ejecutar **primero** el rol restringido (verificación corta: solo confirmar que no se ve). Luego continuar con el rol con acceso (flujo completo).
+- Cubrir todas las pantallas/acciones de ambos roles dentro del **mismo TC** — no crear un TC por pantalla por rol.
+
+**Ejemplo — US que prueba acceso a botón según rol en Grid y en Detalle:**
+```
+Incorrecto (4 TCs): TC-Grid-Cliente + TC-Grid-Distribuidor + TC-Detalle-Cliente + TC-Detalle-Distribuidor
+Correcto (1 TC):    Login Cliente → verificar que botón NO aparece en Grid NI en Detalle
+                    → cerrar sesión → Login Distribuidor → verificar que botón SÍ aparece
+                    en Grid → usarlo → ir a Detalle → verificar que también aparece → usarlo
+```
+
+#### ⚠️ Regla de confirmación — si el agente cree que necesita más de 1 TC
+
+Antes de crear más de 1 TC, el agente **DEBE preguntar** al usuario con este formato:
+
+```
+Estoy pensando en crear [N] TCs en lugar de 1 porque [razón concreta — ej. "el flujo del rol
+Distribuidor es completamente independiente y no parte del mismo estado que el flujo del Cliente"].
+¿Procedo con [N] TCs o prefieres que lo estructure en 1 solo TC?
+```
+
+⛔ Nunca crear más de 1 TC sin esta confirmación previa.
+
 #### ❌ NO dividir en estos casos (errores frecuentes):
 
 | Situación | Qué hacer |
@@ -292,6 +357,8 @@ Si hay muchos pasos, optimizar incluyendo solo los pasos que los criterios realm
 | Escenarios que comparten las mismas precondiciones | Un solo TC — las precondiciones son las mismas |
 | "Hay muchos criterios" sin que ninguno cambie de pantalla o rol | Agrupar todos, optimizar los pasos para cubrir solo lo necesario |
 | Configurar algo en una pantalla y usar esa configuración como entrada del siguiente paso en otra pantalla del mismo flujo (ej. configurar mapeo de columnas → importar archivo usando ese mapeo) | Un solo TC — pasos secuenciales: configurar en la 1ª pantalla, luego usar/verificar el resultado en la 2ª |
+| US de permisos: rol A no ve algo, rol B sí lo ve y lo usa | 1 TC con cambio de sesión: primero verificar restricción del rol A (corto), cerrar sesión como STEP, login rol B como STEP, flujo completo del rol B |
+| Aplicar dos criterios de división a la vez (ej. rol × pantalla) | Aplicar solo el criterio más relevante — los criterios no se multiplican |
 
 #### Ejemplo correcto — 4 criterios en la misma pantalla → 1 TC
 

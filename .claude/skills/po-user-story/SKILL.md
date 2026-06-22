@@ -62,9 +62,29 @@ Formato HTML literal para Azure DevOps:
 - ✅ `…para asegurar la trazabilidad de cada vehículo en el sistema.`
 - ❌ `…para mejorar la experiencia.`
 
-### 3. Criterios de aceptación — bullets HTML densos
+### 3. Criterios de aceptación — formato Gherkin en HTML
 
-Formato HTML que va al campo `Microsoft.VSTS.Common.AcceptanceCriteria`. Usa `<ul><li>` con anidamiento. Patrones obligatorios:
+Formato HTML que va al campo `Microsoft.VSTS.Common.AcceptanceCriteria`. Los criterios se redactan en **Gherkin** (`Dado que / Cuando / Entonces / Y`), envueltos en `<ul><li>` con `<br/>` entre líneas. Cada escenario es un `<li>` independiente:
+
+```html
+<ul>
+  <li>
+    Dado que [contexto o estado inicial]<br/>
+    Cuando [acción del usuario o evento]<br/>
+    Entonces [resultado esperado observable]<br/>
+    Y [condición adicional — si aplica]
+  </li>
+  <li>
+    Dado que [otro escenario]<br/>
+    Cuando [acción]<br/>
+    Entonces [resultado]
+  </li>
+</ul>
+```
+
+⛔ **Sin tecnicismos:** los criterios describen el **QUÉ** (comportamiento visible para el usuario), nunca el **CÓMO** (IDs técnicos, arquitectura, capas de código, nombres de tablas o métodos).
+
+Patrones adicionales obligatorios dentro de los escenarios Gherkin:
 
 #### Campos obligatorios marcados con `*`
 ```html

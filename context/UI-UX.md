@@ -126,13 +126,19 @@ Screenshot: ![pdv-bienvenido-terminos-condiciones](screenshots/pdv-bienvenido-te
 
 ## Motorambar > Vehículos Importados > Grid de inventario
 - **Ruta/URL:** `/import`
-- **Cómo se llega aquí:** clic en "Vehículos Importados" en el menú lateral (Dashboard u otra pantalla).
+- **Cómo se llega aquí:** clic en "Vehículos Importados" en el menú lateral (sidebar) → clic en "Historial de Importaciones" en el submenu desplegable.
 - **Elementos clave:**
   | Elemento | Tipo | Texto/label literal | Comportamiento |
   |---|---|---|---|
+  | **SIDEBAR (Menú lateral)** | nav vertical | — | colapsable/expandible con botón hamburguesa; muestra badge "MANUFACTURER" bajo el logo |
+  | Item sidebar (nivel 1) | nav link | "Dashboard" | ícono grid; navega al Dashboard Ejecutivo |
+  | Item sidebar (nivel 1) | nav link expandible | "Vehículos Importados" | ícono vehículo + badge numérico con total de vehículos (ej. `1057`); **despliega/colapsa submenu** con 3 opciones |
+  | Submenu (nivel 2) | nav link | "Importar Vehículos" | opción dentro de "Vehículos Importados"; navega a `/import/new` (ruta pendiente confirmar) |
+  | Submenu (nivel 2) | nav link | "Historial de Importaciones" | opción dentro de "Vehículos Importados"; navega a `/import` (esta pantalla — **activa por defecto**) |
+  | Submenu (nivel 2) | nav link | "Configurar Importación" | opción dentro de "Vehículos Importados"; navega a `/import/config` (ruta pendiente confirmar) |
+  | Item sidebar (nivel 1) | nav link | "Importar CPA" | ícono documento; navega a `/import/cpa`; **NO está dentro del submenu** de "Vehículos Importados" |
   | Título | texto | "Vehículos Importados" | — |
   | Subtítulo | texto | "Historial de Inventario" | — |
-  | Botón | dropdown | "Acciones" | abre menú con opción "Importar CPA" (con ícono de documento) → navega a `/import/cpa` |
   | Botón | botón primario | "Generar Reporte" | abre modal "Reporte de Inventario de Vehículos" |
   | Buscador | input | placeholder "Buscar por VIN" | ícono de expandir habilita búsqueda multi-VIN (uno por línea), con contadores "Total" / "Válidos" / "Inválidos" y chips removibles |
   | Filtro de localidades | botón + dropdown | "Todas las Localidades" | ver detalle abajo (popup) |
@@ -150,12 +156,66 @@ Screenshot: ![pdv-bienvenido-terminos-condiciones](screenshots/pdv-bienvenido-te
   | Badge de estado | badge | "PENDIENTE" (naranja) | aparece en columnas ESTADO CO / ESTADO CPA / ESTADO DE FACTURA |
   | Indicador PDV | ícono | ✓ verde / ✕ rojo (circulares) | estado de sincronización de Datos/Documentos a PDV |
   | Acciones por fila | íconos | ojo (ver), descarga, "añadir documento", "..." (más opciones) | ver detalle abajo |
+  | Chevron expandir | ícono | flecha derecha (o similar) | expande el detalle inline del vehículo mostrando tabs horizontales |
 - **Estados:**
   - Con datos (1057 registros).
   - **Vacío:** la tabla aparece sin filas (ej. un filtro/búsqueda sin resultados); el badge del total en el menú "Vehículos Importados" desaparece (ver Dashboard).
   - **Loading:** toda la pantalla (buscador, filtros, tabla y paginación) se muestra como **skeleton** (placeholders grises) hasta que la data carga.
   - Error — no documentado.
-- **Screenshot:** ![vehiculos-importados-grid](screenshots/vehiculos-importados-grid.png) · ![vehiculos-importados-iconos-fila](screenshots/vehiculos-importados-iconos-fila.png) · ![vehiculos-importados-grid-loading](screenshots/vehiculos-importados-grid-loading.png)
+- **Permisos por rol:**
+  - **DISTRIBUIDOR:** puede ver y acceder a todas las opciones del sidebar (Dashboard, Vehículos Importados con sus 3 subopciones, Importar CPA).
+  - **CLIENTE:** solo ve "Dashboard" y "Vehículos Asignados" en el sidebar; **NO** ve "Vehículos Importados" ni "Importar CPA". Si intenta acceder a URLs restringidas directamente, el sistema lo redirige al Dashboard mostrando mensaje *"No tienes permisos para acceder a esta funcionalidad"*.
+- **Screenshot:** ![vehiculos-importados-grid](screenshots/vehiculos-importados-grid.png) · ![vehiculos-importados-iconos-fila](screenshots/vehiculos-importados-iconos-fila.png) · ![vehiculos-importados-grid-loading](screenshots/vehiculos-importados-grid-loading.png) · ![vehiculos-importados-sidebar-layout](screenshots/vehiculos-importados-sidebar-layout.png)
+
+### Componente: Detalle inline expandido por fila (tabs)
+
+**Cómo se llega aquí:** clic en el chevron/flecha de expandir de una fila del grid "Vehículos Importados".
+
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Tabs horizontales | nav tabs | "MÁS INFORMACIÓN" / "CO" / "CPA" / "FACTURA" / "DOCS ADICIONALES" / "HISTORIAL" | tabs para navegar entre secciones del detalle del vehículo sin salir del grid |
+| Tab activo | tab resaltado | primer tab activo por defecto: "MÁS INFORMACIÓN" | — |
+
+**Tab "MÁS INFORMACIÓN":** (contenido pendiente documentar)
+
+**Tab "CO" (Certificado de Origen):** (contenido pendiente documentar)
+
+**Tab "CPA" (Certificado de Pago de Arbitrios):**
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Sección título | texto | "CONTRATO DE COMPRA (CPA)" | — |
+| Badge estado | badge | "SUBIDO" (verde) / "PENDIENTE" (naranja) / "COMPLETADO" (verde) | indica el estado del documento CPA |
+| Campo | label + valor | "PRECIO VENTA" | valor monetario (ej. "$37,614.42") |
+| Campo | label + valor | "IMPUESTO VENTA" | valor monetario (ej. "$7,162.11") |
+| Campo | label + valor | "FECHA IMPUESTO" | fecha (ej. "23/2/2026") |
+| Campo | label + valor | "DECLARACIÓN ARB" | texto/código (ej. "—" si vacío) |
+| Campo | label + valor | "ID CPA" | texto/código (ej. "—" si vacío) |
+| Campo | label + valor | "RNC CONTRIBUYENTE" | código (ej. "12502-40512") |
+| Botón | outline morado | "DESCARGAR" | descarga el PDF del CPA actual |
+| Botón | outline morado | "PREVISUALIZAR" | abre el PDF en visor inline o nueva pestaña |
+| Botón | outline morado | "REEMPLAZO" (ícono subir) | abre diálogo de selección de archivo para reemplazar el CPA actual |
+| Panel derecho | card | "HISTORIAL DE SEGUIMIENTO" | muestra eventos cronológicos del CPA (ej. "CPA Importado" con fecha + nombre de archivo) |
+
+**Comportamiento "REEMPLAZO":**
+1. Clic en "REEMPLAZO" → se abre explorador de archivos del sistema operativo
+2. Usuario selecciona nuevo PDF de CPA → confirma
+3. Sistema sube el archivo, muestra toast verde "Documento sustituido correctamente."
+4. Sistema detecta automáticamente que el documento CPA cambió y envía el nuevo documento al Portal DTOP en background mediante el Worker de retry
+
+**Tab "FACTURA":** (contenido pendiente documentar)
+
+**Tab "DOCS ADICIONALES":** (contenido pendiente documentar)
+
+**Tab "HISTORIAL":** (contenido pendiente documentar)
+
+**Screenshot:** (usuario mostró screenshots — pendiente agregar a `context/screenshots/`)
+
+**Notas para TCs:**
+- **CPA = Certificado de Pago de Arbitrios** (no "Contrato de Compra" — el sistema usa ambos términos: "Certificado de Pago de Arbitrios" en la definición y "CONTRATO DE COMPRA (CPA)" como label de sección; ambos labels son literales del sistema).
+- El detalle inline expandido es **más rápido** que navegar a "Editar Vehículo" — usar este flujo para TCs que solo necesitan consultar o reemplazar documentos sin editar campos VHE.
+- El toast "Documento sustituido correctamente." confirma que la operación de reemplazo fue exitosa en el frontend; la sincronización al Portal DTOP ocurre en background (el TC debe verificar en Autoreg "Consulta CO & CPA" que el documento llegó).
+
+
 
 ### Componentes / popups asociados a esta pantalla
 
@@ -506,4 +566,55 @@ Screenshot: ![header-sesion-inactividad](screenshots/header-sesion-inactividad.p
   - Caso de uso típico: la empresa usa un Excel con columnas en español ("Color", "Marca", "Puertas") pero el sistema espera inglés ("autoColor", "brand", "doors") → aquí se mapea "Color" → "autoColor".
   - Al escribir TCs de importación, **siempre verificar primero** que la configuración esté completa antes de subir el Excel — si no, el TC fallará por configuración incompleta, no por un bug en la importación.
   - El screenshot muestra una configuración ya guardada (todos los campos poblados). Estado inicial (sin configuración) — no documentado.
+---
+
+## Autoreg / PDV > DTOP > Consulta CO & CPA
+- **Ruta/URL:** (ruta exacta pendiente — accesible desde el menú lateral "Consulta CO & CPA")
+- **Cómo se llega aquí:** login en Autoreg con usuario **dtopsup** (rol: Case Manager) → menú lateral → opción "Consulta CO & CPA".
+- **Propósito:** pantalla de verificación que consulta los datos vehiculares (VHE) sincronizados desde Motorambar (Portal Distribuidor) hacia el Portal DTOP (Autoreg). Cuando un usuario edita un campo VHE en Motorambar (ej. cilindros, color, etc.), el sistema detecta el cambio y envía los datos actualizados al PDV — esta pantalla confirma que esos valores llegaron correctamente al Portal DTOP.
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Menú lateral | nav link | "Consulta CO & CPA" | activo/resaltado en esta pantalla |
+  | Título | texto | "Consulta CO & CPA" (o similar — pendiente confirmar en app real) | — |
+  | Label | texto | "Número de VIN" (o "VIN" — pendiente confirmar) | — |
+  | Input VIN | input de texto | placeholder: (pendiente confirmar) | campo de entrada para el VIN a consultar |
+  | Botón | primario | "Buscar" (o "Consultar" — pendiente confirmar) | ejecuta la búsqueda del vehículo por VIN |
+  | Mensaje de error | alert/texto rojo | "No se encontró el vehículo con este número de Número de VIN" | aparece cuando el VIN no existe o no ha sido sincronizado desde Motorambar |
+  | Panel de resultados | card/sección | muestra datos del vehículo encontrado | título con marca/modelo/año (ej. "NISSAN PATHFINDER 2025"); campos: VIN, Año, Marca, Modelo, Color, Puertas, Cilindros, Caballos de Fuerza, Tipo de Propulsión, Peso, Capacidad de Carga, etc. (lista completa pendiente confirmar) |
+- **Estados:**
+  - **Vacío:** al entrar a la pantalla, solo muestra el input VIN + botón "Buscar".
+  - **Error — VIN no encontrado:** mensaje "No se encontró el vehículo con este número de Número de VIN" (literal).
+  - **Éxito — vehículo encontrado:** panel de resultados con todos los datos VHE del vehículo (marca, modelo, año, color, puertas, cilindros, etc.).
+- **Screenshot:** (usuario mostró screenshots — pendiente agregar a `context/screenshots/`)
+- **Notas para TCs:**
+  - Esta pantalla es la **verificación final** de que los datos editados en Motorambar llegaron correctamente al Portal DTOP (Autoreg).
+  - **Flujo típico de verificación (2 sesiones en paralelo):**
+    1. Sesión A (Motorambar): login como `distri2` (Distribuidor) → editar un campo VHE de un vehículo (ej. cambiar cilindros de 4 a 6).
+    2. Sesión B (Autoreg): login como `dtopsup` (Case Manager) → "Consulta CO & CPA" → ingresar el VIN → verificar que el valor actualizado (6 cilindros) aparece en los resultados.
+  - **Prerequisito:** el VIN debe haber sido **previamente transmitido al Portal DTOP** (Send to PDV exitoso) — si el VIN nunca se envió, esta pantalla mostrará el error "No se encontró el vehículo".
+  - El mensaje de error dice literalmente "No se encontró el vehículo con este número de **Número de VIN**" (redundancia "número de Número de VIN" — así está en la UI real).
+  - Los labels exactos del input VIN, botón y campos del panel de resultados están pendientes de confirmar mediante inspección de la app real vía MCP Browser — los textos aquí son aproximaciones basadas en la descripción del usuario.
+
+### Componente: Modal "Documentos En Lote" (desde Consulta CO & CPA)
+- **Cómo se llega aquí:** después de buscar un VIN en "Consulta CO & CPA" y obtener resultados exitosos, hacer clic en el ícono de documentos (ícono carpeta/documentos — pendiente confirmar exactamente cuál ícono) en el panel de resultados.
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Título | texto | "Documentos En Lote" | — |
+  | Botón cerrar | ícono "X" | — | esquina superior derecha; cierra el modal |
+  | Tabla | grid | columnas: "Nombre del Archivo" / "Acción" | lista de todos los CPAs (Certificados de Pago de Arbitrio) del vehículo consultado |
+  | Columna Nombre del Archivo | texto con ícono documento | ej. "Certificado de Pago de Arbitrio_CPAJTDB4MEE8S3027120.pdf", "Certificado de Pago de Arbitrio_f35d5ea3-adf9-4a6a-8743-262ce22d506b.pdf" | nombres de archivos PDF de los CPAs |
+  | Columna Acción | ícono lupa | — | clic en la lupa previsualiza/descarga el documento (comportamiento exacto pendiente confirmar) |
+- **Estados:**
+  - **Con documentos:** la tabla muestra todos los CPAs del vehículo (1 o más filas).
+  - **Sin documentos:** _(pendiente confirmar si el modal aparece vacío o no se muestra el ícono de documentos en el panel de resultados)_
+- **Screenshot:** (usuario mostró screenshots — pendiente agregar a `context/screenshots/`)
+- **Notas para TCs:**
+  - Este modal es la **verificación de documentos (CPAs) sincronizados** desde Motorambar al Portal DTOP — análogo a la verificación de datos VHE que se hace directamente en el panel de resultados.
+  - **Flujo típico de verificación de documentos (2 sesiones en paralelo):**
+    1. Sesión A (Motorambar): login como `distri2` (Distribuidor) → navegar al detalle del vehículo → sección "CONTRATO DE COMPRA (CPA)" → botón "REEMPLAZO" → subir nuevo CPA → guardar.
+    2. Sesión B (Autoreg): login como `dtopsup` (Case Manager) → "Consulta CO & CPA" → buscar el VIN → clic en ícono de documentos → verificar que el nuevo CPA (nombre de archivo actualizado) aparece en la lista del modal "Documentos En Lote".
+  - El nombre de los archivos incluye el prefijo "Certificado de Pago de Arbitrio_" seguido de un identificador único (puede ser un código como "CPAJTDB4MEE8S3027120" o un UUID como "f35d5ea3-adf9-4a6a-8743-262ce22d506b").
+  - Para validar el reenvío automático, el TC debe comparar el nombre del archivo antes vs. después de la actualización — si el nombre cambió (nuevo UUID o timestamp), confirma que el sistema detectó el cambio y reenvió automáticamente al PDV.
 ---

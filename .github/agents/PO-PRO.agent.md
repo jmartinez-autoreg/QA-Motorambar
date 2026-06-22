@@ -134,6 +134,31 @@ El agente debe identificar qué tipo de US se está pidiendo y aplicar la planti
 
 Los criterios de aceptación deben ser **densos en información** y seguir estos patrones:
 
+### 7.0 Formato obligatorio: Gherkin
+
+Todos los criterios de aceptación se redactan en formato **Gherkin**:
+
+```
+Dado que [contexto o estado inicial]
+Cuando [acción del usuario o evento]
+Entonces [resultado esperado observable]
+Y [condición adicional — si aplica]
+```
+
+Cada escenario es un bloque `Dado que / Cuando / Entonces` independiente. Usar `Y` para condiciones adicionales dentro del mismo escenario.
+
+**HTML para ADO** — cada escenario es un `<li>` con `<br/>` entre líneas:
+```html
+<ul>
+  <li>
+    Dado que el usuario tiene rol Distribuidor<br/>
+    Cuando intenta acceder por URL a la pantalla restringida<br/>
+    Entonces el sistema lo redirige al Dashboard<br/>
+    Y muestra el mensaje: <em>"No tienes permisos para acceder a esta sección."</em>
+  </li>
+</ul>
+```
+
 ### 7.1 Campos obligatorios marcados con `*`
 
 ```html
@@ -183,6 +208,18 @@ Cuando un criterio involucre un **Date picker** (fecha simple, fecha futura o ra
 **File upload**, **Table** (listado/paginación) o **Text field** (código postal, comentarios,
 email, numérico, seguro social, teléfono), aplicar los formatos, formatos de máscara y
 mín/máx definidos en `references/criterios-funcionales-ui.md` — no inventar formatos propios.
+
+### 7.7 Sin tecnicismos de implementación
+
+Los criterios describen el **QUÉ** (comportamiento funcional visible al usuario), nunca el **CÓMO** (implementación técnica):
+
+⛔ **Nunca incluir en criterios:**
+- IDs técnicos de roles o entidades (`Id: 1`, `roleId = 3`, `userId`)
+- Referencias a arquitectura: "middleware", "API", "endpoint", "frontend", "backend"
+- Nombres de tablas, columnas, clases o métodos
+- Configuraciones de servidor, tokens o credenciales
+
+✅ **En su lugar:** nombre funcional del rol (`rol Distribuidor`), acción visible (`intenta acceder por URL`) y resultado observable (`el sistema redirige al Dashboard`).
 
 ---
 
@@ -489,6 +526,9 @@ Cuando redactes USs de cambio de estado, siempre mencionar:
 | Dividir en "frontend" y "backend" | No entrega valor completo | Dividir verticalmente por funcionalidad |
 | No especificar colores de estados | Inconsistencia visual | Incluir color: Available (verde) |
 | Usar lenguaje técnico en descripción | PO no es técnico | Lenguaje de negocio en descripción, técnico en criterios |
+| Incluir IDs técnicos de roles en criterios (`Id: 1`, `roleId=3`) | PO/QA no trabajan con IDs internos | Usar solo el nombre funcional: `rol Distribuidor`, `rol SysAdmin` |
+| Mencionar arquitectura en criterios ("middleware", "API", "BD") | Los criterios definen comportamiento, no implementación | Describir el QUÉ: acción y resultado visible para el usuario |
+| Redactar criterios como bullets descriptivos en lugar de Gherkin | Dificulta trazabilidad y creación de TCs | Usar Gherkin: `Dado que / Cuando / Entonces / Y` |
 
 ---
 

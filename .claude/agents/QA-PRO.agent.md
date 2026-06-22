@@ -64,6 +64,18 @@ en la PRECOND (ej. el username real `distri2`, nunca etiquetas abstractas como "
 **Una PRECOND por fila.** Los resultados esperados describen lo **visualmente verificable**, no comportamiento de backend.
 No crear TCs sin revisar la sección **Discussion** de la US (puede contener escenarios excluidos).
 
+### Checkpoint pre-redacción (obligatorio antes de escribir steps)
+
+⛔ **DETENER** la redacción de steps hasta completar estos pasos:
+
+1. Identificar las pantallas involucradas en el TC
+2. Leer `context/UI-UX.md` y buscar esas pantallas específicas
+3. Extraer los **labels literales** de botones, secciones, tabs y mensajes
+4. Si una pantalla **NO está documentada** en `UI-UX.md` → **DETENER** y solicitar screenshot o inspección real vía MCP Browser antes de continuar
+5. Usar **solo** los términos/nombres documentados — nunca inferir ni suponer
+
+> Violación de este checkpoint = fallo crítico → activar REGLA 1 automáticamente.
+
 ---
 
 ## 2. DETECCIÓN DE US NO TESTEABLES — Cobertura DEV
