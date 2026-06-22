@@ -183,7 +183,7 @@ Screenshot: ![pdv-bienvenido-terminos-condiciones](screenshots/pdv-bienvenido-te
 **Tab "CPA" (Certificado de Pago de Arbitrios):**
 | Elemento | Tipo | Texto/label literal | Comportamiento |
 |---|---|---|---|
-| Sección título | texto | "CONTRATO DE COMPRA (CPA)" | — |
+| Sección título | texto | "CONTRATO DE COMPRA (CPA)" ⚠️ | ⚠️ Label antiguo en la UI — término correcto: "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)" |
 | Badge estado | badge | "SUBIDO" (verde) / "PENDIENTE" (naranja) / "COMPLETADO" (verde) | indica el estado del documento CPA |
 | Campo | label + valor | "PRECIO VENTA" | valor monetario (ej. "$37,614.42") |
 | Campo | label + valor | "IMPUESTO VENTA" | valor monetario (ej. "$7,162.11") |
@@ -211,7 +211,8 @@ Screenshot: ![pdv-bienvenido-terminos-condiciones](screenshots/pdv-bienvenido-te
 **Screenshot:** (usuario mostró screenshots — pendiente agregar a `context/screenshots/`)
 
 **Notas para TCs:**
-- **CPA = Certificado de Pago de Arbitrios** (no "Contrato de Compra" — el sistema usa ambos términos: "Certificado de Pago de Arbitrios" en la definición y "CONTRATO DE COMPRA (CPA)" como label de sección; ambos labels son literales del sistema).
+- **CO = Certificado de Origen** — término oficial, usado consistentemente en la UI como "CERTIFICADO DE ORIGEN (CO)".
+- **CPA = Certificado de Pago de Arbitrios** — término oficial. La UI puede mostrar variantes ("CONTRATO DE COMPRA (CPA)" en algunas secciones antiguas), pero **los TCs deben usar siempre "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)"** como término oficial del dominio.
 - El detalle inline expandido es **más rápido** que navegar a "Editar Vehículo" — usar este flujo para TCs que solo necesitan consultar o reemplazar documentos sin editar campos VHE.
 - El toast "Documento sustituido correctamente." confirma que la operación de reemplazo fue exitosa en el frontend; la sincronización al Portal DTOP ocurre en background (el TC debe verificar en Autoreg "Consulta CO & CPA" que el documento llegó).
 
@@ -354,14 +355,13 @@ Screenshot: ![vehiculos-importados-reporte-inventario](screenshots/vehiculos-imp
   | Sección "REGULATORIO Y ORIGEN" | fieldset | CÓDIGO DE ORIGEN, TIPO DE CARROCERÍA `CO`, NO. TÍTULO, FECHA TÍTULO `CO` | — |
   | Sección "FINANCIERO" | fieldset | PRECIO CONTRIBUTIVO, ARBITRIOS, FECHA DE PAGO DE ARBITRIOS, NRO. DECLARACIÓN DE ARBITRIOS, CPA ID, ID CONTRIBUYENTE, NRO. FACTURA `CO`, CONCESIONARIO `CO`, NRO. DE LICENCIA, ID CLIENTE, NRO. DE ORDEN DE VENTA, NRO. CARTA DE CRÉDITO, INSTITUCIÓN FINANCIERA | — |
   | Sección "CERTIFICADO DE ORIGEN" | card + badge estado | badge "COMPLETADO" (verde); campos CÓDIGO ORIGEN, NO. TITULO, TIPO DE CUERPO, FECHA TITULO; botones "DESCARGAR" / "PREVISUALIZAR" | panel derecho "HISTORIAL DE SEGUIMIENTO" con eventos "CO Generado" / "CO Reemplazado" (fecha + nombre de archivo PDF) |
-  | Sección "CONTRATO DE COMPRA (CPA)" | card + badge estado | badge "SUBIDO" (verde); campos PRECIO VENTA, IMPUESTO VENTA, FECHA IMPUESTO, DECLARACIÓN ARB, ID CPA, RNC CONTRIBUYENTE; botones "DESCARGAR" / "PREVISUALIZAR" | panel derecho "HISTORIAL DE SEGUIMIENTO" con evento "CPA Importado" (fecha + nombre de archivo PDF) |
+  | Sección "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)" ⚠️ | card + badge estado | ⚠️ UI puede mostrar label antiguo "CONTRATO DE COMPRA (CPA)" — término correcto: "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)". Badge "SUBIDO" (verde); campos PRECIO VENTA, IMPUESTO VENTA, FECHA IMPUESTO, DECLARACIÓN ARB, ID CPA, RNC CONTRIBUYENTE; botones "DESCARGAR" / "PREVISUALIZAR" | panel derecho "HISTORIAL DE SEGUIMIENTO" con evento "CPA Importado" (fecha + nombre de archivo PDF) |
   | Sección "DETALLES DE FACTURACIÓN" | card + badge estado | badge "PENDIENTE" (naranja); estado vacío: ícono subir, "FACTURA FALTANTE" / "No hay factura disponible para este registro." | panel derecho "SEGUIMIENTO FINANCIERO" → "SINCRONIZACIÓN FINANCIERA ACTIVA" / "CONECTADO A {institución financiera}" |
   | Sección "DOCUMENTOS ADICIONALES" | card | (vacío en captura) | — |
 - **Estados:** con datos, todas las secciones con badge de estado (COMPLETADO/SUBIDO/PENDIENTE). Vacío total no documentado.
 - **Screenshot:** ![vehiculo-detalle-readonly](screenshots/vehiculo-detalle-readonly.png) · ![vehiculo-detalle-readonly-scroll-medio](screenshots/vehiculo-detalle-readonly-scroll-medio.png) · ![vehiculo-detalle-readonly-scroll-abajo](screenshots/vehiculo-detalle-readonly-scroll-abajo.png)
 - **Notas para TCs:**
   - El badge `CO` junto a un campo indica que el valor proviene del Certificado de Origen — útil para TCs que validan precarga de datos desde CO.
-  - "CPA" en esta pantalla aparece como "CONTRATO DE COMPRA (CPA)"; en el flujo de importación (`/import/cpa`) el mismo término se describe como "Certificados de Pago de Arbitrios" — ambos labels son literales del sistema, no homologar.
 ---
 
 ## Motorambar > Vehículos Importados > Editar vehículo
@@ -378,7 +378,7 @@ Screenshot: ![vehiculos-importados-reporte-inventario](screenshots/vehiculos-imp
   | Banner cambios sin guardar | alert amarillo | "Cambios sin guardar" / "Has modificado {n} campo(s). No olvides guardar tus cambios." | lista chips con el nombre de cada campo modificado (ej. "PUERTAS") |
   | Campos editables | input/select | mismas secciones "DETALLES", "ESPECIFICACIONES TÉCNICAS", "REGULATORIO Y ORIGEN" que en modo lectura | MARCA, MODELO, COLOR AUTO y TIPO DE PROPULSIÓN son `<select>`; campos numéricos (ej. PUERTAS) tienen spinner +/- |
   | Campo modificado | input resaltado | borde naranja + punto naranja | indica que ese campo difiere del valor original |
-  | Sección "CERTIFICADO DE ORIGEN" / "CONTRATO DE COMPRA (CPA)" | card | igual que en solo lectura + botón adicional "REEMPLAZO" (ícono subir) | permite reemplazar el archivo del documento |
+  | Sección "CERTIFICADO DE ORIGEN" / "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)" ⚠️ | card | ⚠️ UI puede mostrar label antiguo "CONTRATO DE COMPRA (CPA)". Igual que en solo lectura + botón adicional "REEMPLAZO" (ícono subir) | permite reemplazar el archivo del documento |
   | Sección "DETALLES DE FACTURACIÓN" | card | estado vacío "FACTURA FALTANTE" + botón "IMPORTAR FACTURA" (morado, ícono subir) | botón solo visible en modo edición |
   | Sección "DOCUMENTOS ADICIONALES" | card | link "+ AGREGAR DOCUMENTO" (arriba a la derecha) + dropzone "SUBIR NUEVO" | abre modal "Añadir Documento" |
 - **Estados:** sin cambios / con campo(s) modificado(s) (banner amarillo + chip por campo).
@@ -613,7 +613,7 @@ Screenshot: ![header-sesion-inactividad](screenshots/header-sesion-inactividad.p
 - **Notas para TCs:**
   - Este modal es la **verificación de documentos (CPAs) sincronizados** desde Motorambar al Portal DTOP — análogo a la verificación de datos VHE que se hace directamente en el panel de resultados.
   - **Flujo típico de verificación de documentos (2 sesiones en paralelo):**
-    1. Sesión A (Motorambar): login como `distri2` (Distribuidor) → navegar al detalle del vehículo → sección "CONTRATO DE COMPRA (CPA)" → botón "REEMPLAZO" → subir nuevo CPA → guardar.
+    1. Sesión A (Motorambar): login como `distri2` (Distribuidor) → navegar al detalle del vehículo → sección "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)" → botón "REEMPLAZO" → subir nuevo CPA → guardar.
     2. Sesión B (Autoreg): login como `dtopsup` (Case Manager) → "Consulta CO & CPA" → buscar el VIN → clic en ícono de documentos → verificar que el nuevo CPA (nombre de archivo actualizado) aparece en la lista del modal "Documentos En Lote".
   - El nombre de los archivos incluye el prefijo "Certificado de Pago de Arbitrio_" seguido de un identificador único (puede ser un código como "CPAJTDB4MEE8S3027120" o un UUID como "f35d5ea3-adf9-4a6a-8743-262ce22d506b").
   - Para validar el reenvío automático, el TC debe comparar el nombre del archivo antes vs. después de la actualización — si el nombre cambió (nuevo UUID o timestamp), confirma que el sistema detectó el cambio y reenvió automáticamente al PDV.

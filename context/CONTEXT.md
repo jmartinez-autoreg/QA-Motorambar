@@ -110,8 +110,8 @@
 | `Autoreg` | Sistema externo de SSO/identidad — origen del login principal |
 | `Motorambar` / `DistributionCar` | Nombre del proyecto (Motorambar = nombre comercial/repo ADO; DistributionCar = nombre interno de la solución .NET) |
 | `VIN` | Número de identificación del vehículo — campo de búsqueda principal en "Vehículos importados" |
-| `CO` | "Certificado de Origen" — sección en el detalle de vehículo (badge de estado COMPLETADO/etc.), y badge junto a campos cuyo valor proviene de ese certificado (ej. "MARCA `CO`"). También filtro/columna "Estado CO" en el grid |
-| `CPA` | "Certificado(s) de Pago de Arbitrios" — sección "CONTRATO DE COMPRA (CPA)" en el detalle de vehículo, módulo de importación `/import/cpa` ("Importar CPA"), categoría de documento "Certificado de Pago de Arbitrios" en el modal "Añadir Documento", y filtro/columna "Estado CPA" en el grid |
+| `CO` | **"Certificado de Origen"** — sección "CERTIFICADO DE ORIGEN (CO)" en el detalle de vehículo (badge de estado COMPLETADO/etc.), y badge junto a campos cuyo valor proviene de ese certificado (ej. "MARCA `CO`"). También filtro/columna "Estado CO" en el grid |
+| `CPA` | **"Certificado de Pago de Arbitrios"** — sección "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)" en el detalle de vehículo, módulo de importación `/import/cpa` ("Importar CPA"), categoría de documento en el modal "Añadir Documento", y filtro/columna "Estado CPA" en el grid |
 | `PDV` | "Portal de Vehículos" — sistema de Autoreg; mismo origen del login federado (SSO) |
 | `PDV-Datos` / `PDV-Documentos` | Columnas del grid de "Vehículos importados" con indicador ✓/✕ de sincronización hacia **PDV (Portal de Vehículos / Autoreg)**. Existe también una entidad/cliente llamada "PDV" en la lista de "Asignar Cliente" (junto a POPULAR AUTO, FIRSTBANK, ORIENTAL BANK, TOYOTA CREDIT) — relación exacta entre la columna de sincronización y este cliente "PDV" _(pendiente confirmar)_ |
 | `ParentLocation` | Agrupador de localidades — seed actual: "Banco Popular", "First Bank", "Oriental Bank" |
