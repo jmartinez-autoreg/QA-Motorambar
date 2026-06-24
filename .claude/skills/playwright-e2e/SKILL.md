@@ -881,16 +881,23 @@ const ssPop = async (name: string) => {
 
 | Momento | Llamada | Ejemplo |
 |---|---|---|
-| Después del `goto()` inicial | `ss('01-login-cargado')` | Login page ya visible |
+| Después del `goto()` inicial | `ss('01-login-cargado')` | Login page vacía visible |
+| **Formulario lleno, ANTES del submit** | `ss('NN-formulario-lleno')` | Login con usuario visible, antes de hacer click |
 | Después de cada `waitForLoad()` / `waitForURL()` | `ss('NN-pantalla-X-cargada')` | Post-login, post-navegación |
 | Cuando aparece un modal condicional | `ss('NN-modal-tyc-visible')` | Si T&C aparece |
-| ANTES de cualquier click que navegue o haga submit | `ss('NN-antes-ACCION')` | Antes de "Portal Distribuidor" |
-| Resultado esperado de cada step del TC | `ss('NN-resultado-DESCRIPCION')` | Post-login dashboard, post-SSO |
+| ANTES de cualquier click que navegue o haga submit fuera de login | `ss('NN-antes-ACCION')` | Antes de "Portal Distribuidor" |
+| Resultado esperado de cada step del TC | `ss('NN-resultado-DESCRIPCION')` | Dashboard post-login, post-SSO |
 | Final del flujo exitoso | `ss('99-resultado-final')` | Pantalla destino confirmada |
 
-⛔ **UN solo screenshot al final = evidencia inútil.** Si el test falla en el paso 3
-de 5, el único screenshot final no captura lo que ocurrió. Cada step del TC necesita
-su evidencia.
+> **Por qué el formulario lleno es obligatorio:** es la única evidencia que muestra QUÉ usuario
+> se usó y que los datos fueron ingresados correctamente antes del submit. Sin esta imagen,
+> no hay cobertura del step "ingresar credenciales".
+>
+> **Implicación en la estructura del fixture de login:** el método `login()` no debe ser
+> un único paso — separar `fillCredentials()` y `submit()` para poder insertar el `ss()` entre ambos.
+
+⛔ **UN solo screenshot al final = evidencia incompleta.** Si el test falla en el paso 3
+de 5, la única imagen final no captura qué ocurrió antes. Cada step del TC necesita su evidencia.
 
 #### Ejemplo en flujo SSO (TC-11454 como referencia)
 
@@ -903,21 +910,23 @@ test('...', async ({ page }, testInfo) => {
 
   // Step 1 — Login
   await autoregLoginPage.goto();
-  await ss('01-login-page-cargada');          // ← OBLIGATORIO: pantalla inicial
-  await autoregLoginPage.login(user, pass);
+  await ss('01-login-page-cargada');              // ← pantalla inicial (vacía)
+  await autoregLoginPage.fillCredentials(user, pass); // fill sin click
+  await ss('01-credenciales-ingresadas');          // ← OBLIGATORIO: usuario visible antes del submit
+  await autoregLoginPage.submit();
   await autoregHomePage.waitForLoad();
-  await ss('01-resultado-dashboard-autoreg'); // ← OBLIGATORIO: resultado step 1
+  await ss('01-resultado-dashboard-autoreg');      // ← resultado step 1
 
   // Step 2 — Modal T&C (condicional)
   if (await termsModal.isVisible()) {
-    await ss('02-modal-tyc-visible');         // ← si aparece, capturar
+    await ss('02-modal-tyc-visible');
     await termsModal.acceptAllTerms();
     await autoregHomePage.waitForLoad();
     await ss('02-resultado-modal-aceptado');
   }
 
   // Step 3 — Portal Distribuidor
-  await ss('03-antes-click-portal-distribuidor'); // ← OBLIGATORIO: antes de acción clave
+  await ss('03-antes-click-portal-distribuidor'); // ← antes de acción clave
   const popupPage = await autoregHomePage.clickPortalDistribuidor();
 
   // Step 4/5 — Verificar Motorambar (nueva pestaña)
@@ -926,10 +935,23 @@ test('...', async ({ page }, testInfo) => {
     await testInfo.attach(name, { body: buf, contentType: 'image/png' });
   };
   await motorambarDashboard.waitForLoad();
-  await ssPop('04-resultado-motorambar-cargado'); // ← OBLIGATORIO: resultado final
+  await ssPop('04-resultado-motorambar-cargado');
   await ssPop('99-resultado-final');
 });
 ```
+
+> **Fixture de login recomendado** — separar fill de submit:
+> ```ts
+> async fillCredentials(username: string, password: string) {
+>   await this.page.locator(this.usernameInput).fill(username);
+>   await this.page.locator(this.passwordInput).fill(password);
+>   // NO hace click — permite capturar screenshot antes del submit
+> }
+> async submit() {
+>   await this.page.locator(this.loginButton).click();
+> }
+> // login() puede quedar como alias: fillCredentials + submit (para flows sin evidencia)
+> ```
 
 ### REGLA 10 — File Uploads
 
