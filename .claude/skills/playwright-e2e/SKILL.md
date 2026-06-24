@@ -1071,6 +1071,11 @@ testInfo.annotations.push({
 
 | Anti-patrón | Por qué falla | Solución |
 |-------------|---------------|-----------|
+| **Ver la pantalla en MCP Browser y asumir que el selector Playwright funcionará** | MCP usa el accessibility tree del protocolo CDP. Un elemento visible en el screenshot MCP puede tener un locator que Playwright no resuelve (strict mode violation, elemento en shadow DOM, timeout). Ver ≠ selector válido. | La ÚNICA prueba de que un selector funciona es `npx playwright test` verde. No declarar éxito sin ese output. |
+| **Usar `ref=eXX` de MCP Browser como selector en el fixture** | `ref=e35` es un handle interno del árbol de accesibilidad del protocolo MCP. No es un selector CSS/XPath válido para Playwright. El test compilará pero lanzará error al ejecutar: `Error: Unable to find element with selector 'ref=e35'` | Ejecutar JS inventory en MCP para obtener el `id` real del elemento: `document.querySelector('[atributo]').id` |
+| **Cambiar selectores a ciegas cuando el primero falla (2+ intentos sin datos)** | Sin saber qué hay en el DOM, cada cambio es una apuesta. Después de 2 intentos fallidos el problema ya no es el selector elegido — es que el DOM real es desconocido. | **Regla del 2do fallo:** si el selector X falla, intentar UN alternativo. Si ese también falla → parar. Abrir MCP Browser, ejecutar JS inventory, obtener el ID real antes de escribir el tercero. |
+| **Declarar "el test pasó" sin mostrar el output del terminal** | El agente puede ver el browser via MCP en un estado "logueado" de una sesión anterior y asumir que el test Playwright pasará igual. Son contextos completamente distintos. | Ejecutar `npx playwright test` y pegar el output COMPLETO en el chat. Si el output no muestra `✅ X passed`, el test NO pasó. |
+| **Inventar selectores para el dominio destino de un SSO sin hacer discovery allí** | En un flujo SSO el destino es un dominio diferente (popup / nueva pestaña). Sus elementos son desconocidos — los selectores como `span.font-bold:has-text("VehicleDocs")` o `text=Dashboard` son inventados y fallarán. | Para verificar SSO exitoso usar SOLO URL + networkidle: `await page.waitForLoadState('networkidle')` + `expect(page).toHaveURL(/dominio-destino/)`. Los selectores de elementos del destino se agregan DESPUÉS de correr discovery allí. |
 | **Usar `button:has-text(...)` cuando el botón tiene `id`** | Texto puede cambiar; overlays de menú bloquean el click nativo causando timeout | Usar `#id` siempre (PRIORIDAD 1). Si botón está en nav con hover, usar `page.evaluate(() => btn.click())` |
 | **No inventariar locators antes de escribir el fixture** | Selectors frágiles → tests que rompen por cualquier cambio de UI | Ejecutar JS de REGLA 0 en CADA pantalla ANTES de codificar |
 | **Inventar nombres de usuario o keys de `.env` sin preguntar** | Las variables del `.env` no existen → `EnvHelper.getRequired()` lanza error antes de abrir el browser → ningún test llega a ejecutar una acción | Preguntar credenciales en Paso 3.5. Usar el nombre LITERAL que dio el usuario como sufijo de la key: `TEST_USER_JOVIDIO` solo si el usuario dijo "jovidio". |
@@ -1178,10 +1183,18 @@ funcional. Esto duplica el test, confunde el reporte y oculta la causa real de f
 4. Aplicar upgrades y simplificaciones
    ↓
 5. Ejecutar el test: el AGENTE corre npx playwright test --headed
+   → Mostrar el output COMPLETO del terminal en el chat — nunca parafrasear ni resumir
    → Si falla: diagnosticar, corregir, re-ejecutar
-   → NUNCA decir "está listo" sin ver ✅ en el output del terminal
+   → ⛔ NUNCA decir "el test pasó" basándose en lo que MCP Browser muestra visualmente
+   → La ÚNICA fuente de verdad es el output de npx playwright test mostrando "X passed"
    ↓
-6. Solo cuando el test pasa verde → entregar comando de ejecución al usuario
+6. Solo cuando el test pasa verde → entregar comandos de ejecución al usuario
+   → Si el flujo involucra un popup/nueva pestaña cross-domain (SSO federado):
+     • La verificación del dominio destino USA SOLO URL + networkidle
+     • ⛔ NO inventar selectores de elementos en el dominio destino sin haber corrido discovery allí
+     • Patrón mínimo confiable:
+         await destino.waitForLoadState('networkidle', { timeout: 30000 });
+         await expect(destino).toHaveURL(/dominio-destino/, { timeout: 15000 });
 ```
 
 ### Paso 2 — Extracción de Selectores del Código
