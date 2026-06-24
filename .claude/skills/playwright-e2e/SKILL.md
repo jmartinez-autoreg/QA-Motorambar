@@ -1659,30 +1659,14 @@ mcp_ado_wit_update_work_item({
 })
 ```
 
-**6.2 Publicar evidencia en la US — seguir este orden exacto:**
+**6.2 Publicar evidencia en la US:**
 
-> ⛔ NO inventar un formato de reporte. El formato lo dicta la discusión existente de la US.
-
-1. Leer comentarios actuales de la US vinculada al TC:
-   `mcp_ado_wit_list_work_item_comments(workItemId: <US_ID>)`
-   → Observar el formato del último comentario QA para mantener consistencia.
-
-2. Subir cada screenshot como attachment vía REST (ver PASO 3.1 y 4.1 del skill `qa-execution-reporter`) → obtener URLs.
-
-3. Publicar UN comentario en la **US** (no en el TC) con el formato del equipo:
-   ```
-   QA PASSED ✅
-
-   [Test Regresión]
-
-   ![01-login-cargado.png](URL)
-   ![02-dashboard-autoreg.png](URL)
-   ![04-antes-click-portal.png](URL)
-   ![05-motorambar-cargado.png](URL)
-   ![99-resultado-final.png](URL)
-   ```
-   - `[Test Regresión]` como placeholder cuando el test corrió por CLI (sin run ADO)
-   - Solo imágenes y status — sin pasos, sin framework, sin permisos, sin rutas locales
+> ⛔ **ESTE SKILL NO CONTIENE INSTRUCCIONES DE FORMATO PARA EL COMENTARIO ADO.**
+> ⛔ **PROHIBIDO escribir el comentario desde aquí.**
+>
+> Cargar y ejecutar el skill **`qa-execution-reporter`** completo.
+> Todo el formato, el proceso de upload y las reglas de publicación viven allí.
+> No hay ninguna excepción a esta regla.
 
 **6.3 Entregar al usuario:**
 
