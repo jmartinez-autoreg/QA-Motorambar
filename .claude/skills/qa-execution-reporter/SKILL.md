@@ -468,6 +468,11 @@ $attachmentUrls[$testCases[0].tcId] = $tcUrls
 
 ### PASO 3.3: Construir comentario y publicar en la US
 
+> ⛔ **SIEMPRE usar `add_work_item_comment` — NUNCA `update_work_item_comment`.**
+> La API de UPDATE acepta el comando aunque el comentario no exista y falla silenciosamente
+> sin ningún error visible. El resultado: el agente dice "listo" pero en ADO no aparece nada.
+> Para publicar evidencia QA, siempre se crea un comentario nuevo.
+
 ```powershell
 foreach ($tc in $testCases) {
   $status = if ($tc.status -eq "PASSED") { "QA PASSED ✅" } else { "QA NOT PASSED ❌" }
@@ -494,6 +499,20 @@ foreach ($tc in $testCases) {
 ```
 
 **✅ OUTPUT:** Comentario en la US con formato `QA PASSED/NOT PASSED + link + imágenes inline`.
+
+### PASO 3.3b: Verificar que el comentario existe (OBLIGATORIO)
+
+> ⛔ **PROHIBIDO decir "listo" basándose solo en el "éxito" de la llamada MCP.**
+> La API puede devolver éxito y no haber escrito nada (fallo silencioso).
+
+Inmediatamente después de `add_work_item_comment`, leer los comentarios de la US:
+```
+mcp_ado_wit_list_work_item_comments(workItemId: <US_ID>)
+```
+Confirmar que el comentario recién creado aparece en la lista (verificar por ID o por contenido).
+
+- Si aparece → continuar a PASO 3.4.
+- Si NO aparece → **no decir "listo"**. Intentar `add_work_item_comment` una vez más y verificar de nuevo.
 
 ### PASO 3.4: Informar al usuario
 
@@ -570,6 +589,8 @@ Después de ejecutar todo, confirmar al usuario:
 | Publicar comentario con rutas locales, scripts o info técnica | Solo: `QA PASSED ✅` + link (o `[Test Regresión]`) + imágenes inline |
 | Preguntar al usuario el PAT si el MCP de ADO ya funcionó en la sesión | Extraer el PAT de los archivos de config según la plataforma |
 | Publicar sin confirmar con `✅` que el upload fue exitoso | Verificar `$resp.url` para cada imagen antes de construir el comentario |
+| Usar `update_work_item_comment` para publicar evidencia | Siempre `add_work_item_comment` — UPDATE falla silenciosamente si el ID no existe |
+| Decir "listo" basándose en el "éxito" de la API sin verificar en ADO | Leer los comentarios de la US después de publicar y confirmar que aparece (PASO 3.3b) |
 
 ---
 
