@@ -466,6 +466,18 @@ $attachmentUrls[$testCases[0].tcId] = $tcUrls
 > ⛔ **El comentario va en la US, NUNCA en el TC.**
 > Los TCs son los receptores de attachments; la US es donde se publica la evidencia visible.
 
+### PASO 3.2b: Resolver US vinculada al TC (OBLIGATORIO si vienes del flujo playwright-e2e)
+
+> ⛔ **El comentario va en la US, NUNCA en el TC.**
+> Si llegaste aquí desde `playwright-e2e` solo tienes el TC ID — necesitas la US antes de publicar.
+
+```
+mcp_ado_wit_get_work_item(id: <TC_ID>)
+→ Extraer campo "System.Parent" o "Parent" → ese es el ID de la US vinculada
+```
+
+⛔ Si no encuentras la US vinculada → preguntar al usuario el ID de la US. **No publicar en el TC.**
+
 ### PASO 3.3: Construir comentario y publicar en la US
 
 > ⛔ **SIEMPRE usar `add_work_item_comment` — NUNCA `update_work_item_comment`.**
@@ -589,6 +601,7 @@ Después de ejecutar todo, confirmar al usuario:
 | Publicar comentario con rutas locales, scripts o info técnica | Solo: `QA PASSED ✅` + link (o `[Test Regresión]`) + imágenes inline |
 | Preguntar al usuario el PAT si el MCP de ADO ya funcionó en la sesión | Extraer el PAT de los archivos de config según la plataforma |
 | Publicar sin confirmar con `✅` que el upload fue exitoso | Verificar `$resp.url` para cada imagen antes de construir el comentario |
+| Publicar en el TC porque es el ID que se tiene del flujo de automatización | Resolver la US vinculada vía `System.Parent` del TC antes de publicar (PASO 3.2b) |
 | Usar `update_work_item_comment` para publicar evidencia | Siempre `add_work_item_comment` — UPDATE falla silenciosamente si el ID no existe |
 | Decir "listo" basándose en el "éxito" de la API sin verificar en ADO | Leer los comentarios de la US después de publicar y confirmar que aparece (PASO 3.3b) |
 
