@@ -39,6 +39,7 @@ Responde A o B para continuar.
 
 - Si **A**: ir a FASE 0.5 (verificar entorno + entregar comando codegen)
 - Si **B**: ir directamente a FASE 1 (descubrimiento via MCP Browser)
+- Si el usuario proporciona un **TC ID** directamente (ej: "automatiza el TC 9360"): ir a **FASE 6** — flujo autónomo TC-ID → test en verde.
 
 ---
 
@@ -98,29 +99,7 @@ proyecto/
 
 ### playwright.config.ts Base
 
-```ts
-import { defineConfig } from '@playwright/test';
-
-export default defineConfig({
-  testDir: './tests',
-  timeout: 120_000,
-  expect: { timeout: 10_000 },
-  fullyParallel: false,
-  retries: 0,
-  reporter: 'html',
-  use: {
-    baseURL: '<URL_DEL_AMBIENTE>',
-    headless: false,
-    viewport: { width: 1280, height: 720 },
-    actionTimeout: 15_000,
-    screenshot: 'only-on-failure',
-    trace: 'on-first-retry',
-  },
-  projects: [
-    { name: 'chromium', use: { browserName: 'chromium' } },
-  ],
-});
-```
+> Usar la plantilla canónica de **FASE 0.5 Paso 2** — incluye `dotenv`, `SLOW_MO` y los scripts `test:slow` / `test:debug` de `package.json`. No duplicar aquí.
 
 ### Archivo Dummy para Uploads
 
@@ -684,16 +663,18 @@ export const SEL = {
 
 ### REGLA 1 — Esperar SIEMPRE antes de actuar
 
-> Implementación completa de las 3 variantes de `waitForPageIdle` (WebForms/SPA/Universal):
-> → ver `playwright-guide.md` sección **waitForPageIdle**
-
-Regla de uso: detectar tecnología en FASE 1 → usar la variante correcta (A/B/C).
-NO mezclar variantes. La variante incorrecta causará timeouts o falsos positivos.
+> ⛔ Antes de codificar cualquier helper, leer **`playwright-guide.md`** en la raíz del proyecto
+> y copiar la variante correcta de `waitForPageIdle` según la tecnología detectada en FASE 1:
+> - Variante A → WebForms / UpdatePanel
+> - Variante B → React / Vue / Angular SPA
+> - Variante C → Universal / desconocida
+>
+> NO mezclar variantes. La variante incorrecta causará timeouts o falsos positivos.
 
 ### REGLA 2 — No sobrescribir campos pre-llenados
 
-> Implementación de `setIfBlank()` (verifica `inputValue()` antes de llenar):
-> → ver `playwright-guide.md` sección **setIfBlank**
+> Implementación de `setIfBlank()` en `playwright-guide.md` sección **setIfBlank**.
+> Copiar al fixture antes de usar.
 
 ### REGLA 3 — Orden de llenado en páginas con Campos Reactivos
 
@@ -717,15 +698,12 @@ NO mezclar variantes. La variante incorrecta causará timeouts o falsos positivo
 
 ### REGLA 4 — Click seguro en botones de navegación
 
-> Implementación de `waitForClickable()` y `clickContinuar()`:
-> → ver `playwright-guide.md` sección **clickContinuar**
+> `waitForClickable()` y `clickContinuar()` en `playwright-guide.md` sección **clickContinuar**. Copiar al fixture.
 
 ### REGLA 5 — Validación pre-submit
 
-> Implementación de `logEmptyFields()` para diagnóstico pre-submit:
-> → ver `playwright-guide.md` sección **logEmptyFields**
-
-Regla: usar como diagnóstico (`console.warn`) antes del submit. No hacer assert duro con los campos vacíos — el servidor los validará y reportará los errores específicos.
+> `logEmptyFields()` en `playwright-guide.md` sección **logEmptyFields**. Copiar al fixture.
+> Usar como diagnóstico (`console.warn`) antes del submit — no hacer assert duro; el servidor reportará los errores específicos.
 
 ### REGLA 6 — Diagnóstico cuando Continuar no avanza
 

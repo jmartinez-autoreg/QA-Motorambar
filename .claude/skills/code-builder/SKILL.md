@@ -25,9 +25,13 @@ Tomar el plan (pasos, datos) y el catálogo de selectores confirmados y converti
 
 ## PASO 1 — Leer los contratos de input
 
-Leer `.agent-state/plan-<TC_ID>.json` y `.agent-state/discovery-<TC_ID>.json`.
+Leer en este orden:
+1. `.agent-state/plan-<TC_ID>.json` — pasos, datos, precondiciones
+2. `.agent-state/discovery-<TC_ID>.json` — selectores confirmados, tecnología, campos reactivos
+3. `playwright-guide.md` (raíz del proyecto) — implementaciones canónicas de los helpers que irán en el fixture
 
-⛔ Si alguno de los dos archivos no existe → reportar el error al orquestador. NO proceder sin ambos archivos.
+⛔ Si plan o discovery no existen → reportar al orquestador. NO proceder sin ambos archivos.
+⛔ Si `playwright-guide.md` no existe → reportar al orquestador. El fixture quedará con funciones vacías sin él.
 
 Verificar que `discovery-output.json` tiene selectores para todas las pantallas mencionadas en los steps del plan.  
 Si falta una pantalla → reportar al orquestador: "Pantalla X no tiene selectores — se necesita re-run de discovery."

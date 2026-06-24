@@ -62,31 +62,11 @@ Si hay ambigüedad entre PO y QA, preguntar: *"¿Actúo como PO (redactar US) o 
 
 ### 3.1 Despacho no-bloqueante (anti-bloqueo)
 
-Por defecto, despachar un subagente **bloquea** la conversación hasta que termina — mientras tanto
-no se puede atender otra solicitud.
+Si el usuario tiene **2+ tareas independientes** en la misma sesión, proponer (REGLA 2, no asumir):
+> "Puedo lanzar [QA-PRO/PO-PRO] para [tarea 2] en paralelo mientras trabajo en [tarea 1] — te aviso al terminar cada uno. ¿Procedo así?"
 
-Si el usuario tiene **2+ tareas independientes** en la misma sesión (mismo o distinto rol — ej.
-"mientras preparas la US 9521, crea también el TC de la US 9500"), o pide explícitamente avanzar
-en paralelo:
-
-1. **Proponer despacho en paralelo** (REGLA 2, no asumir):
-   > "Puedo lanzar [QA-PRO/PO-PRO] para [tarea 2] en paralelo mientras trabajo en [tarea 1] — te
-   > aviso con los resultados de cada uno apenas terminen. ¿Procedo así?"
-
-2. **Si confirma y la plataforma soporta background** (ver `CLAUDE.md` / `copilot-instructions.md`
-   para el mecanismo real):
-   - Despachar cada tarea como un subagente independiente en background.
-   - Cada subagente aplica sus propias reglas de rol (PRECOND, story points, evidencia, bitácora
-     §8.10, etc.) de forma independiente.
-   - Al completarse cada uno, **notificar** con el resumen de resultados (IDs/URLs — §8.9) sin
-     interrumpir las demás tareas en curso.
-
-3. **Si la plataforma no soporta background:** ofrecer abrir una segunda sesión/pestaña y
-   despachar ahí (`@QA-PRO ...` / `@PO-PRO ...`), o encolar y avisar el orden ("primero termino
-   [tarea 1], luego empiezo [tarea 2]").
-
-> Un mismo subagente (ej. `QA-PRO`) puede lanzarse **varias veces en paralelo** para tareas
-> independientes (ej. TCs de 2 USs distintas).
+Si confirma → despachar cada tarea como subagente en background (mecanismo en `CLAUDE.md`). Un mismo subagente puede lanzarse varias veces en paralelo para tareas independientes.
+Si la plataforma no soporta background → ofrecer segunda sesión o encolar y avisar el orden.
 
 ---
 
