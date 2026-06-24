@@ -217,27 +217,24 @@ TEST_PASS_<NOMBRE>=<valor exacto dado por el usuario>
 
 ### Paso 4 — Entregar el comando Codegen al usuario
 
-Una vez que el entorno está listo, **mostrar al usuario** el comando exacto para ejecutar:
+Una vez que el entorno está listo, **mostrar al usuario** exactamente esto:
 
 ```
 ╔══════════════════════════════════════════════════════════════════╗
 ║  ENTORNO LISTO — Ejecuta este comando para grabar el flujo:      ║
 ║                                                                  ║
-║  npx playwright codegen --viewport-size=1280,720 \               ║
-║    --save-storage=fixtures/auth.json \                           ║
-║    <URL_DE_INICIO>                                               ║
+║  (comando en el bloque de abajo — cópialo completo)              ║
 ║                                                                  ║
-║  Cuando termines de grabar:                                      ║
-║  1. Copia el código generado                                     ║
+║  Graba el flujo completo del TC. Cuando termines:                ║
+║  1. Copia el código del panel derecho de Playwright Inspector    ║
 ║  2. Pégalo aquí en el chat                                       ║
 ║  → El agente lo optimizará y lo convertirá en un test completo   ║
 ╚══════════════════════════════════════════════════════════════════╝
 ```
 
-> Si la app requiere login primero, incluir la URL de login en el comando:
-> ```bash
-> npx playwright codegen --viewport-size=1280,720 <URL_LOGIN>
-> ```
+```powershell
+npx playwright codegen --viewport-size=1280,720 --save-storage=fixtures/auth.json <URL_DE_INICIO>
+```
 
 ### Paso 5 — Dos caminos posibles después del codegen
 
@@ -1399,10 +1396,7 @@ Mostrar el mensaje exactamente así:
 ╔══════════════════════════════════════════════════════════════╗
 ║  ENTORNO LISTO — TC #<ID>: <TÍTULO>                         ║
 ║                                                              ║
-║  Ejecuta este comando en tu terminal:                        ║
-║                                                              ║
-║  npx playwright codegen --viewport-size=1280,720 \          ║
-║    <URL_DE_INICIO>                                           ║
+║  Ejecuta el comando del bloque de abajo en tu terminal.      ║
 ║                                                              ║
 ║  Graba exactamente este flujo:                               ║
 ║  <PASOS_RESUMIDOS_DEL_TC>                                    ║
@@ -1411,6 +1405,10 @@ Mostrar el mensaje exactamente así:
 ║  → Pega el código generado aquí                             ║
 ║  → O escribe "sin codegen" para que continúe sin él         ║
 ╚══════════════════════════════════════════════════════════════╝
+```
+
+```powershell
+npx playwright codegen --viewport-size=1280,720 <URL_DE_INICIO>
 ```
 
 **Instrucciones para el usuario durante codegen:**
@@ -1514,6 +1512,7 @@ mcp_ado_wit_update_work_item({
 ```
 
 **6.2 Entregar al usuario:**
+
 ```
 ╔══════════════════════════════════════════════════════════════╗
 ║  ✅ TC #<ID> AUTOMATIZADO                                    ║
@@ -1522,12 +1521,19 @@ mcp_ado_wit_update_work_item({
 ║  - fixtures/<nombre>.fixture.ts                             ║
 ║  - tests/<nombre>.spec.ts                                   ║
 ║                                                              ║
-║  Para ejecutar:                                              ║
-║  npx playwright test tests/<nombre>.spec.ts --headed        ║
-║                                                              ║
-║  Para ver el reporte:                                        ║
-║  npx playwright show-report                                  ║
+║  Comandos disponibles (bloques de abajo):                    ║
+║  · Ejecutar normal  · Ejecutar lento  · Ver reporte          ║
 ╚══════════════════════════════════════════════════════════════╝
+```
+
+```powershell
+npx playwright test tests/<nombre>.spec.ts --headed
+```
+```powershell
+npm run test:slow
+```
+```powershell
+npx playwright show-report
 ```
 
 ---
