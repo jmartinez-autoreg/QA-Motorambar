@@ -1123,18 +1123,35 @@ testInfo.annotations.push({
    ↓
 6. Primera ejecución: npx playwright test mi-flujo --headed --reporter=list
    ↓
-7. Si falla:
+7. Si falla → PROTOCOLO DE DIAGNÓSTICO (en este orden, sin saltear pasos):
+
    a. Leer el reporte HTML + screenshots adjuntos → entender estado visual
    b. Leer el error exacto del terminal
-   c. ⛔ ANTES de tocar el código — volver a MCP Browser con los selectores guardados:
-      → Navegar a la pantalla donde falló
-      → Verificar el selector que falló: `document.querySelector('#id')` → ¿responde?
-      → Si es campo reactivo: interactuar y observar si el request se dispara
-      → Si es resultado esperado: ¿apareció en el DOM? ¿con qué selector real?
-      → Reproducir manualmente la acción fallida y observar
-   d. Solo con causa clara y confirmada en el DOM real → corregir → re-ejecutar
-   e. NUNCA refactorizar ni hacer fix sin diagnóstico previo confirmado en MCP
-   f. NUNCA repetir el mismo click/acción sin cambio previo
+
+   c. ⛔ BLOQUEANTE — Antes de cambiar una sola línea de código: ir a MCP Browser
+      y reproducir la interacción completa hasta el momento del fallo.
+
+      REGLA DE ELEMENTOS DINÁMICOS:
+      Si el elemento que falla es un tab, panel expandible, modal, resultado de búsqueda,
+      o cualquier elemento que aparece DESPUÉS de una interacción del usuario:
+        → El elemento NO está en el DOM inicial. No sirve navegar a la URL y buscar.
+        → Reproducir TODA la cadena de interacciones en MCP Browser:
+             Ejemplo: login → navegar al módulo → buscar VIN → expandir fila → abrir tab
+        → Recién cuando el elemento sea visible en pantalla, ejecutar JS inventory:
+             document.querySelector('[atributo-visible]')?.id
+             o: snapshot del accessibility tree en ese estado
+        → Con el #id real confirmado → actualizar el fixture
+        ⛔ PROHIBIDO intentar un segundo selector de texto sin haber visto el elemento
+           en el DOM real de MCP Browser en el estado exacto donde aparece.
+
+      REGLA GENERAL (elemento estático que falla):
+        → `document.querySelector('#selector-que-falla')` → ¿null o existe?
+        → Si null: el elemento no está en ese DOM. Discovery obligatorio.
+        → Si existe: verificar visibility, disabled, dentro de shadow DOM.
+
+   d. Solo con el selector confirmado en el DOM real → corregir → re-ejecutar
+   e. NUNCA cambiar `text=X` por `getByRole(X)` sin haber visto el elemento en MCP
+   f. NUNCA repetir el mismo click/acción sin cambio previo confirmado
 ```
 
 ---
