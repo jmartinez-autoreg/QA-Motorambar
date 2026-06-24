@@ -304,26 +304,29 @@ mcp_playwright_browser_close()
 
 ### PASO 3.1: Extraer PAT de ADO
 
-> ⛔ **NUNCA pedir el PAT al usuario** — siempre extraerlo automáticamente del archivo de
-> configuración del MCP. Si ninguna ruta funciona, usar comentario sin imágenes como fallback.
+> ⛔ **NUNCA pedir el PAT al usuario.**
+> Si el agente ya ejecutó exitosamente cualquier tool del MCP de ADO en esta sesión,
+> el PAT existe en su entorno — solo hay que buscarlo en la ubicación correcta según la plataforma.
+> Pedir el PAT al usuario cuando el MCP ya funciona = error de agente, no limitación técnica.
 
 ```powershell
 $pat = $null
 
-# Orden de búsqueda: Claude Code primero, luego VS Code, luego variable de entorno
+# Todas las ubicaciones conocidas de config MCP por plataforma
 $searchPaths = @(
   ".claude\settings.json",                          # Claude Code (proyecto)
   "$env:USERPROFILE\.claude\settings.json",         # Claude Code (usuario global)
-  "$env:APPDATA\Code\User\mcp.json",                # VS Code (usuario)
-  ".vscode\mcp.json"                                # VS Code (workspace)
+  ".vscode\mcp.json",                               # VS Code / Copilot (workspace)
+  "$env:APPDATA\Code\User\mcp.json",                # VS Code / Copilot (usuario global)
+  ".github\mcp.json"                                # GitHub Copilot (workspace)
 )
 
 foreach ($f in $searchPaths) {
   if (Test-Path $f) {
     $c = Get-Content $f -Raw | ConvertFrom-Json -EA SilentlyContinue
-    # Claude Code usa .mcpServers, VS Code usa .servers o .mcp.servers
-    $srv = if ($c.mcpServers) { $c.mcpServers } `
-           elseif ($c.servers) { $c.servers } `
+    # Cada plataforma usa una clave raíz distinta para los servers
+    $srv = if ($c.mcpServers) { $c.mcpServers } `   # Claude Code
+           elseif ($c.servers) { $c.servers } `      # VS Code / Copilot
            elseif ($c.mcp.servers) { $c.mcp.servers } `
            else { $null }
     if ($srv) {
@@ -335,11 +338,13 @@ foreach ($f in $searchPaths) {
     if ($pat) { break }
   }
 }
+# Fallback: variable de entorno inyectada por el launcher del MCP
 if (-not $pat) { $pat = $env:AZURE_DEVOPS_EXT_PAT }
 
 if (-not $pat) {
-  Write-Warning "PAT no encontrado en ninguna ruta. Publicando comentario sin imágenes."
-  # → continuar con comentario de texto plano (ver PASO 3 fallback)
+  # Ninguna ruta devolvió el PAT → publicar comentario de texto sin imágenes (no bloquear)
+  Write-Warning "PAT no encontrado. Publicando comentario sin imágenes inline."
+  # → saltar PASO 3.2 y 4.1; ir directo a PASO 4.2 con texto plano
 }
 
 $auth = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$pat"))
