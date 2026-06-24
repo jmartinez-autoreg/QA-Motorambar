@@ -156,6 +156,8 @@ Crear `playwright.config.ts` con baseURL de la app bajo prueba:
 
 ```ts
 import { defineConfig } from '@playwright/test';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export default defineConfig({
   testDir: './tests',
@@ -165,18 +167,34 @@ export default defineConfig({
   retries: 0,
   reporter: 'html',
   use: {
-    baseURL: '<URL_DEL_AMBIENTE>',  // ← rellenar con la URL real
+    baseURL: process.env.BASE_URL || '<URL_DEL_AMBIENTE>',
     headless: false,
     viewport: { width: 1280, height: 720 },
     actionTimeout: 15_000,
     screenshot: 'only-on-failure',
     trace: 'on-first-retry',
+    slowMo: parseInt(process.env.SLOW_MO || '0'),
   },
   projects: [
     { name: 'chromium', use: { browserName: 'chromium' } },
   ],
 });
 ```
+
+Actualizar `package.json` con scripts estándar:
+
+```json
+"scripts": {
+  "test":       "npx playwright test --headed",
+  "test:slow":  "cross-env SLOW_MO=800 npx playwright test --headed",
+  "test:debug": "cross-env PWDEBUG=1 npx playwright test --headed",
+  "report":     "npx playwright show-report"
+}
+```
+
+> `test:slow` reduce la velocidad de ejecución a 800 ms/acción — usar cuando el usuario quiere
+> verificar visualmente que cada paso ocurre correctamente antes de dar el resultado por bueno.
+> Si `cross-env` no está instalado: `npm install --save-dev cross-env`.
 
 Crear estructura de carpetas mínima:
 ```
@@ -191,6 +209,32 @@ fixtures/files/
 npx playwright --version
 # Si falla → npx playwright install chromium
 ```
+
+### Paso 3.5 — Recopilar credenciales (BLOQUEANTE)
+
+> ⛔ **NUNCA inventar nombres de usuario, roles, ni keys de `.env`.**
+> Si no fueron proporcionadas explícitamente junto al TC o la URL, preguntar ahora:
+
+```
+Antes de grabar el flujo necesito:
+1. Usuario(s) que usaremos (puede ser más de uno si hay roles distintos)
+2. Contraseña de cada uno
+Ejemplo: "usuario: jovidio / pass: Abc123"
+```
+
+Con los datos recibidos, crear el `.env` inmediatamente:
+
+```
+BASE_URL=<URL_DEL_AMBIENTE>
+TEST_USER_<NOMBRE>=<valor exacto dado por el usuario>
+TEST_PASS_<NOMBRE>=<valor exacto dado por el usuario>
+```
+
+> Las keys del `.env` usan el nombre LITERAL que dio el usuario, en mayúsculas con prefijo
+> `TEST_USER_` / `TEST_PASS_`. Ej: usuario "jovidio" → `TEST_USER_JOVIDIO`.
+> ⛔ Prohibido asumir nombres como "jovidio", "distri2", "admin" sin que el usuario los dijera.
+
+---
 
 ### Paso 4 — Entregar el comando Codegen al usuario
 
@@ -1054,6 +1098,8 @@ testInfo.annotations.push({
 |-------------|---------------|-----------|
 | **Usar `button:has-text(...)` cuando el botón tiene `id`** | Texto puede cambiar; overlays de menú bloquean el click nativo causando timeout | Usar `#id` siempre (PRIORIDAD 1). Si botón está en nav con hover, usar `page.evaluate(() => btn.click())` |
 | **No inventariar locators antes de escribir el fixture** | Selectors frágiles → tests que rompen por cualquier cambio de UI | Ejecutar JS de REGLA 0 en CADA pantalla ANTES de codificar |
+| **Inventar nombres de usuario o keys de `.env` sin preguntar** | Las variables del `.env` no existen → `EnvHelper.getRequired()` lanza error antes de abrir el browser → ningún test llega a ejecutar una acción | Preguntar credenciales en Paso 3.5. Usar el nombre LITERAL que dio el usuario como sufijo de la key: `TEST_USER_JOVIDIO` solo si el usuario dijo "jovidio". |
+| **Crear tests separados para un modal condicional ("con T&C" / "sin T&C")** | Duplica el test, confunde el reporte, y hace que el login parezca cubierto cuando solo una variante está verde | Usar `handleOptionalModal()` con try/catch + waitFor(timeout). UN test, lógica condicional inline en el fixture. |
 | **No documentar la prioridad del locator en el fixture** | Nadie sabe por qué se eligió ese selector; difícil de debuguear | Agregar comentario `// ID único ✅ PRIORITY 1` |
 | **Inferir URL de contexto de conversación anterior** | Cada sesión es independiente; URL incorrecta → fallos silenciosos | Pedir URL explícitamente si no está en el TC |
 | **`page.once('dialog')` para diálogos AJAX** | El dialog llega DESPUÉS de networkidle; el listener ya no existe | Usar `Promise.all([waitForEvent('dialog'), click()])` (REGLA 8 Patrón B) |
@@ -1084,28 +1130,68 @@ testInfo.annotations.push({
 
 > ⛔ **REGLA ABSOLUTA — EL CODEGEN ES EL MAPA, NO LA FUENTE DE SELECTORES**
 >
-> El código de Playwright Codegen identifica QUÉ pantallas y QUÉ interacciones existen.
-> **NO es una fuente confiable de selectores** — puede usar clases CSS, `getByText()`,
-> nth-child, o IDs desactualizados que fallarán en ejecución.
+> El código de Playwright Codegen muestra QUÉ pantallas recorrer y QUÉ interacciones hacer.
+> **NO es una fuente confiable de selectores** — puede usar `getByText()`, clases CSS,
+> nth-child, o IDs desactualizados que fallarán en ejecución real.
 >
-> **ANTES de escribir una sola línea de fixture:**
-> 1. Navegar CADA pantalla del flujo con MCP Browser
-> 2. Ejecutar el JS inventory (REGLA 0) para obtener los IDs reales del DOM
-> 3. Si el codegen usó una clase CSS → buscar el `id` del mismo elemento en el DOM real
-> 4. Solo entonces asignar selectores en el fixture
+> **ANTES de escribir una sola línea de fixture, verificar TRES cosas:**
 >
-> ⛔ **PROHIBIDO** copiar selectores del codegen o de archivos YAML/config sin verificarlos
-> en el DOM real. Un selector no verificado es un bug garantizado.
+> 1. **Credenciales:** ¿Ya están en el `.env`? Si no → aplicar Paso 3.5 (pedir al usuario).
+>    ⛔ Prohibido inventar usuarios, contraseñas o keys de `.env` aunque el codegen los muestre.
+>    El codegen puede haber grabado un usuario de sesión de codegen que NO existe en el proyecto.
+>
+> 2. **Selectores:** Navegar CADA pantalla del flujo con MCP Browser y ejecutar el JS inventory
+>    (REGLA 0) para obtener los IDs reales del DOM. Si el codegen usó `getByText('X')` →
+>    buscar el `id` del mismo elemento en el DOM real → usar `#id` (PRIORITY 1).
+>
+> 3. **Flujos condicionales:** Si el codegen grabó un flujo "con modal" Y un flujo "sin modal"
+>    para la misma funcionalidad → NO crear un test por cada variante. Crear UN SOLO test
+>    donde el fixture maneja el modal con try/catch + waitFor(timeout). Ver regla de abajo.
+>
+> ⛔ **PROHIBIDO** copiar selectores del codegen directamente al fixture sin verificarlos en el DOM real.
+> Un selector no verificado es un bug garantizado.
+
+### Regla de flujos condicionales — modales opcionales
+
+> Un modal o paso que **puede o no aparecer** (Términos y Condiciones, confirmación de primer acceso,
+> avisos de sesión, etc.) **NO es un escenario de test separado**. Es una variante de ejecución del
+> mismo flujo.
+
+**Patrón correcto — try/catch condicional dentro del fixture:**
+
+```ts
+async function handleOptionalModal(page: Page): Promise<void> {
+  try {
+    // Esperar el elemento del modal con timeout corto
+    await page.locator('#SELECTOR_MODAL').waitFor({ state: 'visible', timeout: 4_000 });
+    // Si llegamos aquí, el modal apareció → interactuar
+    await page.locator('#SELECTOR_ACEPTAR').click();
+    await page.locator('#SELECTOR_MODAL').waitFor({ state: 'hidden', timeout: 5_000 });
+  } catch {
+    // Timeout → modal no apareció → continuar normalmente (no es un error)
+  }
+}
+```
+
+**Regla de oro:** UN test cubre el flujo completo. `handleOptionalModal()` se llama siempre;
+si el modal no aparece, el catch lo absorbe silenciosamente.
+
+⛔ **PROHIBIDO** crear tests separados como "test con T&C", "test sin T&C" para el mismo flujo
+funcional. Esto duplica el test, confunde el reporte y oculta la causa real de fallos.
+
+---
 
 ### Algoritmo de Auditoría
 
 ```
 0. ⛔ BLOQUEANTE — ANTES de tocar el fixture:
-   Para cada pantalla del flujo codegen:
-     → Navegar con MCP Browser
-     → Ejecutar JS inventory (ver REGLA 0)
-     → Anotar id real de cada elemento interactivo
-     → Solo continuar cuando TODOS los IDs estén confirmados
+   a. Verificar credenciales en .env → si faltan, aplicar Paso 3.5 (pedir al usuario)
+   b. Para cada pantalla del flujo codegen:
+        → Navegar con MCP Browser
+        → Ejecutar JS inventory (ver REGLA 0)
+        → Anotar id real de cada elemento interactivo
+   c. Identificar flujos condicionales (modales opcionales) → consolidar en try/catch
+   d. Solo continuar cuando TODOS los IDs estén confirmados y credenciales estén en .env
    ↓
 1. Leer TODO el fixture y el spec existentes
    ↓
@@ -1283,16 +1369,20 @@ Extraer y mapear:
 | `System.AreaPath` | Módulo/carpeta del fixture |
 | URL en pasos o descripción | `baseURL` del `playwright.config.ts` |
 
-> ⛔ **REGLA BLOQUEANTE — URL ES OBLIGATORIA**
-> Si el TC **no contiene URL** en sus pasos o descripción, y no fue proporcionada junto al TC:
-> **DETENER Y PREGUNTAR** antes de hacer cualquier exploración de app.
+> ⛔ **REGLA BLOQUEANTE — URL Y CREDENCIALES SON OBLIGATORIAS**
+> Si el TC **no contiene URL y credenciales** en sus pasos o en el mensaje del usuario:
+> **DETENER Y PREGUNTAR** antes de hacer cualquier exploración de app o escribir código.
 > ```
 > Para automatizar estos TCs necesito:
 > 1. URL de la aplicación (ej: https://app.miempresa.com)
-> 2. Credenciales de prueba (usuario / contraseña)
+> 2. Usuario(s) exactos que usaremos y su contraseña
+>    (si hay múltiples roles, indicar cuáles para qué escenario)
 > 3. Rutas de archivos de datos si los TCs requieren uploads (Excel, PDF, etc.)
 > ```
-> NO inferir URL de contexto de conversaciones anteriores — cada sesión es independiente.
+> ⛔ **PROHIBIDO** inferir URL de sesiones anteriores, inventar usuarios o asumir nombres
+> de variables de entorno. Cada sesión es independiente. Si el TC o el contexto del proyecto
+> tiene credenciales documentadas en `context/CONTEXT.md`, usar esas — pero verificar que
+> sean válidas antes de crear el `.env`.
 
 > ⚡ **Recopilación paralela para batch de TCs:**
 > Si se reciben múltiples TCs a la vez, obtener todos con `mcp_ado_wit_get_work_items_batch_by_ids`
