@@ -342,9 +342,21 @@ foreach ($f in $searchPaths) {
 if (-not $pat) { $pat = $env:AZURE_DEVOPS_EXT_PAT }
 
 if (-not $pat) {
-  # Ninguna ruta devolvió el PAT → publicar comentario de texto sin imágenes (no bloquear)
-  Write-Warning "PAT no encontrado. Publicando comentario sin imágenes inline."
-  # → saltar PASO 3.2 y 4.1; ir directo a PASO 4.2 con texto plano
+  # PAT no encontrado → PREGUNTAR AL USUARIO (no publicar nada todavía)
+  # ⛔ PROHIBIDO publicar comentarios con rutas locales, nombres de archivos o scripts
+  # ⛔ PROHIBIDO continuar silenciosamente con un comentario "alternativo"
+  #
+  # Mostrar al usuario exactamente esto:
+  # "No encontré el PAT de ADO en ninguna ubicación de configuración.
+  #  Sin él no puedo subir las imágenes como attachments.
+  #  ¿Qué prefieres?
+  #  A) Publicar el comentario ahora sin imágenes: solo 'QA PASSED ✅' + '[Test Regresión]'
+  #  B) Configurar el PAT primero para incluir las imágenes inline"
+  #
+  # Si elige A → publicar SOLO: "QA PASSED ✅\n\n[Test Regresión]"
+  #              Sin nombres de archivos, sin rutas, sin scripts, sin "nota para QA"
+  # Si elige B → indicar dónde agregar el PAT en el archivo de configuración del MCP
+  throw "PAT_NOT_FOUND"
 }
 
 $auth = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$pat"))
