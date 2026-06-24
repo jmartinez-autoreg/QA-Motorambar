@@ -304,12 +304,28 @@ mcp_playwright_browser_close()
 
 ### PASO 3.1: Extraer PAT de ADO
 
+> ⛔ **NUNCA pedir el PAT al usuario** — siempre extraerlo automáticamente del archivo de
+> configuración del MCP. Si ninguna ruta funciona, usar comentario sin imágenes como fallback.
+
 ```powershell
 $pat = $null
-foreach ($f in @("$env:APPDATA\Code\User\mcp.json", ".vscode\mcp.json")) {
+
+# Orden de búsqueda: Claude Code primero, luego VS Code, luego variable de entorno
+$searchPaths = @(
+  ".claude\settings.json",                          # Claude Code (proyecto)
+  "$env:USERPROFILE\.claude\settings.json",         # Claude Code (usuario global)
+  "$env:APPDATA\Code\User\mcp.json",                # VS Code (usuario)
+  ".vscode\mcp.json"                                # VS Code (workspace)
+)
+
+foreach ($f in $searchPaths) {
   if (Test-Path $f) {
     $c = Get-Content $f -Raw | ConvertFrom-Json -EA SilentlyContinue
-    $srv = if ($c.servers) { $c.servers } elseif ($c.mcp.servers) { $c.mcp.servers } else { $null }
+    # Claude Code usa .mcpServers, VS Code usa .servers o .mcp.servers
+    $srv = if ($c.mcpServers) { $c.mcpServers } `
+           elseif ($c.servers) { $c.servers } `
+           elseif ($c.mcp.servers) { $c.mcp.servers } `
+           else { $null }
     if ($srv) {
       foreach ($k in ($srv | Get-Member -MemberType NoteProperty).Name) {
         $v = $srv.$k.env.AZURE_DEVOPS_EXT_PAT
@@ -320,6 +336,12 @@ foreach ($f in @("$env:APPDATA\Code\User\mcp.json", ".vscode\mcp.json")) {
   }
 }
 if (-not $pat) { $pat = $env:AZURE_DEVOPS_EXT_PAT }
+
+if (-not $pat) {
+  Write-Warning "PAT no encontrado en ninguna ruta. Publicando comentario sin imágenes."
+  # → continuar con comentario de texto plano (ver PASO 3 fallback)
+}
+
 $auth = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$pat"))
 ```
 
