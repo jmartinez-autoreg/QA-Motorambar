@@ -140,12 +140,18 @@ La pregunta **A o B** y su descripción están en `AGENTS.md` (PASO 0). Tras rec
 
 | Resultado | Acción |
 |-----------|--------|
-| Todos los TCs/escenarios pasan | `[ADO]` US → `Closed` + comentario `QA PASSED` |
-| Algún TC/escenario falla | `[ADO]` US se mantiene en `Resolved` + crear Bug vinculado + comentario `QA NOT PASSED` (con TP) o `QA FAILED` (sin TP) |
+| Todos los TCs/escenarios pasan | `[ADO]` US → `Closed` + publicar evidencia vía `qa-execution-reporter` |
+| Algún TC/escenario falla | `[ADO]` US se mantiene en `Resolved` + crear Bug vinculado + publicar evidencia vía `qa-execution-reporter` |
 
 > El estado `Closed` **solo lo cambia QA** — representa la aprobación QA de la historia.
 > Antes de cerrar, verificar el checklist de `skills/po-user-story/references/definition-of-done.md`
 > (Definition of Done, 7 ítems).
+
+> ⛔ **BLOQUEANTE — ANTES de publicar CUALQUIER comentario en ADO:**
+> Leer COMPLETO `.claude/skills/qa-execution-reporter/SKILL.md` y seguir sus fases en orden.
+> **PROHIBIDO** redactar el comentario directamente desde esta sección ni desde ningún otro skill.
+> El formato, el proceso de upload y las reglas de publicación viven ÚNICAMENTE en `qa-execution-reporter`.
+> No hay excepciones.
 
 ---
 
