@@ -1093,6 +1093,8 @@ testInfo.annotations.push({
 | `page.evaluate()` para leer inputs | Postback en vuelo puede crashear | `locator.inputValue()` |
 | Asignar checkbox con JS (`checked = true`)` | No dispara eventos ASP.NET | `locator.click()` |
 | Asumir `networkidle` = página lista en ASP.NET | UpdatePanel tiene AJAX sin network visible | Verificar `PageRequestManager` |
+| **`waitForTimeout(N)` como respuesta a "elemento no encontrado"** | El elemento no apareció porque el selector no resuelve ese DOM — agregar 3 segundos de espera con el selector incorrecto solo retrasa el fallo. El selector seguirá sin funcionar después de cualquier cantidad de wait. | Diagnóstico correcto: si el elemento existe visualmente pero el selector falla, el problema es el selector, no el tiempo. Solución: JS inventory → encontrar el `#id` → PRIORITY 1. Nunca parchear un selector roto con waitForTimeout. |
+| **Cambiar `has-text(X)` por `getByRole('button', {name: /X/i})` y declarar "solución robusta"** | Ambos dependen del texto visible del botón — mismo nivel de fragilidad. Un cambio de selector solo es una mejora real si sube de nivel en la tabla de prioridades (text/role → `#id`). Cambiar de has-text a getByRole al mismo nivel es un cambio cosmético que no resuelve nada. | Un selector mejoró si pasó de text/role/class a `#id` (PRIORITY 1). Si no subió de nivel, no es solución. |
 | Timeouts fijos (`page.waitForTimeout(5000)`) | Frágil y lento | Esperar condiciones reales |
 | No tomar screenshots en cada pantalla | Sin contexto visual al fallar | `ss('nombre')` en cada transición |
 | Crear nueva instancia browser MCP por cada inspect | Lento e innecesario | Reutilizar sesión existente |
