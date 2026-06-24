@@ -826,18 +826,90 @@ await expect(page.locator('#MainContent_btnVerResultados')).toBeVisible({ timeou
 
 ---
 
-### REGLA 9 — Screenshots en cada paso
+### REGLA 9 — Screenshots de evidencia (OBLIGATORIO para ADO)
+
+Los screenshots son la evidencia que se sube a ADO al final del test. Sin ellos,
+el test no tiene valor como evidencia. El naming `NN-descripcion` mapea directo
+a los step numbers del TC en ADO.
+
+#### Helper estándar — SIEMPRE con `testInfo.attach()`, NUNCA con `path:`
 
 ```ts
+// Definir UNA VEZ al inicio del test
 const ss = async (name: string) => {
   const buf = await page.screenshot({ fullPage: true });
   await testInfo.attach(name, { body: buf, contentType: 'image/png' });
 };
-await ss('s1-inicio');
-// ... llenar screen 1
-await ss('s1-antes-continuar');
-await clickContinuar(page);
-await ss('s2-inicio');
+```
+
+⛔ **PROHIBIDO** usar `page.screenshot({ path: 'test-results/...' })` para evidencia.
+Los screenshots con `path` fijo van al disco pero **no aparecen en el reporte HTML
+de Playwright** y no pueden exportarse masivamente para ADO. Solo `testInfo.attach()`
+produce evidencia exportable.
+
+#### Para popups / nuevas pestañas (SSO, ventana destino)
+
+```ts
+// La función ss() usa `page` de la instancia original.
+// Para una nueva página, crear helper análogo:
+const ssPop = async (name: string) => {
+  const buf = await popupPage.screenshot({ fullPage: true });
+  await testInfo.attach(name, { body: buf, contentType: 'image/png' });
+};
+```
+
+#### Puntos de screenshot OBLIGATORIOS
+
+| Momento | Llamada | Ejemplo |
+|---|---|---|
+| Después del `goto()` inicial | `ss('01-login-cargado')` | Login page ya visible |
+| Después de cada `waitForLoad()` / `waitForURL()` | `ss('NN-pantalla-X-cargada')` | Post-login, post-navegación |
+| Cuando aparece un modal condicional | `ss('NN-modal-tyc-visible')` | Si T&C aparece |
+| ANTES de cualquier click que navegue o haga submit | `ss('NN-antes-ACCION')` | Antes de "Portal Distribuidor" |
+| Resultado esperado de cada step del TC | `ss('NN-resultado-DESCRIPCION')` | Post-login dashboard, post-SSO |
+| Final del flujo exitoso | `ss('99-resultado-final')` | Pantalla destino confirmada |
+
+⛔ **UN solo screenshot al final = evidencia inútil.** Si el test falla en el paso 3
+de 5, el único screenshot final no captura lo que ocurrió. Cada step del TC necesita
+su evidencia.
+
+#### Ejemplo en flujo SSO (TC-11454 como referencia)
+
+```ts
+test('...', async ({ page }, testInfo) => {
+  const ss = async (name: string) => {
+    const buf = await page.screenshot({ fullPage: true });
+    await testInfo.attach(name, { body: buf, contentType: 'image/png' });
+  };
+
+  // Step 1 — Login
+  await autoregLoginPage.goto();
+  await ss('01-login-page-cargada');          // ← OBLIGATORIO: pantalla inicial
+  await autoregLoginPage.login(user, pass);
+  await autoregHomePage.waitForLoad();
+  await ss('01-resultado-dashboard-autoreg'); // ← OBLIGATORIO: resultado step 1
+
+  // Step 2 — Modal T&C (condicional)
+  if (await termsModal.isVisible()) {
+    await ss('02-modal-tyc-visible');         // ← si aparece, capturar
+    await termsModal.acceptAllTerms();
+    await autoregHomePage.waitForLoad();
+    await ss('02-resultado-modal-aceptado');
+  }
+
+  // Step 3 — Portal Distribuidor
+  await ss('03-antes-click-portal-distribuidor'); // ← OBLIGATORIO: antes de acción clave
+  const popupPage = await autoregHomePage.clickPortalDistribuidor();
+
+  // Step 4/5 — Verificar Motorambar (nueva pestaña)
+  const ssPop = async (name: string) => {
+    const buf = await popupPage.screenshot({ fullPage: true });
+    await testInfo.attach(name, { body: buf, contentType: 'image/png' });
+  };
+  await motorambarDashboard.waitForLoad();
+  await ssPop('04-resultado-motorambar-cargado'); // ← OBLIGATORIO: resultado final
+  await ssPop('99-resultado-final');
+});
 ```
 
 ### REGLA 10 — File Uploads
@@ -1096,6 +1168,9 @@ testInfo.annotations.push({
 | **`waitForTimeout(N)` como respuesta a "elemento no encontrado"** | El elemento no apareció porque el selector no resuelve ese DOM — agregar 3 segundos de espera con el selector incorrecto solo retrasa el fallo. El selector seguirá sin funcionar después de cualquier cantidad de wait. | Diagnóstico correcto: si el elemento existe visualmente pero el selector falla, el problema es el selector, no el tiempo. Solución: JS inventory → encontrar el `#id` → PRIORITY 1. Nunca parchear un selector roto con waitForTimeout. |
 | **Cambiar `has-text(X)` por `getByRole('button', {name: /X/i})` y declarar "solución robusta"** | Ambos dependen del texto visible del botón — mismo nivel de fragilidad. Un cambio de selector solo es una mejora real si sube de nivel en la tabla de prioridades (text/role → `#id`). Cambiar de has-text a getByRole al mismo nivel es un cambio cosmético que no resuelve nada. | Un selector mejoró si pasó de text/role/class a `#id` (PRIORITY 1). Si no subió de nivel, no es solución. |
 | Timeouts fijos (`page.waitForTimeout(5000)`) | Frágil y lento | Esperar condiciones reales |
+| **Un solo screenshot al final del test** | Si el test falla en el paso 3 de 5, la única imagen final no captura qué ocurrió. Evidencia inútil para ADO. | Un `ss()` por cada step del TC: página cargada + antes de acción clave + resultado. Ver tabla de puntos obligatorios en REGLA 9. |
+| **`page.screenshot({ path: 'test-results/...' })`** para evidencia | El screenshot se guarda en disco pero no aparece en el reporte HTML de Playwright ni es exportable para ADO. Si el test falla en CI el archivo puede no estar disponible. | Siempre `testInfo.attach(name, { body: buf, contentType: 'image/png' })` — aparece en el reporte y puede exportarse masivamente. |
+| **Usar la función `ss()` del page principal para screenshots de popup** | `ss()` captura `page` (la pestaña original). Un popup/nueva pestaña es un objeto `Page` distinto — el screenshot saldría de la pestaña equivocada. | Crear `ssPop` con la referencia de la nueva página: `const buf = await popupPage.screenshot(...)` |
 | No tomar screenshots en cada pantalla | Sin contexto visual al fallar | `ss('nombre')` en cada transición |
 | Crear nueva instancia browser MCP por cada inspect | Lento e innecesario | Reutilizar sesión existente |
 
