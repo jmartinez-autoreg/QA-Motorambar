@@ -13,6 +13,25 @@ Skill para convertir test cases manuales en pruebas E2E automatizadas con Playwr
 
 ---
 
+## PASO -1 — LEER CONTEXTO DEL PROYECTO (ANTES DE TODO)
+
+Antes de preguntar modalidad, antes de abrir el browser, leer:
+
+1. **`context/CONTEXT.md`** — URLs reales del ambiente, roles, terminología del dominio.
+2. **`context/UI-UX.md`** — Pantallas documentadas: labels exactos de botones, nombres de campos,
+   flujos de navegación, estados visibles. **Fuente de verdad de la nomenclatura de la app.**
+
+> Los labels y nombres de elementos en `UI-UX.md` son confirmados por el equipo.
+> Usarlos como punto de partida del discovery — si el documento dice "Portal Distribuidor",
+> ese es el texto exacto del botón, no una suposición.
+>
+> ⛔ Si la pantalla involucrada en el TC **no está documentada** en `UI-UX.md` →
+> hacer discovery completo antes de escribir código (no suponer labels).
+> Si la pantalla **sí está documentada** → el discovery confirma el `#id` del elemento;
+> el label ya está validado, no es necesario buscarlo.
+
+---
+
 ## ⚠️ PASO 0 — PREGUNTAR MODALIDAD DE TRABAJO (SIEMPRE PRIMERO)
 
 > **NUNCA comenzar el discovery ni abrir el browser sin haber preguntado esto primero.**
