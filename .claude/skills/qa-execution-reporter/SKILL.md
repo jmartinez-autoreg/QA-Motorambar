@@ -386,34 +386,61 @@ foreach ($tc in $testCases) {
 
 **✅ OUTPUT:** `$attachmentUrls` = `@{ 10941 = @("https://...", "https://...") }`
 
-### PASO 3.3: Construir HTML con placeholder
+### PASO 3.0 (PREVIO): Leer discusión existente de la US
+
+> ⛔ **ANTES de construir el comentario**, leer los comentarios actuales de la US con
+> `wit_list_work_item_comments` para ver si ya existe un comentario de evidencia QA.
+> El formato del nuevo comentario DEBE ser consistente con el existente.
+>
+> **Formato establecido por el equipo** (fuente: discusión real de las USs):
+> ```
+> QA PASSED ✅   ← o QA NOT PASSED ❌
+>
+> [URL del test run]   ← o "[Test Regresión]" si el test corrió por CLI sin crear run en ADO
+>
+> ![nombre.png](URL_attachment)
+> ![nombre.png](URL_attachment)
+> ```
+>
+> ⛔ **PROHIBIDO** publicar en la US:
+> - Listas de pasos ejecutados o resultados por step
+> - Información de framework (Playwright v1.x, Chromium, etc.)
+> - Permisos del usuario autenticado
+> - Rutas locales de archivos (`Automated_Testing/screenshots-ado/`)
+> - Scripts para ejecutar (`.\upload-to-ado.ps1`)
+> - Cualquier información técnica que no sea: status + link de run + imágenes
+>
+> ⛔ **El comentario va en la US, NUNCA en el TC.**
+> Los TCs son los receptores de attachments; la US es donde se publica la evidencia visible.
+
+### PASO 3.3: Construir comentario y publicar en la US
 
 ```powershell
 foreach ($tc in $testCases) {
-  $overallStatus = if ($tc.status -eq "PASSED") { "QA PASSED" } else { "QA NOT PASSED" }
-  
-  # Construir HTML simple con PLACEHOLDER para el link
-  $html = "$overallStatus / Sprint Test<br/><br/>`n`n"
-  $html += "[Link del resultado aquí]<br/><br/>`n`n"
-  
-  # Agregar imágenes apiladas (sin labels)
+  $status = if ($tc.status -eq "PASSED") { "QA PASSED ✅" } else { "QA NOT PASSED ❌" }
+
+  # Para tests Playwright CLI sin run ADO: usar "[Test Regresión]" como placeholder
+  # Para tests con run ADO: usar la URL real del run
+  $runLink = if ($tc.runUrl) { $tc.runUrl } else { "[Test Regresión]" }
+
+  # Formato Markdown (format:0 — el mismo que usa el equipo)
+  $md = "$status`n`n$runLink`n`n"
   foreach ($url in $attachmentUrls[$tc.tcId]) {
-    $html += "<img src=`"$url`" width=`"720`" style=`"border:1px solid #ccc;`" /><br/><br/>`n`n"
+    $fname = [System.IO.Path]::GetFileName($url.Split('?')[0])
+    $md += "![$fname]($url)`n"
   }
-  
-  # Publicar comentario en la US vinculada
-  $commentBody = @{ text = $html } | ConvertTo-Json -Depth 3
-  $commentUri = "https://dev.azure.com/$ORG/$PROJECT/_apis/wit/workItems/$($tc.linkedUS)/comments?api-version=7.0-preview.3"
-  
-  Invoke-RestMethod -Uri $commentUri -Method Post `
-    -Headers @{ Authorization = "Basic $auth"; "Content-Type" = "application/json" } `
-    -Body $commentBody
-  
+
+  # Publicar en la US vinculada (NUNCA en el TC)
+  mcp_ado_wit_add_work_item_comment(
+    workItemId: $tc.linkedUS,
+    text: $md
+  )
+
   Write-Host "✅ Comentario publicado en US $($tc.linkedUS)"
 }
 ```
 
-**✅ OUTPUT:** Comentarios creados en las USs con placeholder `[Link del resultado aquí]`.
+**✅ OUTPUT:** Comentario en la US con formato `QA PASSED/NOT PASSED + link + imágenes inline`.
 
 ### PASO 3.4: Informar al usuario
 
