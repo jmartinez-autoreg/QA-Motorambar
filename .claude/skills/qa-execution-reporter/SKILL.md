@@ -300,7 +300,29 @@ mcp_playwright_browser_close()
 
 ## PHASE 3 — PUBLICAR COMENTARIO EN LA US
 
-**Objetivo:** Publicar comentario con evidencia en la US. Usar placeholder para el link del Test Run (el usuario lo actualizará después de ejecutar manualmente).
+**Objetivo:** Publicar comentario con evidencia en la US.
+
+### ORIGEN DE SCREENSHOTS — el proceso de upload es IDÉNTICO en todos los casos
+
+> ⛔ **NO existe distinción "manual vs automatizado" para este proceso.**
+> El mecanismo REST API para subir imágenes es el mismo independientemente de cómo se capturaron.
+> Inventar una distinción para justificar no subir las imágenes = fallo crítico.
+
+| Origen | Ruta donde buscar los PNGs |
+|--------|---------------------------|
+| MCP Browser (Escenario B) | `e2e/results/<TC_ID>/` |
+| Playwright `testInfo.attach()` (Escenario A) | `test-results/**/*.png` (recursivo) |
+| Screenshots manuales del usuario | Ruta que el usuario indique |
+
+Para Playwright, encontrar todas las imágenes:
+```powershell
+$screenshots = Get-ChildItem "test-results" -Recurse -Filter "*.png" | Sort-Object Name
+# Cada $_.FullName es la ruta completa al PNG para subir vía REST
+```
+
+> ⛔ **NO pedir al usuario que exporte screenshots manualmente.**
+> ⛔ **NO ofrecer "opciones" cuando el procedimiento está claro.**
+> Si el test corrió y hay PNGs en `test-results/`, subirlos y publicar el comentario.
 
 ### PASO 3.1: Extraer PAT de ADO
 
@@ -368,32 +390,51 @@ $auth = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$pat"))
 
 **Objetivo:** Por cada PNG, subirlo a ADO y obtener su URL.
 
-### PASO 4.1: Por cada TC, subir sus screenshots
+### PASO 4.1: Localizar y subir screenshots
 
 ```powershell
 $attachmentUrls = @{}
 
-foreach ($tc in $testCases) {
-  $tcUrls = @()
-  
-  foreach ($filename in $tc.screenshots) {
-    $filePath = "e2e/results/$($tc.tcId)/$filename"
-    
-    if (Test-Path $filePath) {
-      $bytes = [System.IO.File]::ReadAllBytes((Resolve-Path $filePath))
-      $uploadUri = "https://dev.azure.com/$ORG/$PROJECT/_apis/wit/attachments?fileName=$filename&api-version=7.0"
-      
-      $resp = Invoke-RestMethod -Uri $uploadUri -Method Post `
-        -Headers @{ Authorization = "Basic $auth"; "Content-Type" = "application/octet-stream" } `
-        -Body $bytes
-      
-      $tcUrls += $resp.url
-      Write-Host "✅ Screenshot subido: $filename → $($resp.url)"
+# Detectar origen de screenshots según el escenario
+$allScreenshots = @()
+
+# Escenario A (Playwright testInfo.attach): buscar en test-results/
+if (Test-Path "test-results") {
+  $allScreenshots = Get-ChildItem "test-results" -Recurse -Filter "*.png" | Sort-Object Name
+}
+
+# Escenario B (MCP Browser): buscar en e2e/results/<TC_ID>/
+if (-not $allScreenshots -and (Test-Path "e2e/results")) {
+  foreach ($tc in $testCases) {
+    $dir = "e2e/results/$($tc.tcId)"
+    if (Test-Path $dir) {
+      $allScreenshots += Get-ChildItem $dir -Filter "*.png" | Sort-Object Name
     }
   }
-  
-  $attachmentUrls[$tc.tcId] = $tcUrls
 }
+
+if (-not $allScreenshots) {
+  Write-Host "⚠️ No se encontraron screenshots en test-results/ ni e2e/results/" -ForegroundColor Yellow
+  Write-Host "   Verificar que el test corrió y generó imágenes antes de continuar." -ForegroundColor Yellow
+}
+
+# Subir cada PNG vía REST API
+$tcUrls = @()
+foreach ($file in $allScreenshots) {
+  $filename = $file.Name
+  $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
+  $uploadUri = "https://dev.azure.com/$ORG/$PROJECT/_apis/wit/attachments?fileName=$filename&api-version=7.0"
+  
+  $resp = Invoke-RestMethod -Uri $uploadUri -Method Post `
+    -Headers @{ Authorization = "Basic $auth"; "Content-Type" = "application/octet-stream" } `
+    -Body $bytes
+  
+  $tcUrls += $resp.url
+  Write-Host "✅ Screenshot subido: $filename → $($resp.url)"
+}
+
+# Asignar todas las URLs al primer (o único) TC
+$attachmentUrls[$testCases[0].tcId] = $tcUrls
 ```
 
 **✅ OUTPUT:** `$attachmentUrls` = `@{ 10941 = @("https://...", "https://...") }`
@@ -515,6 +556,20 @@ Después de ejecutar todo, confirmar al usuario:
 | Usuario confunde PRECONDs con STEPs | Recordar: **PRECONDs = setup previo (NO screenshots), STEPs = acciones con validación (SÍ screenshots)** |
 | Comentario sin imágenes | Verificar que las URLs de attachments son correctas (GUID válido) |
 | Usuario olvida actualizar placeholder | Recordar en el mensaje final que debe ejecutar manualmente el TC |
+| Screenshots de Playwright no encontrados | Buscar en `test-results/**/*.png` — son los attachments de `testInfo.attach()` |
+
+---
+
+## ANTI-PATRONES (nunca hacer)
+
+| ❌ Evitar | ✅ En su lugar |
+|---|---|
+| Inventar distinción "manual vs automatizado" para no subir imágenes | El proceso REST API es idéntico — encontrar los PNGs y subirlos |
+| "Los screenshots están en playwright-report/, no puedo acceder" | Los PNGs están en `test-results/` — playwright-report/ es solo la vista HTML |
+| Dar 3 opciones al usuario cuando el procedimiento es claro | Ejecutar el procedimiento: buscar PNGs → subir → publicar |
+| Publicar comentario con rutas locales, scripts o info técnica | Solo: `QA PASSED ✅` + link (o `[Test Regresión]`) + imágenes inline |
+| Preguntar al usuario el PAT si el MCP de ADO ya funcionó en la sesión | Extraer el PAT de los archivos de config según la plataforma |
+| Publicar sin confirmar con `✅` que el upload fue exitoso | Verificar `$resp.url` para cada imagen antes de construir el comentario |
 
 ---
 
