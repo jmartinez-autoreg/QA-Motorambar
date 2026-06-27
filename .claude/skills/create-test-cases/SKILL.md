@@ -65,18 +65,20 @@ Todo TC debe comenzar con precondiciones. Las PRECONDs se numeran **secuencialme
 | Dependencias de TCs | TCs que deben ejecutarse antes para dejar el sistema en un estado dado | Si el TC depende de otro TC previo |
 | Datos del sistema | Archivos, usuarios creados, datos precargados, configuraciones específicas | Si el TC requiere datos específicos |
 | Info de usuario | Tipo de rol, escenario de permisos, condiciones del usuario | Si el escenario requiere especificar condiciones de usuario adicionales |
-| **Login** | `Login - Usuario: X - Rol: Y - Acceso portal: Z - Acceso módulo: W` | **Siempre — pero su número = su posición en la secuencia** |
+| **Login** | `Login<br/>- Usuario: X<br/>- Rol: Y<br/>- Acceso portal: Z<br/>- Acceso módulo: W` (usar `<br/>` entre campos — nunca línea plana) | **Siempre — pero su número = su posición en la secuencia** |
 
 > ⚠️ **El número NO es fijo por categoría.** Es la posición en la lista de precondiciones del TC:
-> - Solo login → `PRECOND 0: Login - ...`
-> - Datos + login → `PRECOND 0: Datos [...] | PRECOND 1: Login - ...`
-> - TC deps + datos + login → `PRECOND 0: TC deps [...] | PRECOND 1: Datos [...] | PRECOND 2: Login - ...`
+> - Solo login → `PRECOND 0: Login<br/>- Usuario: X<br/>- Rol: Y<br/>...`
+> - Datos + login → `PRECOND 0: Datos [...]`, `PRECOND 1: Login<br/>- ...`
+> - TC deps + datos + login → `PRECOND 0: TC deps [...]`, `PRECOND 1: Datos [...]`, `PRECOND 2: Login<br/>- ...`
+>
+> ⚠️ **Login siempre usa `<br/>` entre campos** — nunca `Login - Usuario: X - Rol: Y` en línea plana.
 
 Después de los PRECONDs, continúan los **pasos de ejecución** numerados secuencialmente.
 
 **Ejemplo — solo Login (único PRECOND):**
 ```
-1. PRECOND 0: Login - Usuario: usuario01 - Rol: ADMIN - Acceso portal: MiPortal - Acceso módulo: Ventas / Gestión de Pedidos|
+1. PRECOND 0: Login<br/>- Usuario: usuario01<br/>- Rol: ADMIN<br/>- Acceso portal: MiPortal<br/>- Acceso módulo: Ventas / Gestión de Pedidos|
 2. Clic en el botón 'Crear Pedido'|Se presenta el formulario de creación con los campos Nombre, Cantidad y Fecha habilitados
 3. Ingresar 'Producto A' en el campo Nombre|El campo muestra el texto 'Producto A' sin errores de validación
 4. Clic en el botón 'Guardar'|Se presenta mensaje de éxito 'Pedido creado correctamente' y se redirige a la lista de pedidos
@@ -86,7 +88,7 @@ Después de los PRECONDs, continúan los **pasos de ejecución** numerados secue
 ```
 1. PRECOND 0: TC-A (ID XXXX) ejecutado hasta el paso 10; el sistema muestra la pantalla de resultados|
 2. PRECOND 1: Archivo Excel con 3 registros válidos cargado en la sesión activa|
-3. PRECOND 2: Login - Usuario: usuario01 - Rol: ADMIN - Acceso portal: MiPortal - Acceso módulo: Ventas / Gestión de Pedidos|
+3. PRECOND 2: Login<br/>- Usuario: usuario01<br/>- Rol: ADMIN<br/>- Acceso portal: MiPortal<br/>- Acceso módulo: Ventas / Gestión de Pedidos|
 4. Clic en el botón 'Crear Pedido'|Se presenta el formulario de creación con los campos Nombre, Cantidad y Fecha habilitados
 ```
 
@@ -99,7 +101,7 @@ secuencia, agregar una letra mayúscula al número (`1A`, `1B`, `1C`...). Ejempl
 ```
 PRECOND 1A: Referido Admitido
 PRECOND 1B: Referido Serv. Rel. Activo
-PRECOND 2: Login - ...
+PRECOND 2: Login<br/>- ...
 ```
 
 **`PRECOND 0` para dependencias de TCs (formato "TC Ejecutado"):** cuando el TC depende de otro TC
@@ -171,30 +173,6 @@ Al redactar el resultado esperado de un paso, considerar estos aspectos (no todo
 |---|---|---|
 | **Resumen** | Sin detalle del mensaje/alerta | "Presenta pantalla de inicio" |
 | **Detallado** | Mensaje de validación + alerta con botón seleccionado, texto literal completo | "Presenta alerta 'Tiene cambios sin guardar. ¿Desea cancelar?' con botones 'Sí' y 'No (seleccionado)'" |
-
-### Formato de Resultado Esperado con múltiples elementos
-
-**Cuando el resultado esperado lista 2 o más elementos** (secciones, botones, estados, mensajes, campos), **usar encabezado + bullets con `<br/>-`** — **NUNCA prosa inline:**
-
-```
-✅ Correcto (bullets estructurados):
-En las secciones:<br/>- "CERTIFICADO DE ORIGEN (CO)"<br/>- "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)"<br/>NO aparecen los botones:<br/>- "REEMPLAZO"<br/>Solo aparecen los botones:<br/>- "DESCARGAR"<br/>- "PREVISUALIZAR"
-
-❌ Incorrecto (prosa inline):
-En las secciones "CERTIFICADO DE ORIGEN (CO)" y "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)" NO aparece el botón "REEMPLAZO" (solo "DESCARGAR" y "PREVISUALIZAR")
-```
-
-**Razón:** El formato de bullets facilita la verificación visual durante la ejecución manual — el tester puede marcar mentalmente cada elemento de la lista. La prosa inline obliga a leer/parsear la frase completa, aumentando la probabilidad de omitir un elemento.
-
-**Aplicar cuando:**
-- Se validan múltiples botones/opciones presentes o ausentes
-- Se verifica el estado de varios campos/secciones a la vez
-- Se lista más de un mensaje/alerta en el mismo resultado
-
-**NO aplicar cuando:**
-- El resultado menciona un solo elemento (ej. "Aparece el botón 'Guardar'")
-- El resultado es una redirección simple (ej. "Se redirige al Dashboard")
-- El resultado es un mensaje único (ej. "Se presenta el mensaje 'Guardado correctamente'")
 
 ---
 
@@ -304,12 +282,12 @@ Esperar confirmación ("dale", "sí", "ok") antes de crear en ADO.
 
 **Pasos:**
 ```
-1. PRECOND 0: Login - Usuario: admin01 - Rol: VENDEDOR - Acceso portal: MiPortal - Acceso módulo: Ventas / Gestión de Pedidos|
-2. Clic en el botón 'Crear Pedido'|Se presenta el formulario de creación de pedido con campos Nombre, Cantidad, Fecha y botones 'Guardar' y 'Cancelar'
+1. PRECOND 0: Login<br/>- Usuario: admin01<br/>- Rol: VENDEDOR<br/>- Acceso portal: MiPortal<br/>- Acceso módulo: Ventas / Gestión de Pedidos|
+2. Clic en el botón 'Crear Pedido'|Se presenta el formulario de creación de pedido con:<br/>- Campos: Nombre, Cantidad, Fecha<br/>- Botones: 'Guardar' / 'Cancelar'
 3. Ingresar 'Producto de Prueba' en el campo 'Nombre'|El campo muestra el texto ingresado sin errores de validación
 4. Ingresar '5' en el campo 'Cantidad'|El campo muestra '5' y no presenta alertas
-5. Clic en el botón 'Cancelar'|Se presenta un diálogo de confirmación con texto 'Tiene cambios sin guardar. ¿Desea cancelar?' y botones 'Sí' y 'No'
-6. Clic en el botón 'Sí'|El diálogo se cierra; se redirige a la lista de pedidos; el pedido NO aparece en la lista
+5. Clic en el botón 'Cancelar'|Se presenta diálogo de confirmación con:<br/>- Texto: 'Tiene cambios sin guardar. ¿Desea cancelar?'<br/>- Botones: 'Sí' / 'No'
+6. Clic en el botón 'Sí'|Se presenta el estado final con:<br/>- Diálogo: cerrado<br/>- Pantalla: lista de pedidos<br/>- Pedido creado: NO aparece en la lista
 ```
 
 ---

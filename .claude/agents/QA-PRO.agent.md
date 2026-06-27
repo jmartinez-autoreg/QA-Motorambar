@@ -30,9 +30,10 @@ Incluir solo las categorías que el TC necesita, en este orden:
 3. Info de usuario (rol, escenario de permisos)
 4. **Login** — SIEMPRE incluir; su número = su posición en la secuencia. **Nunca** lleva contraseña.
 
-- ✅ Solo login → `PRECOND 0: Login - Usuario: X - Rol: Y - Acceso portal: Z - Módulo: W`
-- ✅ Datos + login → `PRECOND 0: Datos [...]`, `PRECOND 1: Login - ...`
+- ✅ Solo login → `PRECOND 0: Login<br/>- Usuario: X<br/>- Rol: Y<br/>- Acceso portal: Z<br/>- Acceso módulo: W`
+- ✅ Datos + login → `PRECOND 0: Datos [...]`, `PRECOND 1: Login<br/>- Usuario: X<br/>...`
 - ❌ `PRECOND 3: Login` cuando es la única · ❌ saltar números (`PRECOND 1, PRECOND 3`) · ❌ fusionar categorías en una fila
+- ❌ Login en línea plana: `PRECOND 0: Login - Usuario: X - Rol: Y - Acceso portal: Z - Módulo: W`
 
 **Notación de letras:** si hay más de una PRECOND del mismo tipo en la misma posición de la secuencia,
 agregar una letra mayúscula al número (`1A`, `1B`, `1C`...). Ejemplo real: `PRECOND 1A: Referido Admitido`
@@ -41,7 +42,7 @@ agregar una letra mayúscula al número (`1A`, `1B`, `1C`...). Ejemplo real: `PR
 **Múltiples Logins en posiciones distintas → numeración secuencial, no letras.** La notación de
 letras (`0A`/`0B`) es solo para PRECONDs del **mismo tipo en la misma posición**. Si el TC necesita
 2+ Logins en momentos distintos del flujo (ej. 2 sesiones en navegadores distintos), cada Login
-recibe su **propio número secuencial**: `PRECOND 0: Login - Usuario: ...`, `PRECOND 1: Login - Usuario: ...`
+recibe su **propio número secuencial**: `PRECOND 0: Login<br/>- Usuario: ...`, `PRECOND 1: Login<br/>- Usuario: ...`
 — nunca `PRECOND 0A` / `PRECOND 0B`.
 
 **Login como PASO (no PRECOND) cuando crear esa sesión es lo que el TC verifica.** PRECOND es solo
@@ -64,14 +65,25 @@ en la PRECOND (ej. el username real `distri2`, nunca etiquetas abstractas como "
 **Una PRECOND por fila.** Los resultados esperados describen lo **visualmente verificable**, no comportamiento de backend.
 No crear TCs sin revisar la sección **Discussion** de la US (puede contener escenarios excluidos).
 
-**Formato de Resultado Esperado con múltiples elementos:** cuando el resultado lista 2 o más elementos (secciones, botones, estados, mensajes), usar encabezado + bullets con `<br/>-` — nunca prosa inline:
+**Formato estructurado obligatorio — resultados, comportamientos y estados:** cualquier texto de resultado esperado, descripción de comportamiento, estado de usuario o explicación que mencione 2 o más elementos, puntos o condiciones debe usar encabezado + bullets con `<br/>-`. Nunca prosa corrida.
+
+Regla de oro: **una idea por línea** — si puedes unir dos cosas con "y" o ",", sepáralas en bullets.
 
 ```
-✅ Correcto:
+✅ Correcto (pantalla con elementos):
+Se presenta la pantalla con:<br/>- Título: "Importar CPA"<br/>- Botones:<br/>  - "Aceptar"<br/>  - "Cancelar"
+
+✅ Correcto (comportamiento de múltiples usuarios/estados):
+El usuario distri2 presenta:<br/>- Step 1: limpio (proceso completado y limpiado)<br/>- Proceso de usuario B: no visible<br/>- Estado de sesión: aislado por usuario
+
+✅ Correcto (multi-elemento con condiciones):
 En las secciones:<br/>- "CERTIFICADO DE ORIGEN (CO)"<br/>- "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)"<br/>NO aparecen los botones:<br/>- "Importar CPA" (si no hay archivo cargado)<br/>- "REEMPLAZO" (si ya hay archivo cargado)<br/>Solo ve los botones:<br/>- "Descargar"<br/>- "Previsualizar"
 
-❌ Incorrecto (prosa inline):
-En las secciones "CERTIFICADO DE ORIGEN (CO)" y "CERTIFICADO DE PAGO DE ARBITRIOS (CPA)" NO aparece el botón "REEMPLAZO" (solo "DESCARGAR" y "PREVISUALIZAR")
+❌ Incorrecto (prosa corrida — comportamiento):
+El usuario distri2 sigue viendo el step 1 limpio (su proceso ya fue completado y limpiado). NO ve el proceso del usuario B. Cada usuario mantiene su estado aislado.
+
+❌ Incorrecto (prosa inline — pantalla):
+Se abre pantalla con botón cancelar y aceptar.
 ```
 
 ### Checkpoint pre-redacción (obligatorio antes de escribir steps)
@@ -307,6 +319,8 @@ Si ninguna opción funciona → usar comentario MCP sin imágenes inline como fa
 |-------------|---------------|
 | `PRECOND 3: Login` cuando es la única / saltar números | Numerar secuencial desde 0 según posición |
 | Fusionar varias PRECONDs en una fila | Una PRECOND por fila |
+| Login PRECOND en línea plana: `Login - Usuario: X - Rol: Y` | Usar `<br/>` entre campos: `Login<br/>- Usuario: X<br/>- Rol: Y<br/>...` |
+| Prosa corrida para 2+ elementos, comportamientos o estados | Texto estructurado con `<br/>-` bullets — una idea por línea |
 | Resultado esperado que describe backend | Describir lo visualmente verificable |
 | Crear TCs sin leer la Discussion de la US | Revisar Discussion antes (escenarios excluidos) |
 | Crear TC formal para criterios solo-DEV | Cobertura DEV: documentar, no crear TC |
