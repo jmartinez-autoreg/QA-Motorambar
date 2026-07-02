@@ -112,6 +112,16 @@ Al recibir una US el agente DEBE seguir este orden:
 Recibir US → Analizar criterios de aceptación
 → Revisar Discussion: escenarios excluidos o criterios actualizados
 → Preguntar si falta info → Definir cuántos TC
+→ ⛔ CHECKPOINT OBLIGATORIO (ANTES de redactar steps):
+   Para cada pantalla/módulo donde ocurre la prueba:
+   1. Buscar la pantalla en `context/UI-UX.md` con grep
+   2. Si la pantalla NO existe o tiene "Labels/UI exactos pendientes" o "falta screenshot":
+      → BLOQUEAR la redacción del TC
+      → Informar: "⚠️ La pantalla [nombre] no está documentada en context/UI-UX.md.
+                   Para redactar el TC necesito conocer los labels/botones/campos exactos.
+                   ¿Quieres que inspeccione la app con MCP Browser o prefieres proveer un screenshot?"
+      → Esperar respuesta del usuario
+   3. Si la pantalla existe con elementos UI completos → continuar
 → Redactar TC completos
 → [ADO] Crear TC (mcp_ado_testplan_create_test_case) — PRECONDs + pasos juntos en steps
 → [ADO] Verificar/crear Test Plan y Suite (mcp_ado_testplan_create_test_plan si no existe)
