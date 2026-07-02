@@ -82,9 +82,14 @@ Formato HTML que va al campo `Microsoft.VSTS.Common.AcceptanceCriteria`. Los cri
 </ul>
 ```
 
+⛔ **REGLA CRÍTICA — SIEMPRE usar Gherkin:**
+- Los criterios principales DEBEN estar en formato Gherkin (Dado que / Cuando / Entonces)
+- Cada escenario funcional es un `<li>` con Gherkin completo (contexto → acción → resultado)
+- Los detalles de validación (formato de campo, mensajes UI, auditoría) van DENTRO o DESPUÉS de los escenarios Gherkin como bullets complementarios
+
 ⛔ **Sin tecnicismos:** los criterios describen el **QUÉ** (comportamiento visible para el usuario), nunca el **CÓMO** (IDs técnicos, arquitectura, capas de código, nombres de tablas o métodos).
 
-Patrones adicionales obligatorios dentro de los escenarios Gherkin:
+Patrones adicionales obligatorios (complementan los escenarios Gherkin):
 
 #### Campos obligatorios marcados con `*`
 ```html
