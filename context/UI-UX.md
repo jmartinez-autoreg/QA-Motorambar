@@ -29,6 +29,28 @@ Copia este bloque por cada pantalla nueva:
 
 ---
 
+## ⚠️ Historial de cambios importantes de layout
+
+### US 11366 (cerrada 2026-06-19): Reorganización del sidebar
+**Qué cambió:**
+- **Antes:** Botón "Acciones" en la parte superior derecha del grid "Vehículos Importados" con un menú dropdown que contenía: "Importar Vehículos", "Importar CFA", "Historial de Importaciones", "Configurar Importación".
+- **Ahora:** Sidebar izquierdo con estructura jerárquica:
+  - **Dashboard** (sin subopciones)
+  - **Vehículos Importados** (expandible, badge numérico con total) → subopciones:
+    - Importar Vehículos
+    - Historial de Importaciones
+  - **Importar CPA** (opción independiente, fuera del submenu)
+  - **Mantenimiento** (expandible) → subopciones:
+    - Plantilla de importación (antes "Configurar Importación" dentro de Vehículos Importados)
+
+**Impacto en TCs:** TCs escritos antes del 2026-06-19 pueden mencionar "botón Acciones" o "menú Acciones" — al ejecutarlos, usar el sidebar en su lugar. "Configurar Importación" ya NO está en Vehículos Importados — buscar en Mantenimiento > Plantilla de importación. Ver sección obsoleta del menú Acciones en "Vehículos Importados > Grid de inventario > Componentes asociados" para referencia histórica.
+
+**Permisos por rol (US 11366):**
+- **DISTRIBUIDOR:** ve todas las opciones del sidebar.
+- **CLIENTE:** solo ve Dashboard + "Vehículos Asignados" — NO ve Vehículos Importados ni Importar CPA.
+
+---
+
 ## Pantallas documentadas
 
 ## Autoreg / PDV (sistema externo) > Login federado
@@ -130,13 +152,14 @@ Screenshot: ![pdv-bienvenido-terminos-condiciones](screenshots/pdv-bienvenido-te
 - **Elementos clave:**
   | Elemento | Tipo | Texto/label literal | Comportamiento |
   |---|---|---|---|
-  | **SIDEBAR (Menú lateral)** | nav vertical | — | colapsable/expandible con botón hamburguesa; muestra badge "MANUFACTURER" bajo el logo |
-  | Item sidebar (nivel 1) | nav link | "Dashboard" | ícono grid; navega al Dashboard Ejecutivo |
-  | Item sidebar (nivel 1) | nav link expandible | "Vehículos Importados" | ícono vehículo + badge numérico con total de vehículos (ej. `1057`); **despliega/colapsa submenu** con 3 opciones |
-  | Submenu (nivel 2) | nav link | "Importar Vehículos" | opción dentro de "Vehículos Importados"; navega a `/import/new` (ruta pendiente confirmar) |
-  | Submenu (nivel 2) | nav link | "Historial de Importaciones" | opción dentro de "Vehículos Importados"; navega a `/import` (esta pantalla — **activa por defecto**) |
-  | Submenu (nivel 2) | nav link | "Configurar Importación" | opción dentro de "Vehículos Importados"; navega a `/import/config` (ruta pendiente confirmar) |
-  | Item sidebar (nivel 1) | nav link | "Importar CPA" | ícono documento; navega a `/import/cpa`; **NO está dentro del submenu** de "Vehículos Importados" |
+  | **SIDEBAR (Menú lateral)** | nav vertical | — | colapsable/expandible con botón hamburguesa; muestra badge "MANUFACTURER" bajo el logo. **US 11366: opciones que antes estaban en superior derecha se movieron aquí** |
+  | Item sidebar (nivel 1) | nav link | "Dashboard" | ícono grid; navega al Dashboard Ejecutivo; sin subopciones |
+  | Item sidebar (nivel 1) | nav link expandible | "Vehículos Importados" | ícono vehículo + badge numérico con total de vehículos (ej. `1057`); el badge **desaparece** si total = 0; **despliega/colapsa submenu** con 2 opciones |
+  | Submenu (nivel 2) | nav link | "Importar Vehículos" | opción dentro de "Vehículos Importados"; navega a pantalla de carga de Excel |
+  | Submenu (nivel 2) | nav link | "Historial de Importaciones" | opción dentro de "Vehículos Importados"; navega a `/import` (esta pantalla — **activa por defecto** al entrar a Vehículos Importados) |
+  | Item sidebar (nivel 1) | nav link | "Importar CPA" | ícono documento; navega a `/import/cpa`; **opción independiente fuera del submenu** de "Vehículos Importados" |
+  | Item sidebar (nivel 1) | nav link expandible | "Mantenimiento" | ícono settings o llave; **despliega/colapsa submenu** con opciones de administración |
+  | Submenu (nivel 2) | nav link | "Plantilla de importación" | opción dentro de "Mantenimiento"; navega a pantalla de mapeo de columnas Excel (antes "Configurar Importación") |
   | Título | texto | "Vehículos Importados" | — |
   | Subtítulo | texto | "Historial de Inventario" | — |
   | Botón | botón primario | "Generar Reporte" | abre modal "Reporte de Inventario de Vehículos" |
@@ -163,9 +186,13 @@ Screenshot: ![pdv-bienvenido-terminos-condiciones](screenshots/pdv-bienvenido-te
   - **Loading:** toda la pantalla (buscador, filtros, tabla y paginación) se muestra como **skeleton** (placeholders grises) hasta que la data carga.
   - Error — no documentado.
 - **Permisos por rol:**
-  - **DISTRIBUIDOR:** puede ver y acceder a todas las opciones del sidebar (Dashboard, Vehículos Importados con sus 3 subopciones, Importar CPA).
-  - **CLIENTE:** solo ve "Dashboard" y "Vehículos Asignados" en el sidebar; **NO** ve "Vehículos Importados" ni "Importar CPA". Si intenta acceder a URLs restringidas directamente, el sistema lo redirige al Dashboard mostrando mensaje *"No tienes permisos para acceder a esta funcionalidad"*.
+  - **DISTRIBUIDOR:** puede ver y acceder a todas las opciones del sidebar (Dashboard, Vehículos Importados con sus 2 subopciones, Importar CPA, Mantenimiento con sus subopciones incluyendo Plantilla de importación).
+  - **CLIENTE:** solo ve "Dashboard" y "Vehículos Asignados" en el sidebar; **NO** ve "Vehículos Importados" (ni su badge ni subopciones), ni "Importar CPA", ni "Mantenimiento". Si intenta acceder a URLs restringidas directamente, el sistema lo redirige al Dashboard mostrando mensaje *"No tienes permisos para acceder a esta funcionalidad"*.
 - **Screenshot:** ![vehiculos-importados-grid](screenshots/vehiculos-importados-grid.png) · ![vehiculos-importados-iconos-fila](screenshots/vehiculos-importados-iconos-fila.png) · ![vehiculos-importados-grid-loading](screenshots/vehiculos-importados-grid-loading.png) · ![vehiculos-importados-sidebar-layout](screenshots/vehiculos-importados-sidebar-layout.png)
+- **Notas para TCs:**
+  - **US 11366:** Actualización de layout del sidebar. Las opciones que antes estaban en la parte superior derecha (botón "Acciones", etc.) se reorganizaron al menú lateral izquierdo con la estructura Dashboard > Vehículos Importados (expandible con 2 subopciones) > Importar CPA > Mantenimiento (expandible).
+  - El badge del total en el menú "Vehículos Importados" desaparece si el total es `0` (no muestra "0") — ver comportamiento documentado en Dashboard.
+  - **"Configurar Importación" ya NO está en el sidebar de "Vehículos Importados"** — se movió a Mantenimiento > Plantilla de importación.
 
 ### Componente: Detalle inline expandido por fila (tabs)
 
@@ -206,9 +233,26 @@ Screenshot: ![pdv-bienvenido-terminos-condiciones](screenshots/pdv-bienvenido-te
 
 **Tab "DOCS ADICIONALES":** (contenido pendiente documentar)
 
-**Tab "HISTORIAL":** (contenido pendiente documentar)
+**Tab "HISTORIAL":**
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Título sección | texto | "LÍNEA DE TIEMPO DEL REGISTRO" | con ícono de reloj (⏱) |
+| Filtros de tipo documento | tabs/pills | "TODO" (activo por defecto) / "CO" / "CPA" / "DOCS" / "FACTURA" | filtra la línea de tiempo por tipo de documento |
+| Botón principal | botón morado | "DESCARGAR HISTORIAL" | esquina superior derecha; descarga el historial completo del vehículo (todos los documentos) |
+| Ítem de historial | card/item | nombre de archivo (ej. "certificate-5N1DR3CU1TC240132-20260624000030.pdf") + badge de estado | estado puede ser "COMPLETADO" (verde) / "REEMPLAZADO" (naranja); ícono CO/documento; botón "co" pequeño morado para previsualizar/descargar |
+| Fecha/hora | texto | timestamp (ej. "23 JUN 2026, 20:06") | debajo del botón de cada ítem |
+| Estado vacío | mensaje + ilustración | "Sin historial de documentos" | **se muestra cuando NO hay registros en la línea de tiempo** — puede mostrar ilustración/ícono de carpeta vacía |
 
-**Screenshot:** (usuario mostró screenshots — pendiente agregar a `context/screenshots/`)
+**Comportamiento "DESCARGAR HISTORIAL":**
+1. Clic en el botón → descarga archivo ZIP con todos los documentos del vehículo (CO, CPA, Factura, Docs Adicionales)
+2. Nombre del archivo descargado: pendiente documentar (ej. `historial-{VIN}-{fecha}.zip`)
+
+**Estado "Sin historial de documentos":**
+- Si el vehículo **no tiene** ningún documento cargado (ni CO, ni CPA, ni Factura, ni Docs Adicionales), el tab HISTORIAL muestra el mensaje **"Sin historial de documentos"** en lugar de la línea de tiempo.
+- Los filtros (TODO/CO/CPA/DOCS/FACTURA) **siguen visibles** pero la línea de tiempo está vacía con el mensaje.
+- El botón "DESCARGAR HISTORIAL" puede estar **deshabilitado** o no visible cuando no hay documentos — pendiente confirmar.
+
+**Screenshot:** ![Vehiculo expandito pantalla Vehiculos Importados TAB Historia ](screenshots/Vehiculo expandito pantalla Vehiculos Importados TAB Historia .png)
 
 **Notas para TCs:**
 - **CO = Certificado de Origen** — término oficial, usado consistentemente en la UI como "CERTIFICADO DE ORIGEN (CO)".
@@ -232,15 +276,17 @@ Screenshot: ![pdv-bienvenido-terminos-condiciones](screenshots/pdv-bienvenido-te
 
 Screenshot: ![vehiculos-importados-filtro-localidades](screenshots/vehiculos-importados-filtro-localidades.png)
 
-**Menú "Acciones"** (botón "Acciones")
+**Menú "Acciones"** (botón "Acciones" - **OBSOLETO tras US 11366**)
 | Elemento | Tipo | Texto/label literal | Comportamiento |
 |---|---|---|---|
-| Opción de menú | item | "Importar Vehículos" (ícono upload) | navega a `/import/vehicles` — abre pantalla de carga de Excel con vehículos |
-| Opción de menú | item | "Importar CFA" (ícono documento) | navega a `/import/cpa` (nota: la UI dice "CFA" pero la ruta es `/import/cpa`) |
-| Opción de menú | item | "Historial de Importaciones" (ícono historial) | navega a `/import/history` — muestra tabla con todas las importaciones realizadas |
-| Opción de menú | item | "Configurar Importación" (ícono settings) | navega a `/import/config` — permite mapear columnas del Excel con propiedades del vehículo |
+| Opción de menú | item | "Importar Vehículos" (ícono upload) | **Ahora accesible desde sidebar > Vehículos Importados > Importar Vehículos** |
+| Opción de menú | item | "Importar CFA" (ícono documento) | **Ahora accesible desde sidebar > Importar CPA** (nota: la UI anterior decía "CFA", ahora es "CPA") |
+| Opción de menú | item | "Historial de Importaciones" (ícono historial) | **Ahora accesible desde sidebar > Vehículos Importados > Historial de Importaciones** |
+| Opción de menú | item | "Configurar Importación" (ícono settings) | **Se movió fuera del menú Vehículos Importados → ahora en sidebar > Mantenimiento > Plantilla de importación** |
 
 Screenshot: ![vehiculos-importados-acciones-menu-completo](screenshots/vehiculos-importados-acciones-menu-completo.png)
+
+**⚠️ NOTA IMPORTANTE:** Este menú "Acciones" (botón en parte superior) existió hasta la **US 11366** (cerrada 2026-06-19). **Tras la US 11366, estas opciones se movieron al sidebar izquierdo** (ver tabla de sidebar arriba). "Configurar Importación" ya NO está en Vehículos Importados — ahora está en Mantenimiento > Plantilla de importación. TCs escritos antes de 2026-06-19 pueden mencionar "botón Acciones" — al ejecutarlos, usar el sidebar en su lugar.
 
 **Menú "..." por fila / barra de acciones batch**
 | Elemento | Tipo | Texto/label literal | Comportamiento |
@@ -337,6 +383,110 @@ Screenshot: ![vehiculos-importados-descarga-lote](screenshots/vehiculos-importad
 
 Screenshot: ![vehiculos-importados-reporte-inventario](screenshots/vehiculos-importados-reporte-inventario.png)
 
+**Componente: Filtros multi-valor con chips** (Estado CO, Estado CPA, Estado Factura, Marcas)
+
+**Cómo se llega aquí:** Los filtros "Estado CO", "Estado CPA", "Estado Factura" y "Marcas" en el grid de "Vehículos Importados" — al hacer clic en cualquiera de ellos.
+
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| **Estado inicial (sin selección)** | dropdown | placeholder "Seleccione estado" / "Seleccione marcas" | color gris claro; al hacer clic abre el dropdown con checkboxes |
+| **Dropdown abierto** | menu desplegable | — | fondo blanco; muestra lista de checkboxes con opciones del catálogo |
+| Opción especial | checkbox con ícono | "Seleccionar todos" | ícono de checklist morado; marca/desmarca todas las opciones de una vez |
+| Opción individual (ejemplo CPA) | checkbox | "Pendiente" | puede estar marcado ✓ o sin marcar |
+| Opción individual (ejemplo CPA) | checkbox | "Completado" | puede estar marcado ✓ o sin marcar |
+| Opción individual (ejemplo CPA) | checkbox | "En Proceso" | puede estar marcado ✓ o sin marcar |
+| Opción individual (ejemplo CPA) | checkbox | "Cancelado" | puede estar marcado ✓ o sin marcar |
+| **Dropdown con selección** (cerrado) | dropdown resaltado | "Estado CPA Seleccionados (2 total)" / "Estado CO Seleccionados (3 total)" | borde morado, fondo morado muy claro; el label cambia para mostrar el contador de opciones seleccionadas |
+| Chips removibles | chips verdes con "✕" | ej. "Pendiente ✕" · "Completado ✕" | aparecen debajo del dropdown cerrado; cada chip es removible individualmente haciendo clic en "✕"; color verde claro con texto verde oscuro |
+| Ícono "borrar selección" | ícono basura | — | aparece a la derecha del dropdown cuando hay selecciones activas; al hacer clic limpia todos los chips de ese filtro |
+
+**Comportamiento de multi-selección:**
+1. Usuario abre el dropdown de "Estado CPA" → ve la lista de checkboxes.
+2. Usuario marca "Pendiente" y "Completado" → el dropdown se cierra automáticamente.
+3. El label del filtro cambia a **"Estado CPA Seleccionados (2 total)"** y aparecen **2 chips** debajo: `Pendiente ✕` y `Completado ✕`.
+4. La tabla se filtra mostrando solo vehículos con Estado CPA = "Pendiente" **O** "Completado" (operador OR).
+5. Usuario hace clic en la "✕" del chip "Completado" → ese chip desaparece, el contador cambia a **"(1 total)"** y la tabla se actualiza.
+6. Usuario hace clic en el ícono de basura → todos los chips de ese filtro desaparecen, el dropdown vuelve a "Seleccione estado" y la tabla muestra todos los registros.
+
+**Diferencias con el buscador multi-VIN:**
+- **VINs:** cada línea es un chip; validación de formato 17 caracteres; contador "Válidos" / "Inválidos".
+- **Filtros de estado/marca:** cada opción seleccionada es un chip; sin validación (todas las opciones vienen del catálogo); contador total de seleccionadas.
+
+**Estados:**
+- Vacío (placeholder "Seleccione estado").
+- Con 1 selección (ej. "Estado CPA Seleccionados (1 total)" + 1 chip).
+- Con múltiples selecciones (ej. "(2 total)" + 2 chips, "(3 total)" + 3 chips, etc.).
+- Dropdown abierto mostrando checkboxes (con algunas marcadas ✓).
+
+**Screenshot:** ![filtros-multi-valor-chips-vacio](screenshots/filtros-multi-valor-chips-vacio.png) · ![filtros-multi-valor-chips-dropdown-abierto](screenshots/filtros-multi-valor-chips-dropdown-abierto.png) · ![filtros-multi-valor-chips-seleccionados](screenshots/filtros-multi-valor-chips-seleccionados.png) · ![filtros-multi-valor-chips-vins-expandido](screenshots/filtros-multi-valor-chips-vins-expandido.png)
+
+**Notas para TCs:**
+- **US-11369:** este comportamiento multi-valor con chips se aplica a los filtros "Estado CO", "Estado CPA", "Estado Factura" y "Marcas" — antes solo eran dropdowns simples de selección única.
+- El contador "(N total)" es **dinámico** — se actualiza automáticamente al agregar/remover chips.
+- Los chips son **removibles individualmente** (clic en "✕") o **todos a la vez** (ícono basura).
+- El operador de filtro es **OR** — si selecciono "Pendiente" y "Completado", la tabla muestra vehículos con **cualquiera** de esos 2 estados (no ambos a la vez).
+
+---
+
+**Componente: Selector de rango de fechas** (filtro "Fecha" en grid de Vehículos Importados)
+
+**Cómo se llega aquí:** clic en el botón "Seleccionar fecha" (ícono calendario) en el header del grid de "Vehículos Importados" (junto a "Todas las Localidades", estrella de favoritos, etc.).
+
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| **Modal calendario** | modal flotante | fondo blanco con sombra | se posiciona junto al botón "Seleccionar fecha"; cierra al hacer clic fuera o en "Cancelar"/"OK" |
+| Header del modal | título dinámico | ej. "Jun 2026" (con navegación ‹ ›) | actualiza según el mes/año navegado |
+| Navegación | flechas | "‹" / "›" (mes anterior/siguiente) · "«" / "»" (año anterior/siguiente, solo modo Mes) | color morado al hacer hover |
+| **Tabs de modo** | tabs horizontales | "Rango" / "Mes" / "Semana" / "Día" | el tab activo se muestra en texto morado |
+
+**Modo "Rango" (activo por defecto):**
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Calendarios duales | 2 calendarios lado a lado | ej. "Jun 2026" (izq.) y "Jul 2026" (der.) | permite seleccionar un rango de fechas entre ambos meses |
+| Días de la semana | labels | "DOM" / "LUN" / "MAR" / "MIÉ" / "JUE" / "VIE" / "SÁB" | color gris claro, mayúsculas |
+| Día actual | celda resaltada | ej. "26" con círculo morado | se marca automáticamente el día de hoy |
+| Selección de rango | celdas resaltadas | días entre la fecha inicial y final con fondo morado claro | al hacer clic en un día inicial y luego en un día final, todos los días intermedios se resaltan |
+| Botón "Cancelar" | botón secundario gris | "Cancelar" | cierra el modal sin aplicar el filtro |
+| Botón "OK" | botón primario morado | "OK" | aplica el rango seleccionado y cierra el modal; el botón "Seleccionar fecha" en el grid muestra el rango (ej. "1 Jun – 15 Jun") |
+
+**Modo "Mes":**
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Grid de meses | grid 4x3 | "Ene" / "Feb" / "Mar" / "Abr" / "May" / "Jun" / "Jul" / "Ago" / "Sep" / "Oct" / "Nov" / "Dic" | cada mes es un botón; el mes actual o seleccionado se resalta en morado |
+| Navegación de año | flechas "«" / "»" | — | cambia entre años (ej. 2025 ← 2026 → 2027) |
+| Selección de mes | celda morada | ej. "Jun" con fondo morado | al hacer clic en un mes, se selecciona ese mes completo (del 1 al último día del mes) |
+| Botones "Cancelar" / "OK" | igual que Rango | — | — |
+
+**Modo "Semana":**
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Calendario individual | calendario de un solo mes | ej. "Jun 2026" | muestra un mes completo |
+| Selección de semana | 7 celdas resaltadas | ej. días 21-27 con fondo morado | al hacer clic en un día, se selecciona la **semana completa** que contiene ese día (domingo a sábado) |
+| Días de la semana | encabezado calendario | "DOM" / "LUN" / "MAR" / "MIÉ" / "JUE" / "VIE" / "SÁB" | — |
+| Botones "Cancelar" / "OK" | igual que Rango | — | — |
+
+**Modo "Día":**
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Calendario individual | calendario de un solo mes | ej. "Jun 2026" | muestra un mes completo |
+| Selección de día | 1 celda resaltada | ej. día "26" con fondo morado | al hacer clic en un día, se selecciona **solo ese día** |
+| Botones "Cancelar" / "OK" | igual que Rango | — | — |
+
+**Estados:**
+- Sin selección (modal abierto, modo Rango por defecto, día actual marcado con círculo pero sin rango aplicado).
+- Con rango seleccionado (modo Rango, días resaltados).
+- Con mes seleccionado (modo Mes, mes resaltado).
+- Con semana seleccionada (modo Semana, 7 días resaltados).
+- Con día seleccionado (modo Día, 1 día resaltado).
+
+**Screenshot:** ![selector-fecha-range](screenshots/selector-fecha-range.png) · ![selector-fecha-month](screenshots/selector-fecha-month.png) · ![selector-fecha-week](screenshots/selector-fecha-week.png) · ![selector-fecha-day](screenshots/selector-fecha-day.png)
+
+**Notas para TCs:**
+- **Modo por defecto:** al abrir el selector, siempre abre en modo "Rango" con el día actual marcado (círculo morado).
+- **Rango personalizado:** en modo Rango, se puede seleccionar desde una fecha en un mes hasta una fecha en el mes siguiente (span multi-mes).
+- **Semana (Semana):** la semana siempre va de **domingo a sábado** (7 días completos) — si hago clic en un jueves, se seleccionan desde el domingo anterior hasta el sábado siguiente.
+- **Botón "Seleccionar fecha" en el grid:** tras aplicar un filtro, el botón muestra el rango seleccionado en formato corto (ej. "1 Jun – 15 Jun" / "May 2026" / "Semana 21-27 Jun" / "25 Jun") — **debe mostrar la selección activa**, no solo el ícono de calendario.
+
 ---
 
 ## Motorambar > Vehículos Importados > Detalle de vehículo (solo lectura)
@@ -405,7 +555,7 @@ Screenshot: ![vehiculos-importados-reporte-inventario](screenshots/vehiculos-imp
 
 ## Motorambar > Import > Importar CPA
 - **Ruta/URL:** `/import/cpa`
-- **Cómo se llega aquí:** botón "Acciones" → "Importar CPA" desde "Vehículos Importados" (`/import`).
+- **Cómo se llega aquí:** **sidebar > "Importar CPA"** (opción independiente del menú lateral). *(Antes de US 11366: botón "Acciones" → "Importar CPA" desde `/import`)*
 - **Elementos clave:**
   | Elemento | Tipo | Texto/label literal | Comportamiento |
   |---|---|---|---|
@@ -416,11 +566,133 @@ Screenshot: ![vehiculos-importados-reporte-inventario](screenshots/vehiculos-imp
   | Dropzone | input file | "Arrastra y suelta tu PDF aquí" / "o **haz clic para seleccionar**" | — |
   | Botón | primario morado (claro/deshabilitado) | "Vincular VINs" | habilita tras subir un PDF |
 - **Validación paso 1 (regla de negocio):** el PDF debe ser un **batch de múltiples páginas/VINs**. Si se sube un PDF de **una sola página**, el sistema muestra un mensaje de error indicando que para vehículos individuales se debe usar el grid de "Vehículos Importados" en lugar de este flujo. Si el PDF es válido (multi-página), avanza al paso 2.
-- **Paso 2 "PROCESANDO VINS":** ejecuta en tiempo real un proceso en background (OCR) que la UI consulta por **polling** hasta completarse. _(Labels/UI exactos pendientes — falta screenshot real; existe skeleton `CpaProcessingSkeleton` en el código.)_
-- **Paso 3 "RESUMEN":** pantalla de resumen del resultado del procesamiento. _(Labels/UI exactos pendientes — falta screenshot real; existe skeleton `CpaSummarySkeleton` en el código.)_
-- **Estados:** documentado solo el paso 1 "SUBIR ARCHIVO" (vacío, sin archivo, y el caso de error por PDF de una sola página descrito arriba). Pasos "PROCESANDO VINS" y "RESUMEN" — pendiente screenshot real para confirmar labels exactos.
-- **Screenshot:** ![import-cpa](screenshots/import-cpa.png)
-- **Notas para TCs:** "CPA" = Certificados de Pago de Arbitrios (definición oficial dada en esta pantalla). El comportamiento de validación (1 página → error / multi-página → avanza) fue confirmado por el usuario, pero los textos literales exactos de UI para pasos 2-3 no están confirmados — antes de escribir steps detallados para esos pasos, inspeccionar la app real vía MCP Browser o solicitar screenshot.
+- **Screenshot paso 1:** ![cpa-paso1-subir-archivo](screenshots/cpa-paso1-subir-archivo.png) · ![cpa-paso1-archivo-seleccionado](screenshots/cpa-paso1-archivo-seleccionado.png)
+
+### Paso 2 "PROCESANDO VINS" — Vinculación en tiempo real
+- **Título:** "Vinculando VINs"
+- **Subtítulo archivo:** nombre del PDF subido (ej. "CPAINFINITI.pdf")
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Progress bar | barra morada animada | porcentaje dinámico (ej. "0%", "67%") | actualiza en tiempo real por polling |
+  | Mensaje principal | texto | "Procesando archivo..." | — |
+  | Mensaje secundario | texto | "Estamos vinculando los VIN's." | — |
+  | Nota | texto gris con ícono morado | "Esto puede tomar unos minutos." | — |
+  | Card resumen | card con ícono check verde | "0 COMPLETADOS" (dinámico) | actualiza en tiempo real |
+  | Card resumen | card con ícono alerta naranja | "0 PENDIENTES" (dinámico) | actualiza en tiempo real |
+  | Card resumen | card con ícono X rojo | "0 ERRORES" (dinámico) | actualiza en tiempo real |
+  | Buscador | input texto con lupa | placeholder: "Buscar VIN, N.º CPA..." | filtro en tiempo real de la tabla |
+  | Filtro estado | dropdown | "Todos los esta..." (texto truncado) | despliega estados: Completado, Pendiente (probablemente) |
+  | Tabla | grid | columnas: ESTADO / NO. VIN / NO. CPA / RNC CONTRIBUYENTE / CERTIFICACIÓN | se va poblando dinámicamente conforme avanza el procesamiento |
+  | Columna ESTADO | badge verde/naranja | "COMPLETADO" (verde) / "PENDIENTE" (naranja) | actualiza en tiempo real |
+- **Comportamiento:** polling automático cada X segundos hasta que todos los VINs sean procesados. Al completarse (100%), el stepper avanza automáticamente al paso 3 "RESUMEN".
+- **Screenshot paso 2:** ![cpa-paso2-procesando-vins](screenshots/cpa-paso2-procesando-vins.png)
+
+### Paso 3 "RESUMEN" — Resultado del procesamiento
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Banner resultado | card amarillo (con advertencias) o verde (éxito total) | "Proceso completado con advertencias" + "2 de 3 VINs vinculados correctamente." | solo aparece si hay advertencias (VINs no vinculados) o errores |
+  | Card resumen | card con ícono documento morado | "3 VINS DETECTADOS" | total de páginas/VINs en el PDF |
+  | Card resumen | card con ícono check verde | "2 VINCULADOS" | VINs procesados correctamente |
+  | Card resumen | card con ícono X rojo | "0 ERRORES" | VINs con fallo OCR |
+  | Card resumen | card con ícono alerta naranja | "1 NO VINCULADOS" | VINs detectados pero no asociados a vehículos en BD |
+  | Tabs | nav tabs horizontales | "Completados (2)" / "Fallidos (0)" / "No vinculados (1)" | contador dinámico entre paréntesis |
+  | Buscador | input texto con lupa | placeholder: "Buscar VIN, N.º CPA..." | filtro de la tabla |
+  | Filtro estado | dropdown | "Todos los esta..." | despliega estados disponibles |
+  | Tabla | grid | columnas: ESTADO / NO. VIN / NO. CPA / RNC CONTRIBUYENTE / CERTIFICACIÓN | misma estructura del paso 2, pero sin actualizaciones dinámicas |
+  | Columna ESTADO | badge | "COMPLETADO" (verde) / "NO VINCULADO" (naranja) | — |
+  | Botón secundario | outline morado | "Importar otro" | regresa al paso 1 (nueva importación) |
+  | Botón primario | primario morado | "Finalizar" | cierra el flujo y regresa a "Historial de CPA" |
+- **Screenshot paso 3:** ![cpa-paso3-resumen](screenshots/cpa-paso3-resumen.png)
+- **Estados:** con advertencias (banner amarillo + contadores con valores > 0 en "No vinculados" o "Errores") / éxito total (banner verde, todos los VINs vinculados correctamente).
+- **Notas para TCs:**
+  - "CPA" = Certificados de Pago de Arbitrios (definición oficial dada en esta pantalla).
+  - El comportamiento de validación (1 página → error / multi-página → avanza) fue confirmado por el usuario.
+  - Los 3 pasos del flujo están completamente documentados con sus labels y elementos UI exactos.
+  - **US 11366:** Acceso a esta pantalla cambió. Antes: grid `/import` > botón "Acciones" > "Importar CPA". Ahora: sidebar > "Importar CPA" (opción directa).
+
+**Estados de CPA (referencia oficial — aplica en Historial de CPA y paso 2 "PROCESANDO VINS"):**
+
+| Status (código) | English | Español | Descripción |
+|---|---|---|---|
+| `Received` | Received | Recibido | Archivo recibido, esperando inicio del procesamiento |
+| `Processing` | Processing | Procesando | Split del PDF en curso |
+| `Split` | Split | Dividido | PDF dividido en páginas individuales, listo para encolar |
+| `OcrPending` | OCR Pending | OCR Pendiente | Páginas encoladas en Service Bus, OCR en progreso |
+| `Processed` | Completed | Completado | Todas las páginas procesadas correctamente por OCR |
+| `ProcessedWithErrors` | Completed with errors | Completado con errores | Procesamiento finalizado pero al menos una página falló OCR |
+| `Invalid` | Critical error | Error crítico | Archivo inválido detectado en el split (ej. menos de 2 páginas) |
+| `Error` | Critical error | Error crítico | Fallo técnico no recuperable (API OCR caída, error de red, etc.) |
+| `Cancelled` | Cancelled | Cancelado | Cancelado manualmente por el usuario antes de finalizar |
+
+---
+
+## Motorambar > Import > Historial de CPA
+- **Ruta/URL:** `/import/cpa/history` _(pendiente confirmar)_
+- **Cómo se llega aquí:** **sidebar > "Importar CPA" > "Historial de CPA"** (submenu). *(Ruta exacta de navegación pendiente confirmar — puede ser opción en sidebar o dentro de `/import/cpa`)*
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Título | texto (con ícono reloj circular morado) | "Historial de CPA" | — |
+  | Subtítulo | texto gris | "Listado de todos los CPA procesados por tu organización." | — |
+  | Botón | primario morado (esquina superior derecha, con ícono upload) | "Importar CPA" | navega a `/import/cpa` (paso 1 "SUBIR ARCHIVO") |
+  | Campo búsqueda | input texto con ícono lupa | placeholder: "Buscar por archivo, usuario o VIN..." | búsqueda en tiempo real por nombre de archivo, usuario que subió el PDF o VIN contenido en el procesamiento |
+  | Filtro estado | dropdown | "Todos los estados" | despliega lista con las opciones de estados de la tabla oficial (Recibido, Procesando, Dividido, OCR Pendiente, Completado, Completado con errores, Error crítico, Cancelado) |
+  | Tabla | grid | columnas: ARCHIVO / FECHA / USUARIO / PÁGINAS / ERRORES / ESTADO | — |
+  | Columna ARCHIVO | texto con ícono documento | nombre del archivo PDF (ej. "CPANINFINITI.pdf", "CPA 5 vins.pdf") | — |
+  | Columna FECHA | texto | formato "DD mmm AAAA, HH:MM" (ej. "30 jun 2026, 17:14") | zona horaria UTC-4 |
+  | Columna USUARIO | texto | nombre del distribuidor (ej. "Jhon Distribuidor", "Adrian Test Cliente", "stribuidor") | quien subió el archivo |
+  | Columna PÁGINAS | texto | formato "N/M" (ej. "3/3", "0/3", "0/5") | páginas procesadas exitosamente / total de páginas del PDF |
+  | Columna ERRORES | badge con número o "—" | ej. "1" (rojo), "2" (rojo), "—" (si cero errores) | cantidad de páginas con fallo OCR; "—" indica cero errores |
+  | Columna ESTADO | badge de color | ej. "Completado con errores" (amarillo), "Cancelado" (gris), "Dividido" (azul) | ver tabla de estados oficial arriba |
+- **Estados:** con datos (historial con múltiples importaciones CPA) / vacío (sin importaciones previas — no documentado).
+- **Screenshot:** ![historial-cpa](screenshots/historial-cpa.png) · ![estados-cpa-referencia](screenshots/estados-cpa-referencia.png)
+- **Notas para TCs:**
+  - **US 11962:** esta pantalla implementa filtrado por estado + búsqueda combinada. Los filtros NO deben perderse al buscar (criterio de la US).
+  - El campo de búsqueda es multi-criterio: busca en **nombre de archivo**, **usuario** y **VIN** simultáneamente (no requiere seleccionar qué campo buscar).
+  - La columna PÁGINAS muestra el progreso del OCR: "0/5" = ninguna página procesada aún (estados iniciales: Recibido, Procesando, Dividido, OCR Pendiente), "3/3" = todas procesadas (estados finales: Completado, Completado con errores).
+  - La columna ERRORES muestra un badge numérico solo si hubo fallos OCR; si todas las páginas procesaron OK, muestra "—" (guion).
+  - **Al hacer clic en una fila del historial**, se abre el modal "Detalle del lote CPA" (ver sección abajo).
+
+### Modal "Detalle del lote CPA" — Exportación mejorada de certificados (US 11964)
+- **Cómo se abre:** clic en cualquier fila de la tabla de "Historial de CPA".
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Título | texto | "Detalle del lote CPA" | — |
+  | Subtítulo | texto gris | nombre del archivo PDF (ej. "CPAINFINITI.pdf", "CPA-5VALID-3INVALID.pdf") | — |
+  | Badge estado | badge color según estado | ej. "Completado con errores" (amarillo) / "Completado" (verde) | ver tabla de estados oficial arriba |
+  | Usuario y fecha | texto gris | "Jhon Distribuidor · 02 jul 2026, 19:14" | quien subió + fecha |
+  | Progress bar | barra morada | "3 de 3 páginas procesadas" / "8 de 8 páginas procesadas" | resumen del procesamiento |
+  | Tabs | nav tabs horizontales | "Completados (2)" / "Fallidos (0)" / "No vinculados (1)" | contador dinámico entre paréntesis — **tab activo define el botón de descarga** |
+  | **Botón descarga dinámico** | outline morado (esquina superior derecha) | **"Descargar Completados"** / **"Descargar No vinculados"** / **"Descargar Fallidos"** | **texto cambia según el tab activo** — descarga un ZIP solo con los PDFs de ese tab |
+  | Botón cerrar | ícono X | — | cierra el modal |
+  | Tabla | grid | columnas: PÁGINA / VIN / NRO. CPA / FECHA CERT. / ACCIONES | — |
+  | Columna PÁGINA | número | ej. "1", "2", "3" | número de página del PDF original |
+  | Columna VIN | texto (con ícono lápiz en tab "No vinculados") | ej. "5N1AC0FX7VC600743", "JN8AZ3BDXT921007" | en tab "No vinculados" tiene ícono lápiz para corregir VIN |
+  | Columna NRO. CPA | texto | ej. "L0399405856" | número del certificado |
+  | Columna FECHA CERT. | texto | formato "DD-mmm-AAAA" (ej. "15-jun-2026") | fecha de emisión del certificado |
+  | Columna ACCIONES | botones | botón "PREVISUALIZAR" (outline morado) | abre el PDF individual en nueva ventana/modal |
+  | Link adicional (solo tab "No vinculados") | link naranja | "Re-asociar" | abre modal "Corregir VIN" |
+- **Comportamiento del botón dinámico:**
+  - Tab "Completados" activo → botón muestra **"Descargar Completados"** → descarga ZIP solo con PDFs vinculados correctamente
+  - Tab "No vinculados" activo → botón muestra **"Descargar No vinculados"** → descarga ZIP solo con PDFs no asociados a vehículos
+  - Tab "Fallidos" activo → botón muestra **"Descargar Fallidos"** → descarga ZIP solo con PDFs con error OCR
+- **Nomenclatura de archivos en el ZIP descargado (US 11964):** cada PDF individual se nombra con el formato **{VIN}_{NumeroPagina}.pdf** (ej. `5N1AC0FX7VC600743_001.pdf`, `5N1AC0FX9VC602090_002.pdf`).
+- **Screenshot:** ![historial-cpa-modal-detalle-completados](screenshots/historial-cpa-modal-detalle-completados.png) · ![historial-cpa-modal-detalle-no-vinculados](screenshots/historial-cpa-modal-detalle-no-vinculados.png) · ![historial-cpa-modal-detalle-todo-ok](screenshots/historial-cpa-modal-detalle-todo-ok.png)
+
+### Modal "Corregir VIN" (dentro del modal "Detalle del lote CPA")
+- **Cómo se abre:** clic en el ícono lápiz junto al VIN en el tab "No vinculados", o clic en el link "Re-asociar".
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Título | texto | "Corregir VIN" | — |
+  | Label campo | texto | "Nuevo VIN" | — |
+  | Input | campo texto | placeholder: — | campo editable con el VIN incorrecto pre-cargado (ej. "JN8AZ3BDXT921007") |
+  | Botón secundario | outline morado | "Cancelar" | cierra el modal |
+  | Botón primario | primario morado | "Guardar VIN" | guarda el VIN corregido y re-procesa la asociación |
+- **Screenshot:** ![modal-corregir-vin](screenshots/modal-corregir-vin.png)
 ---
 
 ## Motorambar > Componentes Globales > Header (autenticado)
@@ -473,16 +745,86 @@ Screenshot: ![header-sesion-inactividad](screenshots/header-sesion-inactividad.p
 **Notas para TCs:** el contador regresivo es dinámico — para TCs de este modal, validar la presencia del modal y los botones, no un valor exacto de segundos.
 ---
 
+## Motorambar > Administración > Reglas de Completitud
+- **Ruta/URL:** _(pendiente confirmar — sección "Administración", accesible desde dropdown superior)_
+- **Cómo se llega aquí:** hacer clic en el dropdown "Administración" (parte superior de la pantalla) → seleccionar "Reglas de Completitud" de la lista desplegable.
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Título | texto | "Administración" | — |
+  | Dropdown sección | dropdown | "Reglas de Completitud" | muestra la opción activa; al hacer clic despliega todas las secciones de Administración (ver lista completa abajo) |
+  | Descripción | texto | "Define qué documentos deben estar asociados a un vehículo para que se considere completo, por tenant." | — |
+  | Botón | primario morado (esquina superior derecha) | "+ NUEVA REGLA" | abre el modal "Nueva Regla de Completitud" |
+  | Tabla | grid | columnas: TENANT / ESTADO / CO / CPA / FACTURA / AGRUPAR CL# / FECHA / ACCIONES | cada fila representa una regla de completitud por tenant |
+  | Columna TENANT | texto | ej. "Mitsubishi", "Motorambar", "PDV" | nombre del tenant al que aplica la regla |
+  | Columna ESTADO | badge | "Activo" (verde) / "Inactivo" (gris con ícono prohibido) | indica si la regla está activa o no |
+  | Columna CO | badge verde con check | "✓ CO" | indica que el documento CO (Certificado de Origen) es requerido para este tenant |
+  | Columna CPA | badge verde con check | "✓ CPA" | indica que el documento CPA (Carta Porte de Aduana) es requerido |
+  | Columna FACTURA | badge verde con check | "✓ Factura" | indica que el documento Factura es requerido |
+  | Columna AGRUPAR CL# | badge verde con check | "✓ Agrupar CL#" | **Nueva columna (US 11809)** — indica que la regla de agrupación por Credit Letter Number está activada para este tenant |
+  | Columna FECHA | texto | formato "DD/M/AAAA" (ej. "9/6/2026", "30/6/2026") | fecha de creación o última modificación de la regla |
+  | Columna ACCIONES | íconos | ícono lápiz (editar) + ícono basura (eliminar) | por fila; permite editar o eliminar la regla |
+- **Estados:** con datos (tabla con múltiples tenants y reglas) / vacío (sin reglas configuradas — no documentado).
+- **Screenshot:** ![admin-reglas-completitud](screenshots/admin-reglas-completitud.png) · ![admin-dropdown-menu](screenshots/admin-dropdown-menu.png)
+- **Notas para TCs:**
+  - **US 11809:** Esta pantalla implementa la nueva columna "AGRUPAR CL#" que permite activar/desactivar la agrupación por Credit Letter Number por tenant.
+  - El acceso a esta pantalla requiere rol **"ADMINISTRADOR DEL SISTEMA"** (caseplusadmin) — no es visible para roles Distribuidor o Cliente.
+  - **Secciones disponibles en el dropdown "Administración"** (menú completo):
+    - Tenants
+    - Plantillas Email
+    - Marcas
+    - Modelos
+    - Colores
+    - Propulsión
+    - Clientes Padre
+    - Ubicaciones
+    - Favoritos
+    - Teams
+    - SMTP
+    - **Reglas de Completitud** (esta pantalla)
+    - Usuarios
+    - Plantilla de Importación
+    - Firma Digital
+    - Plantilla CO
+
+### Componente: Modal "Nueva Regla de Completitud"
+- **Cómo se llega aquí:** clic en el botón "+ NUEVA REGLA" desde la pantalla "Reglas de Completitud".
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Título | texto | "Nueva Regla de Completitud" | — |
+  | Subtítulo | texto gris | "Selecciona el tenant y los documentos requeridos" | — |
+  | Cerrar | ícono "X" | — | esquina superior derecha; cierra el modal sin guardar |
+  | Label | label | "Tenant" | — |
+  | Campo Tenant | dropdown | placeholder "Seleccionar tenant..." | despliega lista de tenants disponibles (ej. Mitsubishi, Motorambar, PDV) |
+  | Label sección | label | "Documentos requeridos" | encabezado de la sección de checkboxes |
+  | Checkbox 1 | checkbox sin marcar/marcado | "CO — Certificado de Origen" | descripción debajo: "Documento que certifica el país de origen del vehículo." |
+  | Checkbox 2 | checkbox sin marcar/marcado | "CPA — Carta Porte de Aduana" | descripción debajo: "Documento de importación aduanal del vehículo." |
+  | Checkbox 3 | checkbox sin marcar/marcado | "Factura" | descripción debajo: "Factura comercial del vehículo." |
+  | Checkbox 4 | checkbox sin marcar/marcado | **"Agrupar por N. Carta de Crédito"** | **Nueva opción (US 11809)** — descripción debajo: "Agrupa los vehículos por número de carta de crédito para evaluar completitud." |
+  | Botón | secundario gris | "CANCELAR" | cierra el modal sin guardar |
+  | Botón | primario morado | "GUARDAR" | guarda la nueva regla y cierra el modal; la nueva regla aparece en la tabla principal |
+- **Estados:**
+  - Sin tenant seleccionado (botón "GUARDAR" deshabilitado).
+  - Con tenant seleccionado + al menos un documento/regla marcado (botón "GUARDAR" habilitado).
+  - Con tenant "Motorambar" seleccionado y "Agrupar por N. Carta de Crédito" marcado (screenshot proporcionado).
+- **Screenshot:** ![admin-nueva-regla-modal](screenshots/admin-nueva-regla-modal.png) · ![admin-nueva-regla-agrupar-cl](screenshots/admin-nueva-regla-agrupar-cl.png)
+- **Notas para TCs:**
+  - La checkbox **"Agrupar por N. Carta de Crédito"** es la nueva funcionalidad introducida por la US 11809.
+  - Al guardar, la regla aparece en la tabla principal con un badge verde "✓ Agrupar CL#" en la columna correspondiente.
+  - Las descripciones de cada checkbox explican el propósito de cada documento/regla de completitud.
+---
+
 ## Motorambar > Admin > Usuarios (Gestionar Usuarios)
-- **Ruta/URL:** _(pendiente confirmar — sección "Admin", rol Sys Admin)_
-- **Cómo se llega aquí:** menú lateral (rol Sys Admin) → opción "Usuarios".
+- **Ruta/URL:** _(pendiente confirmar — sección "Administración" > "Usuarios", rol Administrador del Sistema)_
+- **Cómo se llega aquí:** dropdown "Administración" → opción "Usuarios".
 - **Elementos clave:**
   | Elemento | Tipo | Texto/label literal | Comportamiento |
   |---|---|---|---|
   | Ícono | botón ícono de "prohibido" (círculo con línea diagonal, por fila de usuario) | — | abre el modal "Revocar Token" para ese usuario |
 - **Estados:** _(pendiente — falta screenshot completo de la lista de usuarios)_
 - **Screenshot:** _(pendiente)_
-- **Notas para TCs:** ver modal "Revocar Token" abajo — descripción literal confirmada por el usuario (sin captura adjunta aún).
+- **Notas para TCs:** ver modal "Revocar Token" abajo — descripción literal confirmada por el usuario (sin captura adjunta aún). Acceso requiere rol "ADMINISTRADOR DEL SISTEMA".
 
 ### Componente: Modal "Revocar Token"
 - **Cómo se llega aquí:** clic en el ícono de "prohibido" (círculo con línea diagonal) de un usuario en "Usuarios".
