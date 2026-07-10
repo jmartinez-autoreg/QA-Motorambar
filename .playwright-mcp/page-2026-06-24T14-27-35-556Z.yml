@@ -1,0 +1,36 @@
+- generic [ref=e1]:
+  - table [ref=e2]:
+    - rowgroup [ref=e3]:
+      - 'row "Image Logo portal de vehculos Iniciar Sesión Usuario: user-large bg Contraseña: icon-lock Olvide mi Contraseña INICIAR SESIÓN circle-exclamation AYUDA" [ref=e4]':
+        - 'cell "Image Logo portal de vehculos Iniciar Sesión Usuario: user-large bg Contraseña: icon-lock Olvide mi Contraseña INICIAR SESIÓN circle-exclamation AYUDA" [ref=e5]':
+          - generic [ref=e8]:
+            - img "Image" [ref=e11]
+            - generic [ref=e12]:
+              - link "Logo portal de vehculos" [ref=e13] [cursor=pointer]:
+                - /url: /Index.aspx
+                - img "Logo portal de vehculos" [ref=e14]
+              - generic [ref=e18]: Iniciar Sesión
+              - generic [ref=e19]:
+                - generic [ref=e20]: "Usuario:"
+                - generic [ref=e21]:
+                  - textbox [active] [ref=e22]
+                  - img "user-large" [ref=e23]
+                - img "bg" [ref=e24]
+              - generic [ref=e25]:
+                - generic [ref=e26]: "Contraseña:"
+                - generic [ref=e27]:
+                  - textbox [ref=e28]
+                  - img "icon-lock" [ref=e29]
+              - link "Olvide mi Contraseña" [ref=e32] [cursor=pointer]:
+                - /url: javascript:__doPostBack('LoginUser$lkForgetPassword','')
+              - generic [ref=e34] [cursor=pointer]: INICIAR SESIÓN
+              - generic [ref=e36] [cursor=pointer]:
+                - img "circle-exclamation" [ref=e37]
+                - generic [ref=e38]: AYUDA
+  - generic:
+    - link "Política de Privacidad" [ref=e41] [cursor=pointer]:
+      - /url: /privacypolicy.aspx
+    - paragraph [ref=e42]:
+      - text: © 2026 Copyright Powered by
+      - link "portaldevehiculos.com" [ref=e43] [cursor=pointer]:
+        - /url: /Index.aspx

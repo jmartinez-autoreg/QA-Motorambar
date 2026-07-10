@@ -1,0 +1,46 @@
+# Dependencias
+node_modules/
+package-lock.json
+
+# Credenciales y configuración local
+.env
+.env.local
+
+# Reportes y resultados de tests
+playwright-report/
+test-results/
+playwright/.cache/
+
+# Screenshots y videos de tests
+screenshots/
+videos/
+downloads/
+
+# Estado de Playwright
+.playwright/
+playwright-state.json
+
+# Auth storage
+fixtures/auth.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# TypeScript
+*.tsbuildinfo
+
+# Temporales
+*.tmp
+*.temp

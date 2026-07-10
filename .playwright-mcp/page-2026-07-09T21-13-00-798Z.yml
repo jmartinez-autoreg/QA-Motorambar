@@ -1,0 +1,57 @@
+- generic [active] [ref=f1e1]:
+  - region "Notifications alt+T"
+  - main [ref=f1e2]:
+    - generic [ref=f1e4]:
+      - img "Quantify" [ref=f1e6]
+      - generic [ref=f1e7]:
+        - heading "Login" [level=1] [ref=f1e8]
+        - paragraph [ref=f1e9]: Enter your email below to login to your account
+        - generic [ref=f1e10]:
+          - generic [ref=f1e11]:
+            - text: Email
+            - textbox "Email" [ref=f1e12]:
+              - /placeholder: m@example
+          - generic [ref=f1e13]:
+            - generic [ref=f1e14]:
+              - generic [ref=f1e15]: Password
+              - link "Forgot your password?" [ref=f1e16] [cursor=pointer]:
+                - /url: "#"
+            - textbox "Password" [ref=f1e17]
+          - button "Login" [ref=f1e18] [cursor=pointer]
+        - generic [ref=f1e19]:
+          - generic [ref=f1e20]: Demo accounts
+          - generic [ref=f1e25]:
+            - button "Provider — Juan del Pueblo juan@quantify.io" [ref=f1e26] [cursor=pointer]:
+              - generic [ref=f1e27]:
+                - generic [ref=f1e28]: Provider — Juan del Pueblo
+                - generic [ref=f1e29]: juan@quantify.io
+            - button "Reviewer — Maria Rivera maria@quantify.io" [ref=f1e30] [cursor=pointer]:
+              - generic [ref=f1e31]:
+                - generic [ref=f1e32]: Reviewer — Maria Rivera
+                - generic [ref=f1e33]: maria@quantify.io
+            - button "Approver — Pedro Martinez pedro@quantify.io" [ref=f1e34] [cursor=pointer]:
+              - generic [ref=f1e35]:
+                - generic [ref=f1e36]: Approver — Pedro Martinez
+                - generic [ref=f1e37]: pedro@quantify.io
+            - button "Admin — Natalie Soto natalie@quantify.io" [ref=f1e38] [cursor=pointer]:
+              - generic [ref=f1e39]:
+                - generic [ref=f1e40]: Admin — Natalie Soto
+                - generic [ref=f1e41]: natalie@quantify.io
+          - paragraph [ref=f1e42]:
+            - text: "Password for both:"
+            - code [ref=f1e43]: demo1234
+    - generic [ref=f1e45]:
+      - img "Quantify users" [ref=f1e57]
+      - generic [ref=f1e62]:
+        - generic [ref=f1e63]: Monto
+        - generic [ref=f1e64]: $1,000.00
+      - generic [ref=f1e65]:
+        - generic [ref=f1e66]: Pagados este mes
+        - generic [ref=f1e70]: $1,000
+        - generic [ref=f1e71]: 1 facturas pagadas
+      - generic [ref=f1e72]: Sometido
+  - complementary "Edit with Lovable" [ref=f1e75]:
+    - link "Edit with Lovable" [ref=f1e76] [cursor=pointer]:
+      - /url: https://lovable.dev/projects/8e5862b0-a029-4fd3-8caf-60798151eca1?utm_source=lovable-badge
+      - generic [ref=f1e77]: Edit with
+    - button "Dismiss" [ref=f1e83] [cursor=pointer]

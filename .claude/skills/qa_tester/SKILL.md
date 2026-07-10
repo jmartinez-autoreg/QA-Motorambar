@@ -124,6 +124,18 @@ Recibir US → Analizar criterios de aceptación
    3. Si la pantalla existe con elementos UI completos → continuar
 → Redactar TC completos
 → [ADO] Crear TC (mcp_ado_testplan_create_test_case) — PRECONDs + pasos juntos en steps
+
+   ### ⚙️ ESTRATEGIA DE TEST PLANS — 1 TP = 1 US (obligatoria)
+   
+   Crear **un Test Plan por cada User Story**, nunca agrupar múltiples USs en un solo TP.
+   
+   - **Nomenclatura obligatoria:** `TP | US-{ID}` (ej. "TP | US-11369")
+   - Aunque varias USs estén en la misma iteración, cada una requiere su propio TP
+   - Un TP puede contener múltiples Test Cases si todos pertenecen a la misma US
+   
+   ❌ Incorrecto: "TP | Entregable 5" con TCs de las USs 11369, 11367, 11383
+   ✅ Correcto: "TP | US-11369" (solo TCs de esa US), "TP | US-11367", "TP | US-11383"
+
 → [ADO] Verificar/crear Test Plan y Suite (mcp_ado_testplan_create_test_plan si no existe)
 → [ADO] Agregar TC al Suite (mcp_ado_testplan_add_test_cases_to_suite)
 → [ADO] TC state = Ready (mcp_ado_wit_update_work_item: System.State = Ready)

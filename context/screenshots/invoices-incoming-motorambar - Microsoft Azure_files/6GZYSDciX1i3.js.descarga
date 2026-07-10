@@ -1,1 +1,0 @@
-define("@fluentui/react-overflow/lib/constants",["exports"],function(A){"use strict";A.DATA_OVERFLOW_MENU=A.DATA_OVERFLOW_ITEM=A.DATA_OVERFLOW_DIVIDER=A.DATA_OVERFLOWING=void 0;A.DATA_OVERFLOWING="data-overflowing",A.DATA_OVERFLOW_ITEM="data-overflow-item",A.DATA_OVERFLOW_MENU="data-overflow-menu",A.DATA_OVERFLOW_DIVIDER="data-overflow-divider"});

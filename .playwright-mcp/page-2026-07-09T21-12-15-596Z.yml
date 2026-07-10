@@ -1,0 +1,104 @@
+- generic [active] [ref=e1]:
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e86]:
+        - generic [ref=e90]: Logged in as Juan del Pueblo (provider)
+  - complementary "Edit with Lovable" [ref=e75]:
+    - link "Edit with Lovable" [ref=e76] [cursor=pointer]:
+      - /url: https://lovable.dev/projects/8e5862b0-a029-4fd3-8caf-60798151eca1?utm_source=lovable-badge
+      - generic [ref=e77]: Edit with
+    - button "Dismiss" [ref=e83] [cursor=pointer]
+  - generic [ref=e92]:
+    - complementary [ref=e93]:
+      - img "Quantify" [ref=e95]
+      - navigation [ref=e96]:
+        - link "Bill" [ref=e97] [cursor=pointer]:
+          - /url: /bills
+        - link "Help" [ref=e101] [cursor=pointer]:
+          - /url: /help
+    - generic [ref=e105]:
+      - banner [ref=e106]:
+        - generic [ref=e107]:
+          - heading "Hello, Juan" [level=1] [ref=e108]
+          - paragraph [ref=e109]: Your payment summary is here!
+        - generic [ref=e110]:
+          - button "Create Bill" [ref=e111] [cursor=pointer]
+          - button "Notifications" [ref=e112]:
+            - generic [ref=e116]: "7"
+          - button "JP" [ref=e117]
+      - generic [ref=e120]:
+        - generic [ref=e121]:
+          - generic [ref=e122]:
+            - heading "Pending Total" [level=3] [ref=e124]
+            - generic [ref=e127]: $3,000
+            - generic [ref=e128]: +20,1% from last month
+          - generic [ref=e129]:
+            - heading "Overdue Amount" [level=3] [ref=e131]
+            - generic [ref=e137]: "01"
+            - generic [ref=e138]: 1 Overdue Bill
+          - generic [ref=e139]:
+            - heading "Payments this month" [level=3] [ref=e141]
+            - generic [ref=e145]: $1,000
+            - generic [ref=e146]: 1 Paid Bill
+        - generic [ref=e147]:
+          - textbox "Provider" [ref=e148]
+          - button [ref=e149] [cursor=pointer]
+          - button [ref=e150] [cursor=pointer]
+          - button "Status 3 selected" [ref=e151] [cursor=pointer]:
+            - text: Status
+            - generic [ref=e152]: 3 selected
+          - button "Oct 17, 2024 - Nov 6, 2024" [ref=e153] [cursor=pointer]
+        - generic [ref=e154]:
+          - generic [ref=e155] [cursor=pointer]:
+            - generic [ref=e156]: Submitted
+            - generic [ref=e166]:
+              - generic [ref=e167]: Provider
+              - generic [ref=e168]: Juan del Pueblo
+            - generic [ref=e175]:
+              - generic [ref=e176]: Company
+              - generic [ref=e177]: Khensys
+            - generic [ref=e182]:
+              - generic [ref=e183]: Deadline to Submit
+              - generic [ref=e185]:
+                - text: 01 Jan 2025
+                - generic [ref=e186]: 5 Days
+            - generic [ref=e192]:
+              - generic [ref=e193]: Period
+              - generic [ref=e194]: "202501"
+            - generic [ref=e199]:
+              - generic [ref=e200]: Amount
+              - generic [ref=e201]: $2,000.00
+            - button "Action" [ref=e203]
+          - generic [ref=e204] [cursor=pointer]:
+            - generic [ref=e205]: Draft
+            - generic [ref=e215]:
+              - generic [ref=e216]: Provider
+              - generic [ref=e217]: Juan del Pueblo
+            - generic [ref=e224]:
+              - generic [ref=e225]: Company
+              - generic [ref=e226]: MiPE
+            - generic [ref=e231]:
+              - generic [ref=e232]: Deadline to Submit
+              - generic [ref=e234]:
+                - text: 01 Jan 2025
+                - generic [ref=e235]: 5 Days
+            - generic [ref=e241]:
+              - generic [ref=e242]: Period
+              - generic [ref=e243]: "202501"
+            - generic [ref=e248]:
+              - generic [ref=e249]: Amount
+              - generic [ref=e250]: $2,000.00
+            - button "Action" [ref=e252]
+        - generic [ref=e253]:
+          - generic [ref=e254]: 2 of 100 row(s) selected.
+          - generic [ref=e255]:
+            - generic [ref=e256]:
+              - text: Rows per page
+              - combobox [ref=e257] [cursor=pointer]:
+                - generic: "10"
+            - generic [ref=e260]: Page 1 of 10
+            - generic [ref=e261]:
+              - button [ref=e262] [cursor=pointer]
+              - button [ref=e263] [cursor=pointer]
+              - button [ref=e264] [cursor=pointer]
+              - button [ref=e265] [cursor=pointer]

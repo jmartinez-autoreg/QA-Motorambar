@@ -1,0 +1,153 @@
+- generic [active] [ref=f1e1]:
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=f1e86]:
+        - generic [ref=f1e90]: Logged in as Maria Rivera (reviewer)
+  - complementary "Edit with Lovable" [ref=f1e75]:
+    - link "Edit with Lovable" [ref=f1e76] [cursor=pointer]:
+      - /url: https://lovable.dev/projects/8e5862b0-a029-4fd3-8caf-60798151eca1?utm_source=lovable-badge
+      - generic [ref=f1e77]: Edit with
+    - button "Dismiss" [ref=f1e83] [cursor=pointer]
+  - generic [ref=f1e92]:
+    - complementary [ref=f1e93]:
+      - img "Quantify" [ref=f1e95]
+      - navigation [ref=f1e96]:
+        - link "Dashboard" [ref=f1e97] [cursor=pointer]:
+          - /url: /dashboard
+        - link "Bill" [ref=f1e103] [cursor=pointer]:
+          - /url: /bills
+        - link "Reports" [ref=f1e107] [cursor=pointer]:
+          - /url: /reports
+        - link "Help" [ref=f1e110] [cursor=pointer]:
+          - /url: /help
+    - generic [ref=f1e114]:
+      - banner [ref=f1e115]:
+        - generic [ref=f1e116]:
+          - heading "Hello, Maria" [level=1] [ref=f1e117]
+          - paragraph [ref=f1e118]: Here's an overview of billing activity across the organization.
+        - generic [ref=f1e119]:
+          - button "View Bills" [ref=f1e120] [cursor=pointer]
+          - button "Notifications" [ref=f1e121]:
+            - generic [ref=f1e125]: "9"
+          - button "MR" [ref=f1e126]
+      - generic [ref=f1e129]:
+        - generic [ref=f1e130]:
+          - generic [ref=f1e131]:
+            - heading "Total Pending" [level=3] [ref=f1e133]
+            - generic [ref=f1e138]: $10,000
+            - generic [ref=f1e139]:
+              - generic [ref=f1e140]: 5 bills awaiting action
+              - generic [ref=f1e141]: +12.4%
+          - generic [ref=f1e142]:
+            - heading "Approved This Month" [level=3] [ref=f1e144]
+            - generic [ref=f1e149]: $2,000
+            - generic [ref=f1e150]:
+              - generic [ref=f1e151]: 1 bills approved
+              - generic [ref=f1e152]: +8.1%
+          - generic [ref=f1e153]:
+            - heading "Rejected" [level=3] [ref=f1e155]
+            - generic [ref=f1e159]: $2,000
+            - generic [ref=f1e160]:
+              - generic [ref=f1e161]: 1 bills rejected
+              - generic [ref=f1e162]: "-3.2%"
+          - generic [ref=f1e163]:
+            - heading "Total Volume" [level=3] [ref=f1e165]
+            - generic [ref=f1e169]: $18,000
+            - generic [ref=f1e170]:
+              - generic [ref=f1e171]: 9 bills processed
+              - generic [ref=f1e172]: +20.1%
+        - generic [ref=f1e173]:
+          - generic [ref=f1e174]:
+            - generic [ref=f1e175]:
+              - generic [ref=f1e176]:
+                - heading "Bills Trend" [level=3] [ref=f1e177]
+                - paragraph [ref=f1e178]: Submitted vs Approved — last 7 months
+              - generic [ref=f1e179]: Trending up
+            - generic [ref=f1e185]:
+              - img [ref=f1e186]:
+                - generic [ref=f1e190]:
+                  - generic [ref=f1e191]: Jul
+                  - generic [ref=f1e193]: Aug
+                  - generic [ref=f1e195]: Sep
+                  - generic [ref=f1e197]: Oct
+                  - generic [ref=f1e199]: Nov
+                  - generic [ref=f1e201]: Dec
+                  - generic [ref=f1e203]: Jan
+                - generic [ref=f1e206]:
+                  - generic [ref=f1e207]: "0"
+                  - generic [ref=f1e209]: "7"
+                  - generic [ref=f1e211]: "14"
+                  - generic [ref=f1e213]: "21"
+                  - generic [ref=f1e215]: "28"
+              - generic:
+                - generic:
+                  - paragraph: Aug
+                  - list:
+                    - listitem: "submitted : 18"
+                    - listitem: "approved : 14"
+          - generic [ref=f1e233]:
+            - heading "Bills by Status" [level=3] [ref=f1e234]
+            - paragraph [ref=f1e235]: Current snapshot
+            - list [ref=f1e255]:
+              - listitem [ref=f1e256]: Submitted
+              - listitem [ref=f1e259]: Reviewed
+              - listitem [ref=f1e262]: Approved
+              - listitem [ref=f1e265]: Paid
+              - listitem [ref=f1e268]: Rejected
+              - listitem [ref=f1e271]: Draft
+        - generic [ref=f1e274]:
+          - generic [ref=f1e275]:
+            - heading "Top Providers by Volume" [level=3] [ref=f1e276]
+            - paragraph [ref=f1e277]: Total billed amount
+            - img [ref=f1e281]:
+              - generic [ref=f1e285]:
+                - generic [ref=f1e286]: "0"
+                - generic [ref=f1e288]: "3500"
+                - generic [ref=f1e290]: "7000"
+                - generic [ref=f1e292]: "10500"
+                - generic [ref=f1e294]: "14000"
+              - generic [ref=f1e297]:
+                - generic [ref=f1e298]: Juan del Pueblo
+                - generic [ref=f1e300]: Maria Lopez
+                - generic [ref=f1e302]: Carlos Rivera
+          - generic [ref=f1e313]:
+            - generic [ref=f1e314]:
+              - heading "Recent Bills" [level=3] [ref=f1e315]
+              - button "View all" [ref=f1e316]
+            - list [ref=f1e320]:
+              - listitem [ref=f1e321] [cursor=pointer]:
+                - generic [ref=f1e322]:
+                  - generic [ref=f1e323]: JDPC0009
+                  - generic [ref=f1e324]: Juan del Pueblo
+                - generic [ref=f1e325]:
+                  - generic [ref=f1e326]: $2,000
+                  - generic [ref=f1e327]: Paid
+              - listitem [ref=f1e329] [cursor=pointer]:
+                - generic [ref=f1e330]:
+                  - generic [ref=f1e331]: JDPC0008
+                  - generic [ref=f1e332]: Carlos Rivera
+                - generic [ref=f1e333]:
+                  - generic [ref=f1e334]: $2,000
+                  - generic [ref=f1e335]: Reviewed
+              - listitem [ref=f1e337] [cursor=pointer]:
+                - generic [ref=f1e338]:
+                  - generic [ref=f1e339]: JDPC0007
+                  - generic [ref=f1e340]: Maria Lopez
+                - generic [ref=f1e341]:
+                  - generic [ref=f1e342]: $2,000
+                  - generic [ref=f1e343]: Submitted
+              - listitem [ref=f1e345] [cursor=pointer]:
+                - generic [ref=f1e346]:
+                  - generic [ref=f1e347]: JDPC0006
+                  - generic [ref=f1e348]: Juan del Pueblo
+                - generic [ref=f1e349]:
+                  - generic [ref=f1e350]: $2,000
+                  - generic [ref=f1e351]: Reviewed
+              - listitem [ref=f1e353] [cursor=pointer]:
+                - generic [ref=f1e354]:
+                  - generic [ref=f1e355]: JDPC0005
+                  - generic [ref=f1e356]: Juan del Pueblo
+                - generic [ref=f1e357]:
+                  - generic [ref=f1e358]: $2,000
+                  - generic [ref=f1e359]: Draft
+  - generic [ref=f1e361]: Juan del Pueblo

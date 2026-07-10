@@ -1,0 +1,57 @@
+- generic [ref=e1]:
+  - region "Notifications alt+T"
+  - complementary "Edit with Lovable" [ref=e75]:
+    - link "Edit with Lovable" [ref=e76] [cursor=pointer]:
+      - /url: https://lovable.dev/projects/8e5862b0-a029-4fd3-8caf-60798151eca1?utm_source=lovable-badge
+      - generic [ref=e77]: Edit with
+    - button "Dismiss" [ref=e83] [cursor=pointer]
+  - generic [ref=e92]:
+    - complementary [ref=e93]:
+      - img "Quantify" [ref=e95]
+      - navigation [ref=e96]:
+        - link "Bill" [ref=e97] [cursor=pointer]:
+          - /url: /bills
+        - link "Help" [active] [ref=e101] [cursor=pointer]:
+          - /url: /help
+    - generic [ref=e354]:
+      - banner [ref=e355]:
+        - generic [ref=e356]:
+          - heading "Help & Support" [level=1] [ref=e357]
+          - paragraph [ref=e358]: Find answers fast or get in touch with our team.
+        - generic [ref=e359]:
+          - button "Notifications" [ref=e360]:
+            - generic [ref=e364]: "7"
+          - button "JP" [ref=e365]
+      - generic [ref=e368]:
+        - generic [ref=e369]:
+          - generic [ref=e370]:
+            - heading "Documentation" [level=4] [ref=e374]
+            - paragraph [ref=e375]: Read guides for submitting, reviewing and approving bills.
+          - generic [ref=e376]:
+            - heading "Live Chat" [level=4] [ref=e380]
+            - paragraph [ref=e381]: Talk to a support agent Mon–Fri, 9am–6pm AST.
+          - generic [ref=e382]:
+            - heading "Email Support" [level=4] [ref=e387]
+            - paragraph [ref=e388]: support@quantify.io · we reply within 1 business day.
+        - generic [ref=e389]:
+          - generic [ref=e390]:
+            - heading "Frequently Asked Questions" [level=3] [ref=e391]
+            - generic [ref=e399]:
+              - generic [ref=e400]:
+                - button "How do I submit a new bill?" [ref=e401]
+                - paragraph [ref=e405]: Go to Bills → Create Bill. Fill in the period, line items and attach your supporting documents. Once submitted, your bill will be routed to a Reviewer.
+              - button "What happens after I submit a bill?" [ref=e407]
+              - button "Why was my bill rejected?" [ref=e412]
+              - button "How are IRS and ITBS calculated?" [ref=e417]
+              - button "Who manages providers and users?" [ref=e422]
+          - generic [ref=e426]:
+            - heading "Send us a message" [level=3] [ref=e427]
+            - paragraph [ref=e428]: We'll reply to juan@quantify.io.
+            - generic [ref=e429]:
+              - generic [ref=e430]:
+                - text: Subject
+                - textbox "How can we help?" [ref=e431]
+              - generic [ref=e432]:
+                - text: Message
+                - textbox "Tell us what's going on..." [ref=e433]
+              - button "Send Message" [ref=e434] [cursor=pointer]

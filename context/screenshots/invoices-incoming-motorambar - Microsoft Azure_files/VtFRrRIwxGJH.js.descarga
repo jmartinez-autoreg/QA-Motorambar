@@ -1,1 +1,0 @@
-define("@fluentui/react-calendar-compat/lib/components/Calendar/Calendar.types",["exports","react"],function(n,t){"use strict";n.AnimationDirection=void 0;n.AnimationDirection=function(n){return n[n.Horizontal=0]="Horizontal",n[n.Vertical=1]="Vertical",n}({})});

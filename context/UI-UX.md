@@ -172,6 +172,8 @@ Screenshot: ![pdv-bienvenido-terminos-condiciones](screenshots/pdv-bienvenido-te
   | Sección colapsable | toggle | "MÁS FILTROS" | expande/colapsa filtros adicionales |
   | Filtro adicional | select | "RANGO DE FECHA" → "Todo el Tiempo" | opciones: Hoy, Semana Actual, Mes Actual, Últimos 30 Días, Año a la Fecha, Rango personalizado |
   | Filtro adicional | select | "MARCA" → "Todas las Marcas" | — |
+  | Filtro adicional | input multi-valor tipo VIN | "CONCESIONARIO" → placeholder "Buscar por concesionario..." | **US 11367:** búsqueda por prefijo (proximidad) con chips; acepta múltiples valores separados por coma o líneas; cada valor es un chip removible; filtra Dealers cuyo nombre comience con el texto ingresado (ej. "popular" muestra "POPULAR AUTO") |
+  | Filtro adicional | input multi-valor tipo VIN | "INSTITUCIÓN FINANCIERA" → placeholder "Buscar por institución financiera..." | **US 11367:** búsqueda por prefijo (proximidad) con chips; acepta múltiples valores separados por coma o líneas; cada valor es un chip removible; filtra Bancos cuyo nombre comience con el texto ingresado |
   | Filtro adicional | input | "N.° FACTURA" → "Buscar por no. de factura..." | — |
   | Filtro adicional | input | "N.° CARTA DE CRÉDITO" → "Buscar por no. de carta de crédito..." | — |
   | Filtro adicional | input | "N.° ORDEN DE VENTA" → "Buscar por no. de orden de venta..." | — |
@@ -383,48 +385,120 @@ Screenshot: ![vehiculos-importados-descarga-lote](screenshots/vehiculos-importad
 
 Screenshot: ![vehiculos-importados-reporte-inventario](screenshots/vehiculos-importados-reporte-inventario.png)
 
-**Componente: Filtros multi-valor con chips** (Estado CO, Estado CPA, Estado Factura, Marcas)
+### Componente: Desasignar cliente (individual y batch) — **US 11383**
 
-**Cómo se llega aquí:** Los filtros "Estado CO", "Estado CPA", "Estado Factura" y "Marcas" en el grid de "Vehículos Importados" — al hacer clic en cualquiera de ellos.
+**Cómo se llega aquí (individual):** En el grid de "Vehículos Importados", hacer clic en el menú de opciones "..." (tres puntos) en la columna ACCIONES de una fila que tenga cliente asignado → seleccionar "Desasignar".
+
+**Cómo se llega aquí (batch):** En el grid de "Vehículos Importados", marcar los checkboxes de 2 o más vehículos que tengan cliente asignado → en la barra inferior de acciones batch, hacer clic en "Desasignar" (dentro del menú "Asignar A" o como botón independiente).
+
+**Modal "Desasignar Cliente" (individual):**
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Ícono | persona con signo menos, naranja | — | esquina superior izquierda del modal |
+| Título | texto | "Desasignar Cliente" | — |
+| Subtítulo | texto naranja mayúsculas | "ESTA ACCIÓN REMOVERÁ EL ACCESO DEL CLIENTE AL VEHÍCULO" | advertencia |
+| Mensaje | texto | "¿Quitar la asignación de {CLIENTE} al vehículo {VIN}?" | ej. "¿Quitar la asignación de ORIENTAL BANK al vehículo KNDEP2AA3T7958212?" |
+| Botón | secundario gris | "CANCELAR" | cierra modal sin realizar acción |
+| Botón | primario naranja | "CONFIRMAR" | ejecuta la desasignación y cierra el modal |
+
+**Modal "Desasignar Clientes" (batch):**
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Ícono | persona con signo menos, naranja | — | esquina superior izquierda del modal |
+| Título | texto | "Desasignar Clientes" | — |
+| Subtítulo | texto naranja mayúsculas | "SE REMOVERÁ EL ACCESO DE LOS CLIENTES A LOS VEHÍCULOS SELECCIONADOS" | advertencia |
+| Mensaje | texto | "¿Quitar la asignación de cliente a los vehículos seleccionados?" | — |
+| Botón | secundario gris | "CANCELAR" | cierra modal sin realizar acción |
+| Botón | primario naranja | "CONFIRMAR" | ejecuta la desasignación batch y cierra el modal |
+
+**Comportamiento tras confirmación:**
+- **Individual:** El sistema remueve la asignación del cliente al vehículo seleccionado. La columna "ASIGNADO A" de esa fila queda vacía (muestra "—" o simplemente sin valor). Aparece un toast verde con el mensaje: **"Cliente removido del vehículo exitosamente."**
+- **Batch:** El sistema remueve la asignación de clientes de todos los vehículos seleccionados (solo afecta a los que tenían cliente asignado). La columna "ASIGNADO A" de esas filas queda vacía. Aparece un toast verde con el mensaje: **"Clientes removidos de {N} vehículos"** (donde {N} es la cantidad de vehículos que efectivamente tenían cliente asignado).
+
+**Reglas de negocio:**
+1. **Opción "Desasignar" solo visible si hay cliente asignado:** Si un vehículo **no tiene cliente asignado** (columna "ASIGNADO A" vacía), la opción "Desasignar" **NO** aparece en el menú de opciones individuales.
+2. **Batch con vehículos sin cliente:** Si el usuario selecciona 5 vehículos y solo 3 tienen cliente asignado, el modal batch muestra un mensaje adicional: *"De 5 vehículos seleccionados, 2 no tienen cliente asignado. La operación solo afectará 3 registros."* (pendiente confirmar en UI si este mensaje aparece en el subtítulo del modal o como texto adicional).
+3. **Persistencia:** Tras desasignar, el cliente pierde acceso al vehículo. El Distribuidor mantiene acceso completo.
+
+**Estados:**
+- Vehículo con cliente asignado (columna "ASIGNADO A" con valor, ej. "ORIENTAL BANK").
+- Vehículo sin cliente asignado (columna "ASIGNADO A" vacía o "—").
+- Modal de confirmación abierto (individual o batch).
+- Toast de éxito visible.
+
+**Screenshot:** Los screenshots provistos por el usuario muestran el flujo completo de desasignación individual y batch, incluyendo el menú de opciones con "Desasignar" resaltado, modales de confirmación y toasts de éxito.
+
+**Notas para TCs:**
+- **US-11383:** Esta funcionalidad permite al Distribuidor quitar la asignación de cliente de uno o varios vehículos para que queden sin cliente asignado. Los clientes pierden acceso a esos vehículos; el Distribuidor mantiene acceso completo.
+- El modal individual usa singular "Cliente" / "vehículo"; el modal batch usa plural "Clientes" / "vehículos seleccionados".
+- El toast de éxito muestra un mensaje diferente según si fue operación individual (1 vehículo) o batch (N vehículos).
+- Verificar que la opción "Desasignar" NO aparece en el menú de opciones de un vehículo que no tiene cliente asignado (Escenario 3 de los criterios de aceptación).
+---
+
+**Componente: Filtros multi-valor con chips** (Estado CO, Estado CPA, Estado Factura, Marca) — **US 11369**
+
+**Cómo se llega aquí:** Los filtros "Estado CO", "Estado CPA", "Estado Factura" y "Marca" en el grid de "Vehículos Importados" — al hacer clic en cualquiera de ellos.
 
 | Elemento | Tipo | Texto/label literal | Comportamiento |
 |---|---|---|---|
-| **Estado inicial (sin selección)** | dropdown | placeholder "Seleccione estado" / "Seleccione marcas" | color gris claro; al hacer clic abre el dropdown con checkboxes |
-| **Dropdown abierto** | menu desplegable | — | fondo blanco; muestra lista de checkboxes con opciones del catálogo |
-| Opción especial | checkbox con ícono | "Seleccionar todos" | ícono de checklist morado; marca/desmarca todas las opciones de una vez |
-| Opción individual (ejemplo CPA) | checkbox | "Pendiente" | puede estar marcado ✓ o sin marcar |
-| Opción individual (ejemplo CPA) | checkbox | "Completado" | puede estar marcado ✓ o sin marcar |
-| Opción individual (ejemplo CPA) | checkbox | "En Proceso" | puede estar marcado ✓ o sin marcar |
-| Opción individual (ejemplo CPA) | checkbox | "Cancelado" | puede estar marcado ✓ o sin marcar |
-| **Dropdown con selección** (cerrado) | dropdown resaltado | "Estado CPA Seleccionados (2 total)" / "Estado CO Seleccionados (3 total)" | borde morado, fondo morado muy claro; el label cambia para mostrar el contador de opciones seleccionadas |
-| Chips removibles | chips verdes con "✕" | ej. "Pendiente ✕" · "Completado ✕" | aparecen debajo del dropdown cerrado; cada chip es removible individualmente haciendo clic en "✕"; color verde claro con texto verde oscuro |
-| Ícono "borrar selección" | ícono basura | — | aparece a la derecha del dropdown cuando hay selecciones activas; al hacer clic limpia todos los chips de ese filtro |
+| **Estado inicial (sin selección)** | dropdown colapsado | "Estado CO" / "Estado CPA" / "Estado de Factura" / "Marca" | color gris claro, sin badge numérico; al hacer clic abre el dropdown con checkboxes y buscador interno |
+| **Dropdown abierto** | menu desplegable | — | fondo blanco con sombra; muestra buscador interno + lista de checkboxes con opciones del catálogo; se posiciona sobre el resto de contenido |
+| Buscador interno (dropdown) | input | placeholder "Buscar..." | permite filtrar la lista de opciones dentro del dropdown; funciona con búsqueda incremental (ej. "pen" muestra "Pendiente") |
+| Opción "Seleccionar todos" | checkbox con texto | checkbox + texto "Pendiente" / "Completado" | primera opción de la lista; al marcar/desmarcar afecta **todas** las opciones de ese filtro a la vez |
+| Opción individual (ejemplo Estado CO) | checkbox + label | "Pendiente" | puede estar marcado ✓ (checkbox morado lleno) o sin marcar (checkbox vacío con borde gris) |
+| Opción individual (ejemplo Estado CO) | checkbox + label | "Completado" | — |
+| Opción individual (ejemplo Marca) | checkbox + label | "Infiniti" / "Kia" / "Nissan" / "+1 más" | el "+1 más" o "+N más" aparece cuando hay muchas opciones en el catálogo y el dropdown tiene scroll |
+| **Dropdown con selección** (cerrado) | dropdown resaltado con badge | "Estado CO" con badge morado "(1)" | borde morado, badge numérico morado con fondo claro a la derecha del label; el badge muestra **cuántas** opciones están seleccionadas (ej. "(1)", "(2)", "(3)") |
+| Chips removibles | chips con "✕" | ej. "Completado ✕" | aparecen **debajo** del dropdown cerrado en una fila horizontal; cada chip tiene fondo morado claro con texto morado oscuro y una "✕" clickeable; son removibles individualmente |
+| Múltiples chips | fila de chips | "Infiniti ✕" · "Kia ✕" · "+1 más" | cuando hay más de 2-3 chips, la UI puede mostrar solo los primeros y un indicador "+N más" para evitar que la fila de chips ocupe demasiado espacio vertical; al hacer clic en "+N más" despliega los chips ocultos |
+| **Combinar múltiples filtros** | varios dropdowns con chips | ej. "Estado CO (1)" + chip "Completado" · "Marca (3)" + chips "Infiniti", "Kia", "+1 más" | cada filtro es independiente; se pueden aplicar varios a la vez; la tabla aplica **AND** entre filtros distintos y **OR** dentro del mismo filtro |
+| Botones de acción del filtro | botones | "ACTUALIZAR" (morado) · "LIMPIAR FILTROS" (outline gris) | "ACTUALIZAR" aplica los filtros activos y cierra dropdowns; "LIMPIAR FILTROS" elimina **todos** los chips de **todos** los filtros y resetea la tabla |
 
 **Comportamiento de multi-selección:**
-1. Usuario abre el dropdown de "Estado CPA" → ve la lista de checkboxes.
-2. Usuario marca "Pendiente" y "Completado" → el dropdown se cierra automáticamente.
-3. El label del filtro cambia a **"Estado CPA Seleccionados (2 total)"** y aparecen **2 chips** debajo: `Pendiente ✕` y `Completado ✕`.
-4. La tabla se filtra mostrando solo vehículos con Estado CPA = "Pendiente" **O** "Completado" (operador OR).
-5. Usuario hace clic en la "✕" del chip "Completado" → ese chip desaparece, el contador cambia a **"(1 total)"** y la tabla se actualiza.
-6. Usuario hace clic en el ícono de basura → todos los chips de ese filtro desaparecen, el dropdown vuelve a "Seleccione estado" y la tabla muestra todos los registros.
+1. Usuario hace clic en el dropdown "Estado CO" → se abre mostrando buscador + lista de checkboxes (ej. "Pendiente", "Completado").
+2. Usuario marca "Completado" → el checkbox se llena de morado ✓.
+3. Usuario cierra el dropdown (clic fuera o en "ACTUALIZAR") → el dropdown ahora muestra badge morado **(1)** y aparece 1 chip debajo: `Completado ✕`.
+4. La tabla se filtra automáticamente mostrando solo vehículos con Estado CO = "Completado".
+5. Usuario reabre el dropdown y marca "Pendiente" también → cierra → ahora badge **(2)** y 2 chips: `Completado ✕` · `Pendiente ✕`.
+6. La tabla muestra vehículos con Estado CO = "Completado" **O** "Pendiente" (operador **OR** dentro del mismo filtro).
+7. Usuario hace clic en la "✕" del chip "Completado" → ese chip desaparece, badge cambia a **(1)**, tabla se actualiza mostrando solo "Pendiente".
+8. Usuario hace clic en "LIMPIAR FILTROS" → **todos** los chips de **todos** los filtros desaparecen, badges numéricos desaparecen, tabla muestra todos los registros sin filtrar.
+
+**Comportamiento al combinar múltiples filtros:**
+- **Ejemplo:** Usuario aplica "Estado CO = Completado" (1 chip) + "Marca = Infiniti, Kia" (2 chips).
+- La tabla muestra vehículos que cumplan **ambas condiciones a la vez** (AND):
+  - Estado CO = Completado **Y**
+  - (Marca = Infiniti **O** Marca = Kia)
+- Dentro de cada filtro el operador es **OR**, entre filtros distintos el operador es **AND**.
 
 **Diferencias con el buscador multi-VIN:**
-- **VINs:** cada línea es un chip; validación de formato 17 caracteres; contador "Válidos" / "Inválidos".
-- **Filtros de estado/marca:** cada opción seleccionada es un chip; sin validación (todas las opciones vienen del catálogo); contador total de seleccionadas.
+- **Búsqueda por VIN:** usa un input de texto expandible con textarea; cada línea escrita es un chip; tiene validación de formato 17 caracteres alfanuméricos; muestra contadores "Total {n}" (verde), "Válidos {n}" (verde), "Inválidos {n}" (rojo); los chips válidos son verdes, los inválidos son rojos.
+- **Filtros de estado/marca:** usan dropdowns con checkboxes; cada opción seleccionada del catálogo es un chip; sin validación (todas las opciones vienen de BD); muestra solo contador total "(N)" en el badge del dropdown; todos los chips son morados (no hay inválidos).
 
 **Estados:**
-- Vacío (placeholder "Seleccione estado").
-- Con 1 selección (ej. "Estado CPA Seleccionados (1 total)" + 1 chip).
-- Con múltiples selecciones (ej. "(2 total)" + 2 chips, "(3 total)" + 3 chips, etc.).
-- Dropdown abierto mostrando checkboxes (con algunas marcadas ✓).
+- Vacío (sin badge numérico, sin chips).
+- Con 1 selección (badge morado "(1)", 1 chip).
+- Con múltiples selecciones (badge "(2)" o "(3)", varios chips en fila horizontal).
+- Dropdown abierto mostrando buscador + checkboxes (algunos marcados ✓).
+- Combinación de múltiples filtros activos (varios dropdowns con badges y chips simultáneos).
 
-**Screenshot:** ![filtros-multi-valor-chips-vacio](screenshots/filtros-multi-valor-chips-vacio.png) · ![filtros-multi-valor-chips-dropdown-abierto](screenshots/filtros-multi-valor-chips-dropdown-abierto.png) · ![filtros-multi-valor-chips-seleccionados](screenshots/filtros-multi-valor-chips-seleccionados.png) · ![filtros-multi-valor-chips-vins-expandido](screenshots/filtros-multi-valor-chips-vins-expandido.png)
+**Screenshot:** 
+![us11369-filtros-vacio](screenshots/us11369-filtros-vacio.png) — pantalla inicial sin filtros aplicados
+![us11369-busqueda-vin-autocompletado](screenshots/us11369-busqueda-vin-autocompletado.png) — búsqueda por VIN con dropdown de sugerencias
+![us11369-busqueda-vin-chips](screenshots/us11369-busqueda-vin-chips.png) — VINs seleccionados con chips y contadores (Verde: 9 Válidos, Rojo: 2 Inválidos, Total: 11)
+![us11369-busqueda-vin-textarea](screenshots/us11369-busqueda-vin-textarea.png) — textarea para pegar múltiples VINs (uno por línea)
+![us11369-filtros-vin-aplicados-tabla](screenshots/us11369-filtros-vin-aplicados-tabla.png) — tabla filtrada mostrando solo los 11 VINs seleccionados
+![us11369-estado-co-dropdown-abierto](screenshots/us11369-estado-co-dropdown-abierto.png) — dropdown "Estado CO" expandido con checkboxes "Pendiente" y "Completado"
+![us11369-multiples-filtros-activos](screenshots/us11369-multiples-filtros-activos.png) — Estado CO (badge "1" + chip "Completado") + Marca (badge "3" + chips "Infiniti", "Kia", "+1 más")
+![us11369-vista-completa-sidebar-filtros](screenshots/us11369-vista-completa-sidebar-filtros.png) — vista completa: sidebar izquierdo + tabla con múltiples filtros aplicados
 
 **Notas para TCs:**
-- **US-11369:** este comportamiento multi-valor con chips se aplica a los filtros "Estado CO", "Estado CPA", "Estado Factura" y "Marcas" — antes solo eran dropdowns simples de selección única.
-- El contador "(N total)" es **dinámico** — se actualiza automáticamente al agregar/remover chips.
-- Los chips son **removibles individualmente** (clic en "✕") o **todos a la vez** (ícono basura).
-- El operador de filtro es **OR** — si selecciono "Pendiente" y "Completado", la tabla muestra vehículos con **cualquiera** de esos 2 estados (no ambos a la vez).
+- **US-11369:** este comportamiento multi-valor con chips se aplica a los filtros "Estado CO", "Estado CPA", "Estado de Factura" y "Marca" — **antes solo eran dropdowns simples de selección única**; ahora permiten seleccionar **múltiples valores** del catálogo mediante checkboxes.
+- El badge numérico **(N)** es **dinámico** — se actualiza automáticamente al agregar/remover chips; cuando no hay selección el badge **desaparece** (no muestra "(0)").
+- Los chips son **removibles individualmente** (clic en "✕" de cada chip) o **todos a la vez** (botón "LIMPIAR FILTROS").
+- **Operador de filtro:** dentro del mismo filtro es **OR** (si selecciono "Completado" y "Pendiente" en Estado CO, la tabla muestra vehículos con **cualquiera** de esos estados); entre filtros distintos es **AND** (si aplico Estado CO + Marca, la tabla muestra vehículos que cumplan **ambos** filtros a la vez).
+- **Búsqueda por VIN** también soporta multi-valor con chips, pero usa un input de texto con validación en lugar de checkboxes — ver comportamiento detallado en la tabla de la sección "Buscador" más arriba.
+- **Antes de la US 11369:** los filtros eran dropdowns simples de un solo valor — si el usuario quería ver vehículos con Estado CO "Pendiente" **y** "Completado" a la vez, tenía que hacerlo en 2 consultas separadas; ahora puede hacerlo en 1 sola consulta seleccionando ambos valores.
 
 ---
 
@@ -551,6 +625,34 @@ Screenshot: ![vehiculos-importados-reporte-inventario](screenshots/vehiculos-imp
 - **Estados:** vacío (sin categoría ni archivo) / con categoría seleccionada (dropdown abierto) / con archivo adjunto (botón habilitado).
 - **Screenshot:** ![vehiculo-anadir-documento](screenshots/vehiculo-anadir-documento.png) · ![vehiculo-anadir-documento-categorias](screenshots/vehiculo-anadir-documento-categorias.png) · ![vehiculo-anadir-documento-seleccionado](screenshots/vehiculo-anadir-documento-seleccionado.png)
 - **Notas para TCs:** la categoría "Certificado de Pago de Arbitrios" es el documento "CPA" — confirma la terminología usada en `/import/cpa`.
+---
+
+## Motorambar > Configuración de Usuario > Dark Mode (Tema Oscuro) — **US 12168**
+
+**Cómo se activa/desactiva:** Menú desplegable del perfil del usuario (esquina superior derecha, clic en nombre/foto de perfil) → opción "Tema Oscuro" o "Tema Claro".
+
+**Descripción general:**
+- **Modo Claro (por defecto):** Fondos blancos o gris muy claro, texto oscuro sobre fondos claros.
+- **Modo Oscuro:** Fondos oscuros (gris oscuro/negro), texto claro (blanco o gris claro) sobre fondos oscuros.
+- La preferencia se aplica inmediatamente (cambio suave) a toda la interfaz: Dashboard, grid de vehículos, detalle de vehículo, modales, sidebar, header, formularios, etc.
+- La preferencia se persiste — si el usuario cierra sesión y vuelve a entrar, el tema se mantiene.
+
+**Evidencia visual de Dark Mode activo:**
+- Header y sidebar con fondo oscuro
+- Cards y secciones de contenido con fondo gris oscuro
+- Texto de labels y campos en color claro (blanco/gris claro)
+- Bordes de inputs y cards más suaves (gris medio)
+- Badges y botones adaptan sus colores para mantener contraste
+
+**Screenshot de referencia:**  
+![dark-mode-vehiculo-financiero](screenshots/dark-mode-vehiculo-financiero.png) — Detalle de vehículo, sección "FINANCIERO" con Dark Mode activado. Muestra los campos "CONCESIONARIO" (VICTOR PEREZ ZAPATA INC, badge CO) e "INSTITUCIÓN FINANCIERA" (POPULAR AUTO) con fondo oscuro y texto claro.
+
+**Notas para TCs:**
+- Verificar que el cambio de tema afecta **todas** las pantallas del portal (no solo algunas).
+- El toggle del tema debe mostrar el label correcto según el modo activo:  
+  - Si está en Modo Claro → muestra "Tema Oscuro"  
+  - Si está en Modo Oscuro → muestra "Tema Claro"
+- Verificar persistencia: cerrar sesión → volver a entrar → el tema se mantiene.
 ---
 
 ## Motorambar > Import > Importar CPA
@@ -864,21 +966,176 @@ Screenshot: ![header-sesion-inactividad](screenshots/header-sesion-inactividad.p
 
 ## Motorambar > Import > Historial de Importaciones de Vehículos
 - **Ruta/URL:** `/import/history`
-- **Cómo se llega aquí:** botón "Acciones" → "Historial de Importaciones" desde "Vehículos Importados" (`/import`).
+- **Cómo se llega aquí:** sidebar > "Vehículos Importados" (expandir) → "Historial de Importaciones".
 - **Elementos clave:**
   | Elemento | Tipo | Texto/label literal | Comportamiento |
   |---|---|---|---|
   | Título | texto (con ícono historial circular morado) | "Historial de Importaciones de Vehículos" | — |
   | Subtítulo | texto gris | "Visualiza todas las importaciones de vehículos realizadas" | — |
   | Botón | primario morado (esquina superior derecha) | "Nueva Importación" (ícono upload) | navega a `/import/vehicles` |
-  | Tabla | grid | columnas: NOMBRE DE ARCHIVO / FECHA ↓ / ESTADO | ordenado descendente por fecha |
-  | Columna NOMBRE DE ARCHIVO | texto con ícono documento | nombre del archivo Excel original (ej. "xBTh3wK3D", "s%3D", "20260518_122734_1100_PDVFile.xlsx%3t=2026-06...") | los nombres pueden estar truncados o codificados si son muy largos |
-  | Columna FECHA | texto | formato "DD jun AAAA, HH:MM" (ej. "14 jun 2026, 01:00", "14 jun 2026, 00:00") | zona horaria UTC-4 (Puerto Rico) |
-  | Columna ESTADO | badge verde | "Completado" | todas las importaciones visibles tienen estado "Completado" — estados de error/pendiente no documentados en captura |
-  | Paginación | controles | — | presente pero no visible en captura (scroll necesario) |
-- **Estados:** con datos (historial con múltiples importaciones) / vacío (sin importaciones previas — no documentado).
-- **Screenshot:** ![import-historial](screenshots/import-historial.png)
-- **Notas para TCs:** los nombres de archivo mostrados en la tabla pueden estar codificados/truncados (URL encoding + límite de caracteres) — al validar el historial en un TC, no asumir que el nombre mostrado coincide exactamente con el nombre original del archivo subido. El badge "Completado" confirma que la importación finalizó sin errores críticos, pero no garantiza que **todos** los VINs del archivo fueron procesados exitosamente (ej. duplicados ignorados, VINs inválidos omitidos). Para validar el detalle de una importación, se requiere funcionalidad de "ver detalle" (ícono/acción no visible en captura actual — pendiente confirmar si existe).
+  | Filtro fecha | input date picker | "Seleccionar fecha" | filtra importaciones por fecha |
+  | Tabla | grid | columnas: NOMBRE DE ARCHIVO / FECHA ↓ / ESTADO / ACCIONES | ordenado descendente por fecha |
+  | Columna NOMBRE DE ARCHIVO | texto con ícono documento | nombre del archivo Excel original (ej. "PDV REPORT 6.08 a 7.01 2026_1797.xlsx") | nombres pueden estar truncados si son muy largos |
+  | Columna FECHA | texto | formato "DD mmm AAAA, HH:MM" (ej. "08 jul 2026, 12:36") | zona horaria UTC-4 (Puerto Rico) |
+  | Columna ESTADO | badge | "COMPLETADO" (verde) / "ERROR" (rojo) / "PENDIENTE" (azul claro) / "COMPLETADO CON ERRORES" (amarillo — pendiente documentar) | indica el resultado de la importación |
+  | Columna ACCIONES | ícono circular | ícono refresh (circular con flecha) cuando estado = "ERROR" / ícono X roja cuando estado = "PENDIENTE" | clic en refresh abre modal "Detalle de Importación"; X cancela el reproceso pendiente |
+  | Paginación | controles | — | presente cuando hay muchas importaciones |
+- **Estados de importación (badges):**
+  | Estado | Color | Significado |
+  |---|---|---|
+  | COMPLETADO | verde | importación finalizada sin errores — todos los registros procesados exitosamente |
+  | ERROR | rojo | fallo crítico durante la importación (ej. columnas faltantes, archivo corrupto) — **ningún** registro fue procesado |
+  | PENDIENTE | azul claro | importación reencolada tras un error — esperando reproceso en background |
+  | COMPLETADO CON ERRORES | amarillo | importación parcial — algunos registros procesados, otros fallaron (ej. VINs inválidos en ciertas filas) — **pendiente documentar** |
+- **Estados UI:** con datos (múltiples importaciones) / vacío (sin importaciones previas — no documentado).
+- **Screenshot:** ![import-historial-estados](screenshots/import-historial-estados.png)
+- **Notas para TCs:**
+  - **US 12076:** la funcionalidad de editar VIN y reprocesar filas fallidas aplica cuando el estado es **"COMPLETADO CON ERRORES"** (importación parcial). El modal "Detalle de Importación" en ese caso muestra la sección "ERRORES DE IMPORTACIÓN" con cards individuales de cada fila fallida y un ícono de lápiz morado para corregir el VIN.
+  - Cuando el estado es **"ERROR"** (fallo crítico), el modal muestra el botón "Reintentar importación" que reencola el archivo completo — no hay edición de VINs individuales.
+  - Los nombres de archivo mostrados en la tabla coinciden con el nombre original del Excel subido.
+
+### Modal "Detalle de Importación" (estado ERROR)
+
+**Cómo se llega aquí:** clic en el ícono refresh (circular) de la columna ACCIONES cuando el estado = "ERROR".
+
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Título | texto | "Detalle de Importación: {nombre-archivo.xlsx}" | ej. "Detalle de Importación: PDV REPORT 6.08 a 7.01 2026_1797.xlsx" |
+| Subtítulo | texto gris | "Intento #{N} — Failed" | ej. "Intento #1 — Failed" |
+| ID importación | texto gris pequeño | "ID: {guid}" | ej. "ID: 9796a889-816b-4381-92bd-21bd0254791" |
+| Botón cerrar | ícono X | esquina superior derecha | cierra el modal |
+| Card de error principal | card rosa con ícono X rojo | título "Importación Fallida" + nombre de archivo | indica fallo crítico general |
+| Sección errores | collapsible section | título "ERRORES DE IMPORTACIÓN" (con ícono info circular) | muestra lista de errores detectados |
+| Card de error individual | card blanco con borde | "#0" + descripción del error + link "Ver Datos" | ej. "#0 Columnas faltantes: AutoColor1" → el link "Ver Datos" abre detalle del error (comportamiento no documentado) |
+| Botón principal | botón azul oscuro | "Reintentar importación" (ícono refresh circular) | abre modal de confirmación "¿Reintentar importación?" |
+
+**Screenshot:** ![import-detalle-error](screenshots/import-detalle-error.png)
+
+**Notas para TCs:**
+- Este modal aparece cuando la importación falló **completamente** (estado ERROR) — no se procesó ningún registro.
+- El botón "Reintentar importación" reencola el archivo completo — el sistema volverá a procesarlo desde cero en background.
+- Los errores típicos en este estado son: columnas faltantes (configuración de importación incorrecta), archivo corrupto, formato inválido.
+- Este flujo es **distinto** al de la US 12076 — esa US trata sobre importaciones en estado "COMPLETADO CON ERRORES" (parcial) donde se pueden corregir VINs individuales.
+
+### Modal "¿Reintentar importación?" (confirmación)
+
+**Cómo se llega aquí:** clic en "Reintentar importación" desde el modal "Detalle de Importación" (estado ERROR).
+
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Ícono | ícono alerta (triángulo naranja) | — | esquina superior del modal |
+| Título | texto | "¿Reintentar importación?" | — |
+| Descripción | texto gris | "Se volverá a procesar el archivo. Los datos existentes podrían actualizarse." | advierte que registros ya procesados pueden modificarse |
+| Botón secundario | texto gris | "CANCELAR" | cierra el modal sin acción |
+| Botón principal | botón rojo | "REINTENTAR IMPORTACIÓN" | confirma el reproceso — reencola el archivo y cierra el modal |
+
+**Screenshot:** ![import-confirmar-reintento](screenshots/import-confirmar-reintento.png)
+
+**Comportamiento tras confirmar:**
+1. Modal se cierra
+2. El estado de la importación en la tabla cambia de "ERROR" (rojo) a "PENDIENTE" (azul claro)
+3. El ícono de ACCIONES cambia de refresh (circular) a X roja (cancelar reproceso)
+4. Toast verde "Importación reencolada exitosamente" aparece en la esquina superior derecha
+5. El Worker procesa el archivo en background — cuando termine, el estado cambiará a "COMPLETADO" o volverá a "ERROR"
+
+**Screenshot (después del reproceso):** ![import-reproceso-pendiente](screenshots/import-reproceso-pendiente.png)
+
+**Notas para TCs:**
+- El botón X rojo (ACCIONES) que aparece tras reencolar permite **cancelar** el reproceso pendiente — útil si el usuario detectó que el error no fue corregido (ej. olvidó actualizar la configuración de columnas).
+- El mensaje "Los datos existentes podrían actualizarse" aplica cuando la importación previa procesó algunos registros antes de fallar — al reintentar, esos registros pueden modificarse con los valores del Excel actual.
+- Este flujo es para fallos **críticos** (ERROR). La US 12076 trata sobre fallos **parciales** (COMPLETADO CON ERRORES) donde se corrigen VINs individuales, no se reintenta todo el archivo.
+
+---
+
+### Modal "Detalle de Importación" (estado COMPLETADO CON ERRORES — US 12076)
+
+**Cómo se llega aquí:** clic en la fila de la tabla cuando el estado = "COMPLETADO CON ERRORES" (amarillo).
+
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Título | texto | "Detalle de Importación: {nombre-archivo.xlsx}" | ej. "Detalle de Importación: PDV REPORT 6.08 a 7.01 2026_1797.xlsx" |
+| Subtítulo | texto gris | "Intento #{N} — CompletedWithErrors" | ej. "Intento #1 — CompletedWithErrors" |
+| ID importación | texto gris pequeño | "ID: {guid}" | ej. "ID: 6a8758ce-2652-412c-8a33-6f28a9a8e33e" |
+| Botón cerrar | ícono X | esquina superior derecha | cierra el modal |
+| Card resumen | card amarillo con ícono alerta (triángulo) | título "Completado con Errores" + "{insertadas} de {total} filas insertadas" | ej. "880 de 882 filas insertadas" |
+| **Métricas (4 cards)** | — | — | — |
+| Métrica 1 | card con ícono lista | "882 TOTAL FILAS" | total de filas en el Excel (incluye exitosas + fallidas + omitidas) |
+| Métrica 2 | card con ícono check verde | "880 INSERTADAS" | filas procesadas exitosamente |
+| Métrica 3 | card con ícono X roja | "2 FALLIDAS" | filas que no se pudieron procesar (ej. VIN inválido) |
+| Métrica 4 | card con ícono play naranja | "0 OMITIDAS" | filas que se saltaron (ej. VINs duplicados en el mismo Excel) |
+| **Sección errores** | collapsible section expandida | título "ERRORES DE IMPORTACIÓN" (con ícono info circular) | muestra lista de filas fallidas |
+| Card de error individual | card blanco | "#{número-fila}" + texto del error en rojo + link "Ver Datos" + botón "REPROCESAR" | ej. "#2 VIN inválido. El VIN debe contener 17 caracteres alfanuméricos." |
+| Link "Ver Datos" | link gris/azul | "Ver Datos" / "Ocultar" (toggle) | expande/colapsa el detalle de todos los campos de esa fila (VIN, AUTOCOLOR, HORSEPOWER, MAKE, MODEL, etc.) |
+| Botón "REPROCESAR" | botón azul oscuro | "REPROCESAR" (ícono refresh circular) | abre modal "Reprocesar Fila" con el campo "VIN corregido" prellenado con el VIN original inválido |
+
+**Estados de la sección "ERRORES DE IMPORTACIÓN":**
+- **Con errores:** muestra lista de cards con las filas fallidas (ej. 2 cards: #2 y #3).
+- **Sin errores** (tras reprocesar todas las filas): muestra "No se encontraron errores" con ícono check verde.
+
+**Screenshot:** ![import-detalle-completado-con-errores](screenshots/import-detalle-completado-con-errores.png) · ![import-detalle-ver-datos](screenshots/import-detalle-ver-datos.png)
+
+**Notas para TCs:**
+- Este modal aparece cuando la importación se completó **parcialmente** (estado COMPLETADO CON ERRORES) — la mayoría de registros se procesaron, pero algunos fallaron.
+- Las causas típicas de fallas individuales: VIN inválido (≠ 17 caracteres o contiene caracteres especiales), VIN duplicado dentro del mismo Excel, campos obligatorios vacíos.
+- El botón "REPROCESAR" permite corregir el VIN de cada fila fallida **individualmente** — no reintenta todo el archivo como en el flujo de ERROR.
+- Las métricas se actualizan en **tiempo real** tras reprocesar cada fila: INSERTADAS aumenta, FALLIDAS disminuye.
+- Si todas las filas se reprocesaran exitosamente, el estado de la importación en la tabla cambia de "COMPLETADO CON ERRORES" (amarillo) a "COMPLETADO" (verde).
+
+---
+
+### Modal "Reprocesar Fila" (US 12076)
+
+**Cómo se llega aquí:** clic en "REPROCESAR" desde un card de error en "Detalle de Importación" (estado COMPLETADO CON ERRORES).
+
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Título | texto | "Reprocesar Fila" | — |
+| Botón cerrar | ícono X | esquina superior derecha | cierra el modal sin guardar |
+| Card info | card gris claro | "FILA" + "#{número}" + "VIN ORIGINAL" + VIN inválido | ej. "FILA #2", "VIN ORIGINAL 5XYK6CDFXTG4477646" |
+| Label campo | texto | "VIN corregido: *" | asterisco rojo indica campo obligatorio |
+| Campo VIN | input texto | prellenado con el VIN original inválido | el usuario puede editar |
+| Texto ayuda | texto gris pequeño | "17 caracteres alfanuméricos (A-H, J-N, P-Z, 0-9, sin I/O/Q)" | debajo del campo |
+| Botón secundario | texto outline gris | "CANCELAR" | cierra el modal sin guardar |
+| Botón principal | botón morado | "CONFIRMAR Y REPROCESAR" | valida el VIN, guarda y reprocesa la fila |
+
+**Validaciones del campo "VIN corregido":**
+| Validación | Comportamiento |
+|---|---|
+| **Limpieza automática** (silenciosa) | el sistema elimina **todos los espacios** del texto ingresado **antes** de validar (ej. "3N8AP6GCE2TL 37850 0" → "3N8AP6GCE2TL378500") |
+| **Longitud** | debe tener **exactamente 17 caracteres** (después de eliminar espacios) |
+| **Formato** | solo caracteres **alfanuméricos** (A-Z, 0-9), sin espacios ni caracteres especiales |
+| **Caracteres prohibidos** | no puede contener I, O, Q (por estándar VIN) |
+| **Mensaje de error** | si alguna validación falla, muestra: *"VIN inválido. Debe contener exactamente 17 caracteres alfanuméricos."* en rojo debajo del campo + campo resaltado en rojo |
+| **Estado válido** | si todas las validaciones pasan, el campo se resalta en **verde** (borde verde) |
+
+**Estados del campo:**
+- **Inicial:** campo prellenado con VIN inválido, sin borde de color.
+- **Inválido:** borde rojo + mensaje de error rojo debajo del campo.
+- **Válido:** borde verde + sin mensaje de error.
+
+**Screenshot:** ![import-reprocesar-fila-inicial](screenshots/import-reprocesar-fila-inicial.png) · ![import-reprocesar-fila-error](screenshots/import-reprocesar-fila-error.png) · ![import-reprocesar-fila-valido](screenshots/import-reprocesar-fila-valido.png)
+
+**Comportamiento tras confirmar (VIN válido):**
+1. Modal se cierra
+2. Toast verde "Fila reprocesada exitosamente" aparece en la esquina superior derecha
+3. El sistema reprocesa la fila en background — inserta el vehículo con el VIN corregido
+4. El modal "Detalle de Importación" se actualiza automáticamente:
+   - Card de la fila #2 desaparece de la lista de errores
+   - Métricas se actualizan: INSERTADAS aumenta de 880 → 881, FALLIDAS disminuye de 2 → 1
+5. Si todas las filas se reprocesaran exitosamente (FALLIDAS = 0):
+   - Card principal cambia de "Completado con Errores" (amarillo) a "Importación Exitosa" (verde)
+   - Métricas: INSERTADAS = TOTAL FILAS, FALLIDAS = 0
+   - Sección "ERRORES DE IMPORTACIÓN" muestra "No se encontraron errores" con ícono check verde
+   - El estado en la tabla de fondo cambia de "COMPLETADO CON ERRORES" (amarillo) a "COMPLETADO" (verde)
+
+**Screenshot (después del reproceso exitoso):** ![import-reproceso-exitoso](screenshots/import-reproceso-exitoso.png)
+
+**Notas para TCs:**
+- **Limpieza automática de espacios:** el sistema elimina espacios **antes** de validar — el usuario puede ingresar "3N8AP6GCE2TL 37850 0" (con espacios) y el sistema lo acepta como válido tras limpiar.
+- **Caracteres prohibidos I/O/Q:** el mensaje de error **no** menciona explícitamente estos caracteres — simplifica diciendo "alfanuméricos", pero la validación sí los rechaza (estándar VIN internacional).
+- **Reproceso inmediato:** el sistema no espera un worker batch — reprocesa la fila en background al confirmar, y la UI se actualiza en ~1-2 segundos.
+- **No hay modal de confirmación adicional:** "CONFIRMAR Y REPROCESAR" ejecuta directamente — no pide confirmación tipo "¿Estás seguro?".
+
 ---
 
 ## Motorambar > Import > Configuración de Importación

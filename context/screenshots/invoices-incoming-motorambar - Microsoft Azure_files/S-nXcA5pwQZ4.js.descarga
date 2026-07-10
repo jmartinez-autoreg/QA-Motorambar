@@ -1,1 +1,0 @@
-define("@microsoft/azureportal-reactview/FunctionProxy",["require","exports","@microsoft/azureportal-reactview/internal/ReactView"],function(e,t,r){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.getFunctionProxy=function(){return r.ReactView.getInstance().getFunctionProxy()}});

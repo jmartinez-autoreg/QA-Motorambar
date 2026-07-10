@@ -1,1 +1,0 @@
-define("@fluentui/react-motion/lib/factories/createPresenceComponentVariant",["exports","@fluentui/react-motion/lib/factories/createPresenceComponent"],function(e,n){"use strict";function t(e,n){return t=>e({...n,...t})}e.createPresenceComponentVariant=function(e,r){const c=t(e[n.PRESENCE_MOTION_DEFINITION],r);return(0,n.createPresenceComponent)(c)},e.createPresenceFnVariant=t});

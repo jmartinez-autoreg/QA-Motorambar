@@ -1,1 +1,0 @@
-define("@fluentui/react-avatar/lib/contexts/AvatarContext",["exports","react"],function(t,e){"use strict";t.useAvatarContext=t.AvatarContextProvider=void 0;const r=e.createContext(void 0),a={};t.AvatarContextProvider=r.Provider;t.useAvatarContext=()=>{var t;return null!==(t=e.useContext(r))&&void 0!==t?t:a}});

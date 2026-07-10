@@ -1,1 +1,0 @@
-define("@azure/portal-internal-services/lib/Resources.resjson",{PolicyServiceResources:{clickDetails:"Detalles de la directiva",policyDetailsFormat:"Asignación de directiva: {0}"}});

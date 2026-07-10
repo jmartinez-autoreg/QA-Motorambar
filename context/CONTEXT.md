@@ -16,7 +16,7 @@
 |-------|-------|
 | Idioma de interacción | `Español` |
 | Zona horaria | `America/Puerto_Rico (UTC-4)` |
-| Sprint actual | `S2 Entregable 3` |
+| Sprint actual | `S3 -Entregable 4` |
 
 > Actualiza "Sprint actual" al iniciar cada sprint nuevo — define el nombre de carpeta de la bitácora.
 
@@ -38,7 +38,7 @@
 | Usuario | Rol | Notas |
 |---|---|---|
 | `jovidio` | Cliente | Solo lectura — ve solo vehículos asignados a su cliente (Dealer o Banco) |
-| `distri2` | Distribuidor | Permisos completos |
+| `motorambar.distribuidor` | Distribuidor | Permisos completos |
 
 ---
 
@@ -143,6 +143,21 @@
   - Realtime: SignalR (notificaciones)
   - Gráficos: recharts
   - Toasts: sonner
+
+### Comportamiento de notificaciones en tiempo real (SignalR)
+
+> ⚠️ **Regla de negocio — cuándo se envía notificación en tiempo real:**
+
+- **Operaciones batch** (múltiples registros procesados en una sola acción del usuario):
+  - ✅ **SÍ generan notificaciones en tiempo real** → se envían una por una a los canales SignalR configurados
+  - Ejemplos: "Reenviar Datos a PDV" (N vehículos), "Enviar Docs a PDV" (N vehículos), importar CPA batch (múltiples VINs), procesar facturas batch
+
+- **Operaciones individuales** (1 a 1, manuales):
+  - ❌ **NO generan notificaciones individuales en tiempo real**
+  - ✅ Se incluyen en el **resumen diario** junto con las métricas de las operaciones batch
+  - Ejemplos: editar un vehículo, subir un documento individual, asignar un cliente a un vehículo
+
+**Justificación:** evitar saturar el panel de notificaciones con cientos de eventos individuales poco relevantes (ej. si el usuario sube 200 facturas manualmente una por una). Las operaciones batch son procesadas por el sistema en background y requieren visibilidad inmediata de su progreso/resultado.
 
 ---
 

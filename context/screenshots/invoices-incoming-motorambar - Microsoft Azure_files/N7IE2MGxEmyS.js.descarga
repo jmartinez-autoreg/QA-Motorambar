@@ -1,1 +1,0 @@
-define("@fluentui/react-tags/lib/utils/useTagAvatarContextValues",["exports","react"],function(a,t){"use strict";a.useTagAvatarContextValues_unstable=function(a){const{avatarSize:e,avatarShape:s}=a;return{avatar:t.useMemo(()=>({size:e,shape:s}),[s,e])}}});

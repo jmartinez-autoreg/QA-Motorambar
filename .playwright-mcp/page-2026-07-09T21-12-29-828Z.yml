@@ -1,0 +1,86 @@
+- generic [active] [ref=e1]:
+  - region "Notifications alt+T"
+  - complementary "Edit with Lovable" [ref=e75]:
+    - link "Edit with Lovable" [ref=e76] [cursor=pointer]:
+      - /url: https://lovable.dev/projects/8e5862b0-a029-4fd3-8caf-60798151eca1?utm_source=lovable-badge
+      - generic [ref=e77]: Edit with
+    - button "Dismiss" [ref=e83] [cursor=pointer]
+  - generic [ref=e92]:
+    - complementary [ref=e93]:
+      - img "Quantify" [ref=e95]
+      - navigation [ref=e96]:
+        - link "Bill" [ref=e97] [cursor=pointer]:
+          - /url: /bills
+        - link "Help" [ref=e101] [cursor=pointer]:
+          - /url: /help
+    - generic [ref=e105]:
+      - banner [ref=e266]:
+        - generic [ref=e267]:
+          - heading "Create Bill" [level=1] [ref=e268]
+          - generic [ref=e270]:
+            - link "Bill" [ref=e271] [cursor=pointer]:
+              - /url: /bills
+            - text: ›Create Bill
+        - generic [ref=e272]:
+          - button "Notifications" [ref=e273]:
+            - generic [ref=e277]: "7"
+          - button "JP" [ref=e278]
+      - generic [ref=e281]:
+        - generic [ref=e283]:
+          - generic [ref=e284]:
+            - text: Period
+            - combobox [ref=e285] [cursor=pointer]:
+              - generic: Select...
+          - generic [ref=e288]:
+            - text: Company
+            - combobox [ref=e289] [cursor=pointer]:
+              - generic: Khensys
+          - generic [ref=e292]:
+            - text: Bill Number
+            - textbox "JDP001" [ref=e293]
+        - generic [ref=e294]:
+          - generic [ref=e295]:
+            - generic [ref=e296]: Project
+            - generic [ref=e297]: Type
+            - generic [ref=e298]: Hours
+            - generic [ref=e299]: Description
+            - generic [ref=e300]: Rate
+            - generic [ref=e301]: Amount
+          - generic [ref=e303]:
+            - combobox [ref=e305] [cursor=pointer]:
+              - generic: Select...
+            - combobox [ref=e309] [cursor=pointer]:
+              - generic: Select...
+            - spinbutton "0.00" [ref=e313]
+            - textbox "Service description" [ref=e315]
+            - generic [ref=e316]: $0.00
+            - generic [ref=e317]: $0.00
+          - button "Add" [ref=e319] [cursor=pointer]
+        - generic [ref=e320]:
+          - generic [ref=e321]:
+            - generic [ref=e322]: IRS
+            - generic [ref=e323]: $0.00
+          - generic [ref=e324]:
+            - generic [ref=e325]: ITBS
+            - generic [ref=e326]: $0.00
+          - generic [ref=e327]:
+            - generic [ref=e328]: Total
+            - generic [ref=e329]: $0.00
+        - generic [ref=e330]:
+          - heading "Documents" [level=2] [ref=e331]
+          - generic [ref=e332]:
+            - generic [ref=e333]:
+              - generic [ref=e334]: File
+              - generic [ref=e335]: Document Type
+            - generic [ref=e338]:
+              - button "Upload Document" [ref=e340] [cursor=pointer]
+              - combobox [ref=e342] [cursor=pointer]:
+                - generic: Select...
+              - generic [ref=e345]:
+                - button [ref=e346] [cursor=pointer]
+                - button [ref=e347] [cursor=pointer]
+            - button "Add" [ref=e349] [cursor=pointer]
+        - generic [ref=e350]:
+          - button "Cancel" [ref=e351] [cursor=pointer]
+          - button "Save" [ref=e352] [cursor=pointer]
+          - button "Submit" [ref=e353] [cursor=pointer]

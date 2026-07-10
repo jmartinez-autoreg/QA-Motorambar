@@ -1,1 +1,0 @@
-define("@fluentui/react-utilities/lib/utils/getRTLSafeKey",["exports"],function(e){"use strict";e.getRTLSafeKey=void 0;e.getRTLSafeKey=(e,t)=>{if("rtl"===t)switch(e){case"ArrowLeft":return"ArrowRight";case"ArrowRight":return"ArrowLeft"}return e}});

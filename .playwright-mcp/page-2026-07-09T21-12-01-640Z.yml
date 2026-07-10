@@ -1,0 +1,57 @@
+- generic [active] [ref=e1]:
+  - region "Notifications alt+T"
+  - main [ref=e2]:
+    - generic [ref=e4]:
+      - img "Quantify" [ref=e6]
+      - generic [ref=e7]:
+        - heading "Login" [level=1] [ref=e8]
+        - paragraph [ref=e9]: Enter your email below to login to your account
+        - generic [ref=e10]:
+          - generic [ref=e11]:
+            - text: Email
+            - textbox "Email" [ref=e12]:
+              - /placeholder: m@example
+          - generic [ref=e13]:
+            - generic [ref=e14]:
+              - generic [ref=e15]: Password
+              - link "Forgot your password?" [ref=e16] [cursor=pointer]:
+                - /url: "#"
+            - textbox "Password" [ref=e17]
+          - button "Login" [ref=e18] [cursor=pointer]
+        - generic [ref=e19]:
+          - generic [ref=e20]: Demo accounts
+          - generic [ref=e25]:
+            - button "Provider — Juan del Pueblo juan@quantify.io" [ref=e26] [cursor=pointer]:
+              - generic [ref=e27]:
+                - generic [ref=e28]: Provider — Juan del Pueblo
+                - generic [ref=e29]: juan@quantify.io
+            - button "Reviewer — Maria Rivera maria@quantify.io" [ref=e30] [cursor=pointer]:
+              - generic [ref=e31]:
+                - generic [ref=e32]: Reviewer — Maria Rivera
+                - generic [ref=e33]: maria@quantify.io
+            - button "Approver — Pedro Martinez pedro@quantify.io" [ref=e34] [cursor=pointer]:
+              - generic [ref=e35]:
+                - generic [ref=e36]: Approver — Pedro Martinez
+                - generic [ref=e37]: pedro@quantify.io
+            - button "Admin — Natalie Soto natalie@quantify.io" [ref=e38] [cursor=pointer]:
+              - generic [ref=e39]:
+                - generic [ref=e40]: Admin — Natalie Soto
+                - generic [ref=e41]: natalie@quantify.io
+          - paragraph [ref=e42]:
+            - text: "Password for both:"
+            - code [ref=e43]: demo1234
+    - generic [ref=e45]:
+      - img "Quantify users" [ref=e57]
+      - generic [ref=e62]:
+        - generic [ref=e63]: Monto
+        - generic [ref=e64]: $1,000.00
+      - generic [ref=e65]:
+        - generic [ref=e66]: Pagados este mes
+        - generic [ref=e70]: $1,000
+        - generic [ref=e71]: 1 facturas pagadas
+      - generic [ref=e72]: Sometido
+  - complementary "Edit with Lovable" [ref=e75]:
+    - link "Edit with Lovable" [ref=e76] [cursor=pointer]:
+      - /url: https://lovable.dev/projects/8e5862b0-a029-4fd3-8caf-60798151eca1?utm_source=lovable-badge
+      - generic [ref=e77]: Edit with
+    - button "Dismiss" [ref=e83] [cursor=pointer]
