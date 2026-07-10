@@ -129,12 +129,14 @@ Recibir US → Analizar criterios de aceptación
    
    Crear **un Test Plan por cada User Story**, nunca agrupar múltiples USs en un solo TP.
    
-   - **Nomenclatura obligatoria:** `TP | US-{ID}` (ej. "TP | US-11369")
+   - **Nomenclatura obligatoria:** `TP | US-{ID} - {Título completo de la US}`
+     - Ejemplo: "TP | US-11369 - Vehículos Importados: Sistema de filtrado multi-valor con chips para todos los filtros"
    - Aunque varias USs estén en la misma iteración, cada una requiere su propio TP
    - Un TP puede contener múltiples Test Cases si todos pertenecen a la misma US
    
    ❌ Incorrecto: "TP | Entregable 5" con TCs de las USs 11369, 11367, 11383
-   ✅ Correcto: "TP | US-11369" (solo TCs de esa US), "TP | US-11367", "TP | US-11383"
+   ❌ Incorrecto: "TP | US-11369" (sin título completo)
+   ✅ Correcto: "TP | US-11369 - Vehículos Importados: Sistema de filtrado multi-valor con chips para todos los filtros"
 
 → [ADO] Verificar/crear Test Plan y Suite (mcp_ado_testplan_create_test_plan si no existe)
 → [ADO] Agregar TC al Suite (mcp_ado_testplan_add_test_cases_to_suite)
