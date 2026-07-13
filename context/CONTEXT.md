@@ -17,8 +17,12 @@
 | Idioma de interacción | `Español` |
 | Zona horaria | `America/Puerto_Rico (UTC-4)` |
 | Sprint actual | `S3 -Entregable 4` |
+| Ruta local de QA-TOOLS-TEMPLATE | `[pendiente — preguntar al usuario la ruta absoluta del repo en disco]` |
 
 > Actualiza "Sprint actual" al iniciar cada sprint nuevo — define el nombre de carpeta de la bitácora.
+> "Ruta local de QA-TOOLS-TEMPLATE" apunta al repo `QA-TOOLS-TEMPLATE` en el disco local — usado por
+> REGLA 1 (auto-aprendizaje) cuando un fix TEMPLATE debe subirse a GitHub desde un proyecto que no es
+> el template mismo.
 
 ---
 

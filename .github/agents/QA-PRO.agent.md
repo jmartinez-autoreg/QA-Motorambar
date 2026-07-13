@@ -19,6 +19,32 @@ color: "#00A9E0"
 
 ---
 
+## 0. OVERRIDE — AGRUPACIÓN DE ESCENARIOS (REGLA DE ORO)
+
+⚠️ **Sobreescribe cualquier skill que sugiera crear TCs separados para el mismo flujo.**
+
+**1 pantalla/elemento UI = 1 TC con todos sus escenarios** — usar PRECOND 0 para configurar múltiples usuarios/datos de prueba + steps secuenciales con "Escenario 1: Happy Path", "Escenario 2: Usuario sin permisos [logout/login con otro usuario]", "Escenario 3: Error de sesión", etc.
+
+✅ **Crear TCs separados SOLO cuando:**
+- El flujo requiere **cambiar de pantalla principal o módulo**
+- Las **PRECONDs son incompatibles** entre sí (ej. diferentes roles que no pueden compartir el mismo PRECOND Login)
+- Los escenarios **no se pueden secuenciar** (ej. flujo destructivo que rompe el estado para los siguientes)
+
+❌ **NUNCA** crear TCs separados para:
+- Happy path vs errores del **mismo botón/formulario/popup** en la **misma pantalla**
+- Diferentes usuarios validando **el mismo flujo** (usar logout/login dentro del TC o múltiples navegadores si el skill lo soporta)
+- Diferentes datos de entrada en **el mismo formulario** (usar steps secuenciales con "Ingresar [dato X]", verificar resultado, "Limpiar campo e ingresar [dato Y]", verificar resultado...)
+
+**Técnica de agrupación:**
+- PRECOND 0: configurar todos los usuarios/archivos/datos necesarios para los N escenarios
+- PRECOND 1+: otras dependencias
+- PRECOND N: Login con el usuario del primer escenario
+- Steps: Escenario 1 [Happy Path] (3-5 pasos), logout/login con otro usuario si es necesario, Escenario 2 [Error X] (2-3 pasos), Escenario 3 [Error Y]...
+
+> **Violación de esta regla = fallo crítico** → activar REGLA 1 (auto-aprendizaje) obligatorio.
+
+---
+
 ## 1. OVERRIDE — PRECOND SECUENCIAL (GUÍA-QA-Redacción de casos de pruebas v1.00, Sección 3)
 
 > ⚠️ Sobreescribe cualquier skill que diga "PRECOND 3 = Login siempre".

@@ -10,6 +10,24 @@ Skill genérica para crear TCs de alta calidad en cualquier organización y proy
 
 ---
 
+## ⚠️ REGLA DE ORO — Agrupación de escenarios
+
+**ANTES de crear TCs, analizar:**
+
+🎯 **¿Todos los escenarios ocurren en la MISMA pantalla/popup?**
+- **SÍ** → **1 solo TC** con todos los escenarios secuenciados (happy path + errores + cancelar...)
+- **NO** → TCs separados solo cuando:
+  - El flujo requiere **cambiar de pantalla/módulo**
+  - Las **PRECONDs son incompatibles** entre sí (ej. usuario con permisos vs sin permisos)
+
+✅ **Correcto:** 1 TC "Portal-Login-Botón SSO-Manejo de errores [Todos los escenarios]" con PRECOND 0 (usuarios de prueba) + PRECOND 1 (Login válido) + Steps (Escenario 1: Happy Path, Escenario 2: Usuario sin permisos [logout/login con otro usuario], Escenario 3: Error de sesión, Escenario 4: Error comunicación, Escenario 5: Error técnico)
+
+❌ **Incorrecto:** 3 TCs separados para validar el mismo botón en la misma pantalla ("Happy Path", "Usuario sin permisos", "Errores varios")
+
+> **Usar PRECONDs para configurar múltiples usuarios/datos** y **steps secuenciales con logout/login o cambio de usuario** para validar todos los escenarios del mismo elemento UI en un solo flujo narrativo.
+
+---
+
 ## 1. Recolectar contexto — SIEMPRE preguntar primero
 
 Antes de crear cualquier TC, necesitas estos datos. **Pregunta todo lo que falte:**
@@ -124,8 +142,8 @@ Ejemplos reales:
 
 ### Hacer (obligatorio)
 
-- **Flujo narrativo continuo por pantalla/funcionalidad** — todos los escenarios que ocurren en la misma pantalla/popup van en 1 solo TC secuencial, sin salir de ella
-- **Dividir en TCs separados SOLO cuando** el flujo requiere cambiar de pantalla, de módulo, o cuando las precondiciones son incompatibles entre sí
+- **🎯 AGRUPACIÓN OBLIGATORIA:** todos los escenarios que validan el **mismo elemento UI** (botón, formulario, popup) en la **misma pantalla** van en **1 solo TC secuencial** — usar PRECOND 0 para múltiples usuarios/datos + steps con Escenario 1/2/3... y logout/login cuando sea necesario cambiar de usuario. **NUNCA** crear TCs separados para happy path, errores y otros escenarios del mismo flujo
+- **Dividir en TCs separados SOLO cuando** el flujo requiere cambiar de pantalla, de módulo, o cuando las precondiciones son incompatibles entre sí (ej. diferentes roles que no pueden compartir el mismo PRECOND Login)
 - **Cada paso = 1 acción + 1 resultado esperado observable**
 - **Resultados específicos**: qué texto aparece, qué elementos se habilitan/deshabilitan, qué cambia en pantalla
 - **Español correcto** con tildes y ortografía impecable (á, é, í, ó, ú, ñ)
@@ -133,11 +151,11 @@ Ejemplos reales:
 
 ### NO hacer (prohibido)
 
+- ❌ **FALLO CRÍTICO:** crear TCs separados para validar el mismo botón/formulario/popup en la misma pantalla (ej. "TC 1: Happy Path", "TC 2: Usuario sin permisos", "TC 3: Errores varios") — esto debe ser **1 solo TC** con escenarios secuenciales
 - ❌ `"Vuelve al paso X"` — no es observable, no sirve como resultado esperado
 - ❌ Copiar/pegar criterios de aceptación como pasos del TC
 - ❌ Pasos sin resultado esperado (excepto PRECONDs)
 - ❌ Combinar varias acciones distintas en un solo paso cuando cada una tiene resultado esperado diferente
-- ❌ Crear TCs separados para escenarios que ocurren en la misma pantalla/popup y comparten el mismo flujo de navegación
 - ❌ Resultados vagos como "funciona correctamente" o "se actualiza la página"
 - ❌ Usar comillas dobles `"` dentro del texto de pasos (causa problemas de escape XML/JSON) — preferir comillas simples o describir sin comillas
 

@@ -498,6 +498,106 @@ Screenshot: ![vehiculos-importados-reporte-inventario](screenshots/vehiculos-imp
 - Los chips son **removibles individualmente** (clic en "✕" de cada chip) o **todos a la vez** (botón "LIMPIAR FILTROS").
 - **Operador de filtro:** dentro del mismo filtro es **OR** (si selecciono "Completado" y "Pendiente" en Estado CO, la tabla muestra vehículos con **cualquiera** de esos estados); entre filtros distintos es **AND** (si aplico Estado CO + Marca, la tabla muestra vehículos que cumplan **ambos** filtros a la vez).
 - **Búsqueda por VIN** también soporta multi-valor con chips, pero usa un input de texto con validación en lugar de checkboxes — ver comportamiento detallado en la tabla de la sección "Buscador" más arriba.
+---
+
+**Componente: Agrupación por Carta de Crédito y Estados de Completitud** (columna VIN) — **US 11268, 11773, 11269**
+
+**Cómo se visualiza:** En la tabla del grid de "Vehículos Importados", cada fila muestra el VIN del vehículo en la columna VIN. Cuando **varios vehículos comparten el mismo número de carta de crédito**, el sistema puede mostrar **íconos de estado** junto al VIN para indicar el estado de completitud del registro.
+
+**Comportamiento según configuración del tenant:**
+
+| Configuración | Comportamiento |
+|---|---|
+| **Credit Letter Group = ACTIVA** | El sistema aplica agrupación por carta de crédito: si varios vehículos tienen el mismo número de carta de crédito, sus estados de completitud se validan **en conjunto**. Los íconos de estado reflejan si **todos** los registros de la carta están completos o si aún hay pendientes. |
+| **Credit Letter Group = INACTIVA** | El sistema NO agrupa por carta de crédito: cada vehículo se valida de forma **individual**. Los íconos de estado solo reflejan la completitud del propio registro (tiene/no tiene los documentos requeridos según reglas del tenant). |
+
+**Íconos de estado en columna VIN:**
+
+| Ícono | Estado | Cuándo aparece | Configuración |
+|---|---|---|---|
+| ⚠️ **Warning (triángulo amarillo/naranja)** | Faltan documentos | Al registro le faltan documentos para estar completo según las reglas de completitud del tenant | Aplica con Credit Letter Group **ACTIVA** o **INACTIVA** |
+| 🕒 **Relojito azul** | Completado documentalmente, pero carta pendiente | El registro **está completo documentalmente**, pero **otros vehículos dentro de la misma carta de crédito aún NO están completos** | **Solo** cuando Credit Letter Group está **ACTIVA** |
+| ✅ **Check verde** | Liberado / Completado | **Con agrupación (ACTIVA):** Todos los vehículos de la carta de crédito están completos documentalmente<br/>**Sin agrupación (INACTIVA):** El registro individual está completo documentalmente | Aplica con Credit Letter Group **ACTIVA** o **INACTIVA** |
+
+**Flujo con Credit Letter Group ACTIVA (agrupación habilitada):**
+
+1. Usuario importa 3 vehículos que comparten el mismo número de carta de crédito (ej. "90625419").
+2. **Estado inicial:** Los 3 vehículos muestran ⚠️ **warning** porque les faltan documentos (ej. falta CO o CPA).
+3. **Primer vehículo completo:** El usuario sube todos los documentos del primer vehículo → ese vehículo cambia de ⚠️ **warning** a 🕒 **relojito azul** (indica: "yo estoy completo, pero mis hermanos de carta aún no").
+4. **Segundo vehículo completo:** El usuario sube todos los documentos del segundo vehículo → ese vehículo también cambia a 🕒 **relojito azul**.
+5. **Tercer vehículo completo:** El usuario sube todos los documentos del tercer vehículo → **los 3 vehículos** cambian simultáneamente de 🕒 **relojito azul** a ✅ **check verde** (todos completos → carta liberada).
+
+**Flujo con Credit Letter Group INACTIVA (sin agrupación):**
+
+1. Usuario importa 3 vehículos que comparten el mismo número de carta de crédito (ej. "90625419").
+2. **Estado inicial:** Los 3 vehículos muestran ⚠️ **warning** porque les faltan documentos.
+3. **Primer vehículo completo:** El usuario sube todos los documentos del primer vehículo → ese vehículo cambia **directamente** de ⚠️ **warning** a ✅ **check verde** (sin pasar por relojito azul — cada vehículo es independiente).
+4. **Segundo y tercer vehículo:** Cada uno cambia a ✅ **check verde** individualmente cuando el usuario complete sus documentos — no hay dependencia entre ellos.
+
+**Botón "Liberar Manualmente" / "Release Manual":**
+
+| Elemento | Tipo | Texto/label literal | Comportamiento |
+|---|---|---|---|
+| Botón (individual) | botón en menú "..." de la fila | "Liberar Manualmente" (o "Release Manual") | Hace que el registro **se libere para el cliente sin importar su estado de completitud**: aunque tenga ⚠️ warning (faltan documentos), o aunque esté con 🕒 relojito azul (carta pendiente), **se marca como liberado** y el cliente puede acceder al vehículo. Es una **acción manual** que **sobrepasa** las reglas de completitud automáticas. |
+
+**Reglas de completitud del tenant:**
+
+- La configuración de qué documentos son **requeridos** para considerar un vehículo "completo" se gestiona en **Mantenimiento > Reglas de Completitud** (o configuración del tenant).
+- Ejemplos de documentos requeridos: CO (Certificado de Origen), CPA (Certificado de Pago de Arbitrios), Factura, Carta Exento de Arbitrios, etc.
+- Si un documento requerido falta → el vehículo muestra ⚠️ **warning**.
+- Si todos los documentos requeridos están presentes → el vehículo **puede** pasar a 🕒 **relojito azul** (si hay agrupación y su carta está pendiente) o a ✅ **check verde** (si no hay agrupación o toda su carta está completa).
+
+**Screenshots:**
+
+![vehiculos-importados-credit-letter-group-1](screenshots/vehiculos-importados-credit-letter-group-1.png) — ejemplo de vehículos con mismo número de carta de crédito mostrando íconos de estado  
+![vehiculos-importados-credit-letter-group-2](screenshots/vehiculos-importados-credit-letter-group-2.png) — vista de la tabla con múltiples vehículos y sus estados  
+![vehiculos-importados-credit-letter-group-3](screenshots/vehiculos-importados-credit-letter-group-3.png) — ejemplo de transición de estados
+
+**Notas para TCs:**
+
+- **US-11268, 11773, 11269:** Feature de agrupación por carta de crédito y validación de completitud — permite al Distribuidor visualizar el estado de completitud de vehículos agrupados por carta de crédito.
+- Los TCs deben cubrir **ambos escenarios** (Credit Letter Group ACTIVA vs INACTIVA) — el comportamiento de los íconos cambia radicalmente según la configuración del tenant.
+- El **relojito azul 🕒 solo aparece cuando Credit Letter Group está ACTIVA** — si la configuración está inactiva, los vehículos pasan directamente de ⚠️ warning a ✅ check verde sin ícono intermedio.
+- El botón "Liberar Manualmente" es una **excepción manual** a las reglas automáticas — un TC debe validar que un vehículo con ⚠️ warning (documentos faltantes) puede liberarse manualmente y que el cliente puede acceder a él después de la liberación.
+- **Contexto funcional completo:** Cuando varios vehículos tienen el mismo número de carta de crédito y Credit Letter Group está activa, el sistema aplica la siguiente lógica:
+  1. Si **al menos uno** de los vehículos de la carta tiene documentos faltantes → **todos** muestran ⚠️ warning (o el ícono que corresponda según su estado individual).
+  2. Si **un vehículo** completa todos sus documentos requeridos pero **otros vehículos de su carta aún NO** → ese vehículo muestra 🕒 relojito azul (completo, esperando a sus hermanos).
+  3. Cuando **todos** los vehículos de la carta completen sus documentos requeridos → **todos** cambian simultáneamente a ✅ check verde (carta liberada automáticamente).
+  4. Si se usa "Liberar Manualmente" en cualquier vehículo → ese vehículo se libera **independientemente** de su estado o del estado de su carta (bypasa las reglas automáticas).
+---
+
+## Motorambar > Administración > Notificaciones Diarias
+- **Ruta/URL:** pendiente confirmar (accesible desde sidebar > Administración)
+- **Cómo se llega aquí:** En el menú lateral (sidebar), hacer clic en "Administración" → seleccionar "Notificaciones Diarias" del submenu desplegable.
+- **Elementos clave:**
+  | Elemento | Tipo | Texto/label literal | Comportamiento |
+  |---|---|---|---|
+  | Título de página | texto | "Administración" | título principal de la pantalla |
+  | Tabs/pestañas | nav tabs | "Notificaciones Diarias" | tab activo/seleccionado (puede haber otras pestañas en Administración — pendiente documentar) |
+  | Campo Tenant | dropdown | label "Tenant", valor "Motorambar" | selecciona el tenant para el cual se configurará el reporte diario |
+  | Sección | card/grupo | "Configuración de reporte diario" | ícono de sobre ✉ + título de sección |
+  | Timestamp último envío | texto info | "Último envío: 10/7/2026. 13:21:14" | muestra fecha y hora del último email enviado; formato dd/mm/yyyy. HH:mm:ss |
+  | Campo hora de envío | time picker | label "HORA DE ENVÍO (UTC)", placeholder/valor "08:00" | permite seleccionar la hora del día (formato 24h) en que se enviará el email consolidado; incluye dropdown con horarios cada hora (08, 09, 10, 11, 12, 13, 14, 15...); texto descriptivo debajo: "El reporte se enviará automáticamente a esta hora en UTC." |
+  | Campo idioma template | dropdown | label "IDIOMA DEL TEMPLATE", valor "Español" | selecciona el idioma del template HTML del email; texto descriptivo debajo: "Determina el idioma del template sembrado al crear la configuración." |
+  | Campo destinatarios | input email | label "DESTINATARIOS (TO)", placeholder/valor "jmartinez@portaldevehiculos.com" | campo de texto para ingresar emails de destinatarios principales; acepta múltiples emails separados por coma; texto descriptivo debajo: "Separar múltiples emails con coma." |
+  | Campo copia | input email | label "COPIA (CC) (opcional)", placeholder/valor "copia@empresa.com" | campo de texto para emails en copia; acepta múltiples emails separados por coma |
+  | Toggle activo | switch on/off | label "Activo" | interruptor que habilita/deshabilita el envío del reporte diario; estado actual: ON (morado) |
+  | Nota informativa | texto info | "El template HTML se gestiona desde Plantillas Email. Key: daily-activity-report. Puedes personalizarlo desde esa sección." | texto en gris claro con información sobre cómo personalizar el template |
+  | Botón guardar | botón primario morado | "Guardar" | guarda la configuración actual |
+  | Botón enviar prueba | botón outline | "Enviar prueba" | envía un email de prueba con la configuración actual (ícono de enviar ✉📨) |
+- **Estados:**
+  - Con configuración existente (campos pre-llenados con valores guardados, timestamp de último envío visible).
+  - Sin configuración (campos vacíos, sin timestamp — pendiente confirmar).
+  - Toggle "Activo" ON (morado) / OFF (gris).
+  - Loading al guardar o enviar prueba — pendiente confirmar UI.
+  - Error al guardar/enviar — pendiente confirmar mensaje de error.
+- **Screenshot:** Las dos imágenes proporcionadas por el usuario muestran la pantalla completa con todos los campos documentados arriba.
+- **Notas para TCs:**
+  - **US-11658:** Sistema de notificaciones diarias consolidadas por email. Esta pantalla permite al Distribuidor configurar la hora de envío (UTC), idioma del template, destinatarios (TO + CC), y activar/desactivar el envío automático del reporte diario.
+  - El template HTML se gestiona en una pantalla separada ("Plantillas Email", key: `daily-activity-report`) — los TCs de configuración de notificaciones NO deben intentar editar el template desde esta pantalla, solo configurar destinatarios/hora/idioma/estado activo.
+  - El botón "Enviar prueba" permite validar la configuración sin esperar la hora programada — ideal para TCs de validación de envío y estructura del email.
+  - La hora es en UTC — los TCs deben documentar claramente que el email se enviará a la hora UTC configurada, independientemente de la zona horaria del usuario.
+---
 - **Antes de la US 11369:** los filtros eran dropdowns simples de un solo valor — si el usuario quería ver vehículos con Estado CO "Pendiente" **y** "Completado" a la vez, tenía que hacerlo en 2 consultas separadas; ahora puede hacerlo en 1 sola consulta seleccionando ambos valores.
 
 ---
